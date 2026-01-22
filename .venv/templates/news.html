@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>News & Activities | OSCCPA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Standard Favicon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --lilac-primary:#8a6fbf;
+  --lilac-light:#f3eefb;
+  --lilac-dark:#5f4b8b;
+  --text-dark:#333;
+  --border:#e2d9f3;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#faf9fd;
+  color:var(--text-dark);
+}
+
+/* ================= HEADER ================= */
+.main-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 6%;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  max-width:75%;
+}
+
+.logo img{
+  height:65px;
+}
+
+.header-divider{
+  width:2px;
+  height:60px;
+  background:var(--lilac-dark);
+}
+
+.header-text{
+  line-height:1.2;
+}
+
+.header-text h2{
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+  color:var(--lilac-dark);
+}
+
+.header-text p{
+  margin:3px 0 0;
+  font-size:13px;
+  color:#555;
+}
+
+/* ================= NAV ================= */
+nav ul{
+  display:flex;
+  gap:22px;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+nav a{
+  text-decoration:none;
+  font-weight:600;
+  color:#444;
+}
+
+nav a:hover{
+  color:var(--lilac-primary);
+}
+
+/* ================= MOBILE MENU ================= */
+.mobile-menu-toggle{
+  display:none;
+  width:42px;
+  height:42px;
+  background:var(--lilac-light);
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.mobile-menu-toggle span{
+  position:absolute;
+  width:22px;
+  height:2.5px;
+  background:var(--lilac-dark);
+  border-radius:2px;
+  transition:.3s ease;
+}
+
+.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px);}
+.mobile-menu-toggle span:nth-child(3){transform:translateY(7px);}
+
+.mobile-menu-toggle.active span:nth-child(1){
+  transform:rotate(45deg);
+}
+.mobile-menu-toggle.active span:nth-child(2){
+  opacity:0;
+}
+.mobile-menu-toggle.active span:nth-child(3){
+  transform:rotate(-45deg);
+}
+
+/* Mobile dropdown */
+.mobile-menu{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .4s ease;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.mobile-menu.open{
+  max-height:500px;
+}
+
+.mobile-menu a{
+  padding:16px 6%;
+  text-decoration:none;
+  border-bottom:1px solid #eee;
+  color:#1f2937;
+  font-weight:600;
+}
+
+/* ================= PAGE ================= */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:30px 20px 50px;
+}
+
+h1{
+  text-align:center;
+  color:var(--lilac-dark);
+}
+
+.subtitle{
+  text-align:center;
+  color:#666;
+  margin-bottom:40px;
+}
+
+/* ================= NEWS ================= */
+.news-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:30px;
+}
+
+.news-card{
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  transition:transform .3s ease;
+}
+
+.news-card:hover{
+  transform:translateY(-4px);
+}
+
+.news-image{
+  position:relative;
+}
+
+.news-image img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+}
+
+.badge{
+  position:absolute;
+  top:12px;
+  left:12px;
+  background:var(--lilac-primary);
+  color:#fff;
+  font-size:12px;
+  padding:5px 12px;
+  border-radius:20px;
+}
+
+.news-content{
+  padding:20px;
+}
+
+.news-content h3{
+  margin:0 0 6px;
+  font-size:18px;
+  color:var(--lilac-dark);
+}
+
+.date{
+  font-size:12px;
+  color:#777;
+}
+
+.preview,
+.more-text{
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* Read more animation */
+.more-text{
+  display:none;
+  margin-top:10px;
+}
+
+.more-text.show{
+  display:block;
+}
+
+/* ================= ACTIONS ================= */
+.actions{
+  margin-top:16px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.read-more{
+  background:none;
+  border:none;
+  color:var(--lilac-primary);
+  font-weight:600;
+  cursor:pointer;
+  padding:0;
+}
+
+.gallery-btn{
+  background:var(--lilac-light);
+  border:1px solid var(--border);
+  padding:7px 16px;
+  border-radius:20px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* ================= GALLERY ================= */
+.gallery{
+  display:none;
+  padding:15px;
+  border-top:1px solid var(--border);
+  background:#faf7ff;
+  grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
+  gap:10px;
+}
+
+.gallery.show{
+  display:grid;
+}
+
+.gallery img{
+  width:100%;
+  height:90px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+  nav{display:none;}
+  .mobile-menu-toggle{display:flex;}
+  .header-divider{display:none;}
+  .header-left{max-width:85%;}
+  .header-text h2{font-size:15px;}
+  .header-text p{font-size:12px;}
+  .logo img{height:55px;}
+}
+
+@media(max-width:480px){
+  h1{font-size:22px;}
+  .news-image img{height:180px;}
+  .actions{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="main-header">
+  <div class="header-left">
+    <div class="logo">
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition & Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
+    </div>
+  </div>
+
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/news">News</a>
+    <a href="/services">Services</a>
+    <a href="/complaints">Complaints</a>
+    <a href="/contact">Contact</a>
+  </div>
+</header>
+
+
+  <div class="container">
+  <h1>News & Recent Activities</h1>
+  <p class="subtitle">
+    Updates on OSCCPA interventions, stakeholder engagements, and market activities
+  </p>
+
+  <div class="news-grid">
+
+    <!-- NEWS ITEM -->
+    <div class="news-card">
+
+      <div class="news-image">
+        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}">
+        <span class="badge">Market Regulation</span>
+      </div>
+
+      <div class="news-content">
+        <h3>Ondo State Consumer Protection Agency Strengthens Ties with FCCPC</h3>
+        <p class="date">April, 16, 2025</p>
+
+        <p class="preview">
+        In a strategic move to deepen consumer protection and promote fair competition in Ondo State, the Ondo State Competition and Consumer Protection Agency has undertaken a high-level familiarization visit to the Federal Competition and Consumer Protection Commission (FCCPC) in Abuja.
+        </p>
+
+        <p class="more-text">
+The visit, which marks a significant step in regulatory collaboration, was aimed at fostering knowledge sharing, replicating best practices, and exploring avenues for joint initiatives between the two agencies.
+
+The FCCPC, Nigeria’s apex consumer protection and competition regulator, plays a critical role in safeguarding consumer rights and ensuring a fair marketplace. Its mandate spans across key areas including consumer protection, competition regulation, and business education. The Commission is renowned for its robust mechanisms in handling consumer complaints, regulating market conduct, and educating both businesses and consumers on their rights and responsibilities.
+
+During the visit, the Ondo State delegation led by the Administrative Secretary Hajia Kudirat Ola engaged extensively with FCCPC officials on topics central to strengthening consumer protection frameworks at the subnational level.
+          Speaking during the engagement, the Administrative Secretary, Hajia Kudirat Ola, emphasized their commitment to building a responsive, transparent, and effective consumer protection system that reflects global best practices while addressing local realities.
+
+"The visit has been an eye-opener," said one senior official from the Ondo State agency. "We now have clearer insights into how to strengthen our complaint resolution systems, raise consumer awareness, and ensure that businesses in Ondo State adhere to fair trade practices."
+          The FCCPC lauded the initiative, reaffirming its readiness to support state-level agencies in advancing the national goal of a consumer-centric and competition-friendly economy. As more states take proactive steps toward building their regulatory capacities, partnerships like this signal a positive shift toward a more decentralized and efficient consumer protection landscape in Nigeria.
+
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Read More</button>
+          <button class="gallery-btn">View Gallery</button>
+        </div>
+      </div>
+
+      <!-- IMAGE GALLERY -->
+      <div class="gallery">
+        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}">
+        <img src="{{ url_for('static', filename='gallery/fcpc2.jpg') }}">
+        <img src="{{ url_for('static', filename='gallery/fcpc3.jpg') }}">
+        <img src="{{ url_for('static', filename='gallery/fcpc4.jpg') }}">
+      </div>
+
+    </div>
+
+    <!-- NEWS ITEM 2 -->
+    <div class="news-card">
+      <div class="news-image">
+        <img src="{{ url_for('static', filename='news/stakeholder.jpg') }}">
+        <span class="badge">Stakeholder Engagement</span>
+      </div>
+
+      <div class="news-content">
+        <h3>Stakeholders Engagement with Traders</h3>
+        <p class="date">December 2025</p>
+
+        <p class="preview">
+          The agency engaged market leaders and trade unions on consumer
+          protection laws and ethical business practices.
+        </p>
+
+        <p class="more-text">
+          Discussions focused on dispute resolution, transparency in pricing,
+          and strengthening collaboration between traders and government.
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Read More</button>
+          <button class="gallery-btn">View Gallery</button>
+        </div>
+      </div>
+
+      <div class="gallery">
+        <img src="{{ url_for('static', filename='news/gallery4.jpg') }}">
+        <img src="{{ url_for('static', filename='news/gallery5.jpg') }}">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const toggle = document.querySelector(".mobile-menu-toggle");
+  const menu = document.getElementById("mobileMenu");
+
+  /* ---------------- MOBILE MENU TOGGLE ---------------- */
+  if (toggle && menu) {
+    toggle.addEventListener("click", () => {
+      toggle.classList.toggle("active");
+      menu.classList.toggle("open");
+    });
+
+    // Close menu when clicking a link
+    menu.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        toggle.classList.remove("active");
+        menu.classList.remove("open");
+      }
+    });
+
+    // Reset menu on desktop resize
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 768) {
+        toggle.classList.remove("active");
+        menu.classList.remove("open");
+      }
+    });
+  }
+
+  /* ---------------- READ MORE TOGGLE ---------------- */
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("read-more")) {
+      const card = e.target.closest(".news-card");
+      if (!card) return;
+
+      const moreText = card.querySelector(".more-text");
+      if (!moreText) return;
+
+      const isOpen = moreText.classList.toggle("show");
+      e.target.textContent = isOpen ? "Read Less" : "Read More";
+    }
+  });
+
+  /* ---------------- GALLERY TOGGLE ---------------- */
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("gallery-btn")) {
+      const card = e.target.closest(".news-card");
+      if (!card) return;
+
+      const gallery = card.querySelector(".gallery");
+      if (!gallery) return;
+
+      const isOpen = gallery.classList.toggle("show");
+      e.target.textContent = isOpen ? "Hide Gallery" : "View Gallery";
+    }
+  });
+
+});
+</script>
+
+</body>
+</html>

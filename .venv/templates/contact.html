@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | OSCCPA</title>
+<!-- Standard Favicon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#5f4b8b;
+  --primary-light:#f3eefb;
+  --primary-dark:#43317b;
+  --text-dark:#333;
+  --border:#e2d9f3;
+}
+
+/* ===== RESET ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Poppins',sans-serif;
+  background:#f6f5fb;
+  color:var(--text-dark);
+}
+
+/* ================= HEADER (SAME AS NEWS PAGE) ================= */
+.main-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 6%;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  max-width:75%;
+}
+
+.logo img{height:60px}
+
+.header-divider{
+  width:2px;
+  height:60px;
+  background:var(--primary);
+}
+
+.header-text h2{
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+  color:var(--primary);
+  line-height:1.2;
+}
+
+.header-text p{
+  margin-top:4px;
+  font-size:13px;
+  color:#555;
+}
+
+/* NAV */
+nav ul{
+  display:flex;
+  list-style:none;
+  gap:22px;
+}
+
+nav a{
+  text-decoration:none;
+  font-weight:600;
+  color:#444;
+}
+
+nav a:hover{color:var(--primary)}
+
+/* MOBILE TOGGLE */
+.mobile-menu-toggle{
+  display:none;
+  width:40px;
+  height:40px;
+  background:var(--primary-light);
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  position:relative;
+}
+
+.mobile-menu-toggle span{
+  position:absolute;
+  width:22px;
+  height:2.5px;
+  background:var(--primary);
+  border-radius:2px;
+  transition:.3s;
+}
+
+.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px)}
+.mobile-menu-toggle span:nth-child(3){transform:translateY(7px)}
+
+.mobile-menu-toggle.active span:nth-child(1){transform:rotate(45deg)}
+.mobile-menu-toggle.active span:nth-child(2){opacity:0}
+.mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg)}
+
+.mobile-menu{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .4s ease;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.mobile-menu.open{max-height:500px}
+
+.mobile-menu a{
+  padding:16px 6%;
+  text-decoration:none;
+  border-bottom:1px solid #eee;
+  color:#1f2937;
+  font-weight:600;
+}
+
+/* ================= PAGE ================= */
+.container{
+  max-width:1100px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+h1{text-align:center;color:var(--primary);margin-bottom:8px}
+.subtitle{text-align:center;color:#555;margin-bottom:40px}
+
+/* CONTACT CARDS */
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  margin-bottom:50px;
+}
+
+.contact-card{
+  background:#fff;
+  border-radius:14px;
+  padding:28px 20px;
+  text-align:center;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.contact-card h3{color:var(--primary);margin-bottom:12px}
+.contact-card a{text-decoration:none;color:var(--primary);font-weight:600}
+
+/* FORM */
+.contact-form{
+  background:#fff;
+  padding:30px;
+  border-radius:14px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  max-width:700px;
+  margin:auto;
+}
+
+.contact-form label{display:block;margin-bottom:6px;font-weight:500}
+.contact-form input,
+.contact-form textarea{
+  width:100%;
+  padding:12px;
+  margin-bottom:16px;
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+
+.contact-form button{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  padding:12px 28px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* WHATSAPP */
+.whatsapp-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25D366;
+  color:#fff;
+  padding:14px 18px;
+  border-radius:50px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  text-decoration:none;
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+  nav{display:none}
+  .mobile-menu-toggle{display:flex}
+  .header-divider{display:none}
+  .header-text h2{font-size:15px}
+  .header-text p{font-size:12px}
+}
+.contact-card a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-weight:600;
+  margin-top:6px;
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="main-header">
+  <div class="header-left">
+    <div class="logo">
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition & Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
+    </div>
+  </div>
+
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News & Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/news">News & Activities</a>
+    <a href="/services">Services</a>
+    <a href="/complaints">Complaints</a>
+    <a href="/contact">Contact</a>
+  </div>
+</header>
+
+<!-- ===== PAGE CONTENT ===== -->
+<div class="container">
+  <h1>Contact OSCCPA</h1>
+  <p class="subtitle">Reach us via email, WhatsApp, or the form below</p>
+  <div class="contact-grid">
+
+  <!-- EMAIL -->
+  <div class="contact-card">
+    <h3>Email</h3>
+    <p>info@osccpa.gov.ng</p>
+    <a href="mailto:info@osccpa.gov.ng">Send Email</a>
+  </div>
+
+  <!-- SOCIAL MEDIA -->
+  <div class="contact-card">
+    <h3>Follow Us</h3>
+    <p>Stay connected with OSCCPA</p>
+
+    <a href="https://facebook.com/osccpa" target="_blank">
+      <img src="{{ url_for('static', filename='logo/facebook.png') }}" width="22">
+      Facebook
+    </a><br><br>
+
+    <a href="https://twitter.com/osccpa" target="_blank">
+      <img src="{{ url_for('static', filename='logo/x.png') }}" width="22">
+      Twitter (X)
+    </a><br><br>
+
+    <a href="https://instagram.com/osccpa" target="_blank">
+      <img src="{{ url_for('static', filename='logo/instagram.png') }}" width="22">
+      Instagram
+    </a>
+  </div>
+
+  <!-- WHATSAPP -->
+  <div class="contact-card">
+    <h3>Phone / WhatsApp</h3>
+    <p>Chat directly with our support team</p>
+    <a href="https://wa.me/2348012345678" target="_blank">
+      Start Chat
+    </a>
+  </div>
+</div>
+
+<form method="POST" class="contact-form">
+  <label>Full Name</label>
+  <input type="text" name="name" placeholder="Your full name" required>
+
+  <label>Email</label>
+  <input type="email" name="email" placeholder="you@example.com" required>
+
+  <label>Phone</label>
+  <input type="text" name="phone" placeholder="+2348012345678" required>
+
+  <label>Subject</label>
+  <input type="text" name="subject" placeholder="Subject of your message" required>
+
+  <label>Message</label>
+  <textarea name="message" rows="6" placeholder="Write your message here..." required></textarea>
+
+  <button type="submit">Send Message</button>
+</form>
+
+
+<a href="https://wa.me/2348012345678" class="whatsapp-btn">
+  <img src="{{ url_for('static', filename='logo/whatsapp.png') }}" width="22"> Chat Now
+</a>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const toggle=document.querySelector(".mobile-menu-toggle");
+  const menu=document.getElementById("mobileMenu");
+
+  toggle.addEventListener("click",()=>{
+    toggle.classList.toggle("active");
+    menu.classList.toggle("open");
+  });
+
+  document.querySelectorAll(".mobile-menu a").forEach(link=>{
+    link.addEventListener("click",()=>{
+      toggle.classList.remove("active");
+      menu.classList.remove("open");
+    });
+  });
+
+  window.addEventListener("resize",()=>{
+    if(window.innerWidth>768){
+      toggle.classList.remove("active");
+      menu.classList.remove("open");
+    }
+  });
+});
+</script>
+</div>
+</body>
+</html>

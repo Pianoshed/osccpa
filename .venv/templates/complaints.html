@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File a Complaint | OSCCPA</title>
+
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --lilac-primary:#8b5cf6;
+  --lilac-dark:#6d28d9;
+  --lilac-soft:#f5f3ff;
+  --text-dark:#1f2937;
+}
+
+/* ================= BASE ================= */
+*{box-sizing:border-box;}
+body{
+  font-family:'Roboto',sans-serif;
+  margin:0;
+  background:#f9fafb;
+  color:var(--text-dark);
+}
+
+/* ================= HEADER ================= */
+.main-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 8%;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  position:relative;
+  z-index:1000;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.logo img{height:70px;}
+
+.header-divider{
+  width:2px;
+  height:70px;
+  background:var(--lilac-dark);
+}
+
+.header-text h2{
+  font-family:'Poppins',sans-serif;
+  font-size:26px;
+  font-weight:700;
+  color:var(--lilac-dark);
+  margin:0;
+}
+.header-text p{
+  font-size:14px;
+  margin-top:4px;
+  color:#555;
+}
+
+/* NAV */
+nav ul{
+  display:flex;
+  list-style:none;
+  gap:22px;
+  margin:0;
+  padding:0;
+}
+nav a{
+  text-decoration:none;
+  font-weight:600;
+  color:#444;
+}
+nav a:hover{color:var(--lilac-primary);}
+
+/* MOBILE MENU */
+.mobile-menu-toggle{
+  display:none;
+  width:42px;
+  height:42px;
+  background:var(--lilac-soft);
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.mobile-menu-toggle span{
+  position:absolute;
+  width:22px;
+  height:2.5px;
+  background:var(--lilac-dark);
+  transition:.3s;
+}
+.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px)}
+.mobile-menu-toggle span:nth-child(3){transform:translateY(7px)}
+
+.mobile-menu-toggle.active span:nth-child(1){transform:rotate(45deg)}
+.mobile-menu-toggle.active span:nth-child(2){opacity:0}
+.mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg)}
+
+.mobile-menu{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:#fff;
+  max-height:0;
+  overflow:hidden;
+  transition:.4s;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+.mobile-menu.open{max-height:400px;}
+.mobile-menu a{
+  display:block;
+  padding:16px 8%;
+  border-bottom:1px solid #eee;
+  text-decoration:none;
+  color:#111;
+  font-weight:600;
+}
+
+/* Responsive Header */
+@media(max-width:768px){
+  nav{display:none;}
+  .mobile-menu-toggle{display:flex;}
+  .header-divider{display:none;}
+  .header-text h2{font-size:16px;}
+  .header-text p{font-size:12px;}
+}
+
+/* ================= HERO WITH IMAGE ================= */
+.complaint-hero{
+  position:relative;
+  background:url("{{ url_for('static', filename='images/complaint_hero.jpg') }}") center/cover no-repeat;
+  padding:100px 10%;
+  color:#fff;
+  text-align:center;
+}
+.complaint-hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(rgba(109,40,217,.78),rgba(109,40,217,.78));
+}
+.complaint-hero-content{
+  position:relative;
+  max-width:850px;
+  margin:auto;
+}
+.complaint-hero h1{
+  font-family:'Poppins',sans-serif;
+  font-size:42px;
+}
+.complaint-hero p{
+  margin-top:12px;
+  font-size:17px;
+  line-height:1.6;
+}
+
+/* ================= SECTION ================= */
+.section{
+  padding:70px 10%;
+}
+
+/* ================= FORM BOX ================= */
+.form-box{
+  max-width:900px;
+  margin:auto;
+  background:#fff;
+  padding:40px;
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+.form-box h2{
+  font-family:'Poppins',sans-serif;
+  color:var(--lilac-dark);
+}
+.form-box p{
+  color:#555;
+  margin-bottom:25px;
+  font-size:15px;
+}
+
+/* GRID */
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+.form-group{display:flex;flex-direction:column;}
+.form-group.full{grid-column:1/-1;}
+
+label{
+  font-size:14px;
+  font-weight:500;
+  margin-bottom:6px;
+}
+
+input, select, textarea{
+  padding:12px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+  font-size:14px;
+  font-family:'Roboto',sans-serif;
+}
+textarea{min-height:120px;resize:vertical;}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--lilac-primary);
+}
+
+/* CHECKBOX */
+.checkbox{
+  display:flex;
+  gap:10px;
+  font-size:14px;
+  margin-top:18px;
+}
+.checkbox span{flex:1;}
+
+/* BUTTON */
+.submit-btn{
+  margin-top:25px;
+  background:var(--lilac-primary);
+  color:#fff;
+  padding:14px;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  width:100%;
+}
+.submit-btn:hover{background:var(--lilac-dark);}
+
+/* NOTE */
+.note{
+  font-size:13px;
+  color:#555;
+  margin-top:18px;
+}
+
+/* ================= MOBILE COMPACT MODE ================= */
+@media(max-width:768px){
+  .complaint-hero{padding:65px 6%;}
+  .complaint-hero h1{font-size:24px;}
+  .complaint-hero p{font-size:14px;}
+
+  .section{padding:45px 6%;}
+  .form-box{padding:22px;}
+
+  .form-grid{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  input,select,textarea{
+    padding:9px;
+    font-size:13px;
+  }
+
+  textarea{min-height:100px;}
+}
+
+/* EXTRA SMALL PHONES */
+@media(max-width:480px){
+  .form-box{padding:18px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+  <div class="header-left">
+    <div class="logo">
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition & Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
+    </div>
+  </div>
+
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News & Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/news">News & Activities</a>
+    <a href="/services">Services</a>
+    <a href="/complaints">Complaints</a>
+    <a href="/contact">Contact</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="complaint-hero">
+  <div class="complaint-hero-content">
+    <h1>File a Consumer Complaint</h1>
+    <p>
+      OSCCPA is committed to resolving consumer complaints fairly,
+      transparently, and promptly across Ondo State.
+    </p>
+  </div>
+</section>
+
+<!-- ================= FORM SECTION ================= -->
+<section class="section">
+  <div class="form-box">
+    <h2>Complaint Submission Form</h2>
+    <p>Please complete this form accurately. All information is confidential.</p>
+
+    <form method="POST" action="/complaints" enctype="multipart/form-data">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="full_name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="tel" name="phone" required>
+        </div>
+
+        <div class="form-group">
+          <label>Local Government Area *</label>
+          <select name="lga" required>
+            <option value="">Select LGA</option>
+            <option>Akure South</option>
+            <option>Akure North</option>
+            <option>Owo</option>
+            <option>Ondo West</option>
+            <option>Ondo East</option>
+            <option>Okitipupa</option>
+            <option>Ikare</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Name of Business / Trader *</label>
+          <input type="text" name="business_name" required>
+        </div>
+
+        <div class="form-group full">
+          <label>Nature of Complaint *</label>
+          <select name="complaint_type" required>
+            <option value="">Select Complaint Type</option>
+            <option>Overpricing</option>
+            <option>Substandard Product</option>
+            <option>Fake or Counterfeit Goods</option>
+            <option>Unfair Business Practice</option>
+            <option>Refusal to Refund</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Complaint Details *</label>
+          <textarea name="complaint_details" required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label>Upload Evidence (Optional)</label>
+          <input type="file" name="evidence">
+        </div>
+
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" required>
+        <span>I confirm that the information provided is true and accurate.</span>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Complaint</button>
+
+      <p class="note">
+        After submission, your complaint will be reviewed and assigned to an OSCCPA officer.
+      </p>
+
+    </form>
+  </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+function toggleMobileMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  document.querySelector(".mobile-menu-toggle").classList.toggle("active");
+}
+document.querySelectorAll(".mobile-menu a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    document.getElementById("mobileMenu").classList.remove("open");
+    document.querySelector(".mobile-menu-toggle").classList.remove("active");
+  });
+});
+</script>
+
+</body>
+</html>

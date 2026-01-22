@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumer Services | OSCCPA</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --lilac-primary:#8b5cf6;
+  --lilac-dark:#6d28d9;
+  --lilac-soft:#f5f3ff;
+  --text-dark:#1f2937;
+}
+
+/* ================= HEADER ================= */
+body{
+  font-family:'Roboto',sans-serif;
+  margin:0;
+  background:#fff;
+  color:var(--text-dark);
+}
+
+.main-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 8%;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  position:relative;
+  z-index:1000;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.logo img{
+  height:70px;
+}
+
+.header-divider{
+  width:2px;
+  height:70px;
+  background:var(--lilac-dark);
+}
+
+.header-text h2{
+  font-family:'Poppins',sans-serif;
+  font-size:26px;
+  font-weight:700;
+  color:var(--lilac-dark);
+  margin:0;
+}
+.header-text p{
+  font-size:14px;
+  margin-top:4px;
+  color:#555;
+}
+
+/* Desktop Nav */
+nav ul{
+  display:flex;
+  list-style:none;
+  gap:22px;
+  margin:0;
+  padding:0;
+}
+nav a{
+  text-decoration:none;
+  font-weight:600;
+  color:#444;
+}
+nav a:hover{color:var(--lilac-primary);}
+
+/* Mobile Menu */
+.mobile-menu-toggle{
+  display:none;
+  width:42px;
+  height:42px;
+  border:none;
+  background:var(--lilac-soft);
+  border-radius:10px;
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.mobile-menu-toggle span{
+  position:absolute;
+  width:22px;
+  height:2.5px;
+  background:var(--lilac-dark);
+  transition:.3s;
+}
+.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px)}
+.mobile-menu-toggle span:nth-child(3){transform:translateY(7px)}
+
+.mobile-menu-toggle.active span:nth-child(1){transform:rotate(45deg)}
+.mobile-menu-toggle.active span:nth-child(2){opacity:0}
+.mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg)}
+
+.mobile-menu{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:#fff;
+  max-height:0;
+  overflow:hidden;
+  transition:.4s;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+.mobile-menu.open{max-height:400px;}
+.mobile-menu a{
+  display:block;
+  padding:16px 8%;
+  border-bottom:1px solid #eee;
+  text-decoration:none;
+  color:#111;
+  font-weight:600;
+}
+
+/* Responsive Header */
+@media(max-width:768px){
+  nav{display:none;}
+  .mobile-menu-toggle{display:flex;}
+  .header-divider{display:none;}
+  .header-text h2{font-size:16px;}
+  .header-text p{font-size:12px;}
+}
+
+/* ================= HERO WITH IMAGE ================= */
+.services-hero{
+  position:relative;
+  background:url("{{ url_for('static', filename='gallery/partnerncdc.jpg') }}") center/cover no-repeat;
+  padding:110px 10%;
+  color:#fff;
+}
+
+.services-hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(rgba(109,40,217,.75),rgba(109,40,217,.75));
+}
+
+.services-hero-overlay{
+  position:relative;
+  text-align:center;
+  max-width:900px;
+  margin:auto;
+}
+
+.services-hero h1{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  margin-bottom:10px;
+}
+.services-hero p{
+  font-size:18px;
+  line-height:1.6;
+}
+
+/* ================= SECTIONS ================= */
+.section{
+  padding:80px 10%;
+}
+.section.light{background:var(--lilac-soft)}
+
+.section h2{
+  font-family:'Poppins',sans-serif;
+  font-size:32px;
+  color:var(--lilac-dark);
+  margin-bottom:18px;
+}
+.section p{
+  line-height:1.8;
+  max-width:900px;
+}
+
+/* ================= SERVICES GRID ================= */
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+  margin-top:35px;
+}
+
+.service-card{
+  background:#fff;
+  padding:30px;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition:.3s;
+}
+.service-card:hover{transform:translateY(-6px);}
+.service-card h3{
+  color:var(--lilac-primary);
+  margin-bottom:10px;
+}
+
+/* ================= PROCESS ================= */
+.process{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+  margin-top:30px;
+}
+.step{
+  background:#fff;
+  border-left:6px solid var(--lilac-primary);
+  padding:25px;
+  border-radius:10px;
+}
+.step span{
+  font-weight:bold;
+  color:var(--lilac-dark);
+}
+
+/* ================= CTA ================= */
+.cta{
+  background:var(--lilac-primary);
+  color:#fff;
+  padding:70px 10%;
+  text-align:center;
+}
+.cta h2{
+  font-family:'Poppins',sans-serif;
+  font-size:34px;
+}
+.cta a{
+  display:inline-block;
+  margin-top:20px;
+  background:#fff;
+  color:var(--lilac-dark);
+  padding:12px 24px;
+  border-radius:6px;
+  text-decoration:none;
+  font-weight:600;
+}
+
+/* ================= MOBILE COMPACT MODE ================= */
+@media(max-width:768px){
+  .services-hero{padding:70px 6%;}
+  .services-hero h1{font-size:26px;}
+  .services-hero p{font-size:14px;}
+
+  .section{padding:45px 6%;}
+
+  .services-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  .service-card{
+    padding:16px;
+  }
+  .service-card h3{font-size:15px;}
+  .service-card p{font-size:13px; line-height:1.4;}
+
+  .process{
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+  .step{padding:14px;}
+  .step p{font-size:13px;}
+}
+
+/* Extra Small Phones */
+@media(max-width:480px){
+  .services-grid,.process{grid-template-columns:1fr;}
+  .section h2{font-size:22px;}
+  .cta h2{font-size:22px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+  <div class="header-left">
+    <div class="logo">
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition & Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
+    </div>
+  </div>
+
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News & Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/news">News & Activities</a>
+    <a href="/services">Services</a>
+    <a href="/complaints">Complaints</a>
+    <a href="/contact">Contact</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="services-hero">
+  <div class="services-hero-overlay">
+    <h1>Our Consumer Services</h1>
+    <p>
+      OSCCPA provides regulatory, protection, and advisory services to ensure
+      fair competition and safeguard consumer interests across Ondo State.
+    </p>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="section">
+  <h2>What We Do</h2>
+  <p>
+    The Ondo State Competition and Consumer Protection Agency delivers services
+    that protect consumers, regulate business practices, and promote transparency.
+  </p>
+
+  <div class="services-grid">
+    <div class="service-card"><h3>Consumer Complaint Resolution</h3><p>Investigate and resolve disputes fairly.</p></div>
+    <div class="service-card"><h3>Market Surveillance & Inspections</h3><p>Detect hoarding, price manipulation and unfair trade.</p></div>
+    <div class="service-card"><h3>Price Regulation & Monitoring</h3><p>Prevent exploitative and illegal pricing.</p></div>
+    <div class="service-card"><h3>Product Quality & Safety</h3><p>Protect consumers from unsafe and counterfeit goods.</p></div>
+    <div class="service-card"><h3>Consumer Education</h3><p>Public awareness on consumer rights.</p></div>
+    <div class="service-card"><h3>Business Compliance Support</h3><p>Advisory services for ethical business practices.</p></div>
+  </div>
+</section>
+
+<!-- ================= PROCESS ================= -->
+<section class="section light">
+  <h2>How to File a Complaint</h2>
+  <div class="process">
+    <div class="step"><span>Step 1</span><p>Submit complaint online or at office.</p></div>
+    <div class="step"><span>Step 2</span><p>Review and preliminary assessment.</p></div>
+    <div class="step"><span>Step 3</span><p>Investigation and mediation.</p></div>
+    <div class="step"><span>Step 4</span><p>Resolution or enforcement action.</p></div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta">
+  <h2>Need Assistance or Have a Complaint?</h2>
+  <p>Our team is ready to assist you.</p>
+  <a href="/complaints">File a Complaint</a>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+function toggleMobileMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  document.querySelector(".mobile-menu-toggle").classList.toggle("active");
+}
+
+document.querySelectorAll(".mobile-menu a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    document.getElementById("mobileMenu").classList.remove("open");
+    document.querySelector(".mobile-menu-toggle").classList.remove("active");
+  });
+});
+</script>
+
+</body>
+</html>

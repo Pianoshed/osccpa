@@ -1,0 +1,29 @@
+# Ignore Python virtual environments
+venv/
+.venv/
+env/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+
+# Sensitive scripts
+contact.py
+init-db.py
+create_admin.py
+database.py
+
+# IDE folders
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore requirements.txt if you want to manually create it
+# Otherwise, you can track it
