@@ -281,7 +281,7 @@ def delete_contact(contact_id):
 
 
 @app.route('/export_excel')
-def export_all_data():
+def export_excel():
     conn = get_db_connection()
     
     # 1. Fetch both datasets into DataFrames
