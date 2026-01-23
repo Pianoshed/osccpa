@@ -6,6 +6,7 @@ import pandas as pd
 from database import get_db_connection
 from flask import Flask, render_template, request, redirect, send_file, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from openpyxl.workbook import Workbook
 # from flask_mail import Mail, Message  # Not needed if emails are not sent
 
 app = Flask(__name__)
