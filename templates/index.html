@@ -25,7 +25,6 @@ body{
   color:var(--text-dark);
 }
 
-/* Header main flex */
 .main-header{
   display:flex;
   align-items:center;
@@ -33,42 +32,37 @@ body{
   padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:relative;
-  gap:20px;
+  position:sticky;
+  top:0;
+  z-index:1000;
 }
 
-/* Logo + header text container */
 .header-left{
   display:flex;
   align-items:center;
-  gap:15px;
+  gap:16px;
 }
 
-/* Logo */
-.logo img {
-  height:80px; /* smaller, fits nicely with text */
-}
+.logo img{height:70px;}
 
-/* Divider between logo and text */
 .header-divider{
   width:2px;
-  height:80px; /* adjust to logo height */
+  height:60px;
   background:var(--lilac-dark);
 }
 
-/* Header text */
 .header-text h2{
   font-family:'Poppins',sans-serif;
-  font-size:50px; /* smaller than before */
-  font-weight:700;
+  font-size:35px;
   color:var(--lilac-dark);
+  margin:0;
 }
-
 .header-text p{
-  font-family:'Roboto',sans-serif;
-  font-size:14px;
+  font-size:13px;
+  margin:0;
   color:#555;
 }
+
 
 /* Desktop nav */
 nav ul{
