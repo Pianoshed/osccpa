@@ -435,6 +435,10 @@ function openContactModal(name,email,subject,message,status,date){
 }
 function closeContactModal(){ contactModal.style.display="none"; }
 
+<a href="{{ url_for('export_excel') }}" class="btn btn-success">
+   Download Data as Excel
+</a>
+
 /* FILTERS */
 // Complaints
 complaintsDate.onchange = complaintsFilter;

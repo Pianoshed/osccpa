@@ -1,9 +1,10 @@
 import os
 import sqlite3
 from functools import wraps
-
+import io
+import pandas as pd
 from database import get_db_connection
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, send_file, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 # from flask_mail import Mail, Message  # Not needed if emails are not sent
 
@@ -277,6 +278,33 @@ def delete_contact(contact_id):
 
     flash("Contact deleted successfully")
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route('/export-all-data')
+def export_all_data():
+    conn = get_db_connection()
+    
+    # 1. Fetch both datasets into DataFrames
+    df_complaints = pd.read_sql_query("SELECT * FROM complaints", conn)
+    df_contacts = pd.read_sql_query("SELECT * FROM contacts", conn)
+    conn.close()
+
+    # 2. Setup the memory buffer
+    output = io.BytesIO()
+    
+    # 3. Use ExcelWriter to save to multiple sheets
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_complaints.to_excel(writer, index=False, sheet_name='Complaints')
+        df_contacts.to_excel(writer, index=False, sheet_name='Contacts')
+    
+    output.seek(0)
+
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='full_backup.xlsx'
+    )
 
 # -----------------------------
 # Run app
