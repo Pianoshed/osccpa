@@ -10,7 +10,6 @@ __pycache__/
 # Environment files
 .env
 
-
 # IDE folders
 .idea/
 .vscode/
