@@ -10,7 +10,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
 
-UPLOAD_FOLDER = 'uploads'
+# Define the absolute path to the uploads folder
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+
+# Create the directory if it doesn't exist
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    print(f"Created directory: {UPLOAD_FOLDER}")
+
+# Update your route to use the absolute path
+# evidence.save(os.path.join(UPLOAD_FOLDER, evidence_filename))
 
 # -----------------------------
 # Mail setup (Optional)
