@@ -10,16 +10,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
 
-# Define the absolute path to the uploads folder
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+# Put the upload folder inside static so it's web-accessible
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
 
-# Create the directory if it doesn't exist
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    print(f"Created directory: {UPLOAD_FOLDER}")
 
-# Update your route to use the absolute path
-# evidence.save(os.path.join(UPLOAD_FOLDER, evidence_filename))
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # -----------------------------
 # Mail setup (Optional)
@@ -171,7 +168,7 @@ def complaints():
         evidence_filename = None
         if evidence and evidence.filename:
             evidence_filename = evidence.filename
-            evidence.save(os.path.join("uploads", evidence_filename))
+            evidence.save(os.path.join(app.config['UPLOAD_FOLDER'], evidence_filename))
 
         conn = get_db_connection()
         conn.execute("""
