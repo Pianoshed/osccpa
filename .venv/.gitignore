@@ -10,11 +10,6 @@ __pycache__/
 # Environment files
 .env
 
-# Sensitive scripts
-contact.py
-init-db.py
-create_admin.py
-database.py
 
 # IDE folders
 .idea/
