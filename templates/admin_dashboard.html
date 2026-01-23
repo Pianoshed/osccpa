@@ -402,6 +402,10 @@ tbody tr:hover{
   </div>
 </div>
 
+<a href="{{ url_for('export_excel') }}" class="btn btn-success">
+   Download Data as Excel
+</a>
+
 <script>
 /* TAB SWITCHING */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
@@ -434,10 +438,6 @@ function openContactModal(name,email,subject,message,status,date){
   contactModal.style.display="flex";
 }
 function closeContactModal(){ contactModal.style.display="none"; }
-
-<a href="{{ url_for('export_excel') }}" class="btn btn-success">
-   Download Data as Excel
-</a>
 
 /* FILTERS */
 // Complaints
