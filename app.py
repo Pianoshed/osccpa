@@ -280,7 +280,7 @@ def delete_contact(contact_id):
     return redirect(url_for("admin_dashboard"))
 
 
-@app.route('/export-all-data')
+@app.route('/export_excel')
 def export_all_data():
     conn = get_db_connection()
     
