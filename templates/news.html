@@ -312,6 +312,92 @@ h1{
     align-items:flex-start;
   }
 }
+
+/* ================= MEDIA GALLERY SECTION ================= */
+.media-gallery-section{
+  padding:60px 0;
+  background:linear-gradient(180deg,#faf9fd,#ffffff);
+}
+
+.gallery-header{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.gallery-header h2{
+  font-size:28px;
+  color:var(--lilac-dark);
+  margin-bottom:6px;
+}
+
+.gallery-header p{
+  font-size:14px;
+  color:#666;
+  max-width:650px;
+  margin:auto;
+}
+
+.news-video{
+  width:100%;
+  height:220px;
+  border:none;
+}
+
+
+/* Gallery Grid */
+.media-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+}
+
+/* Gallery Card */
+.media-card{
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  transition:.3s ease;
+}
+
+.media-card:hover{
+  transform:translateY(-4px);
+}
+
+/* Thumbnail */
+.media-thumb img,
+.media-thumb video{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  background:#000;
+}
+
+/* Info */
+.media-info{
+  padding:14px 16px;
+}
+
+.media-info h3{
+  font-size:16px;
+  color:var(--lilac-dark);
+  margin:0 0 4px;
+}
+
+.media-info p{
+  font-size:12px;
+  color:#777;
+}
+
+/* Mobile */
+@media(max-width:480px){
+  .media-thumb img,
+  .media-thumb video{
+    height:160px;
+  }
+}
+
+
 </style>
 </head>
 
@@ -363,6 +449,127 @@ h1{
 
   <div class="news-grid">
 
+<!-- NEWS ITEM 1 -->
+    <div class="news-card">
+ <div class="news-image">
+
+  <iframe 
+    src="https://www.youtube.com/embed/TYgfR4ssT-I"
+    class="news-video"
+    title="OSCCPA Safety Standards Video"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+
+  <span class="badge">Safety Standards</span>
+
+</div>
+      <div class="news-content">
+        <h3>The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure</h3>
+        <p class="date">December 2025</p>
+
+        <p class="preview">
+          The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure.
+        </p>
+
+        <p class="more-text">
+          This follows an inspection by the State competition and consumer protection agency after several warning and sensitization on the danger of roasting goat meat with tires and disturbing sanitary condition of the facility 
+          Watch Video Report.
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Read More</button>
+          <button class="gallery-btn">View Gallery</button>
+        </div>
+      </div>  
+    </div>
+
+   <!-- NEWS ITEM 2 -->
+    <div class="news-card">
+      <div class="news-image">
+        <img src="{{ url_for('static', filename='news/stakeholder.jpg') }}">
+        <span class="badge">Stakeholder Engagement and sensitization at Isinkan marketplace</span>
+      </div>
+
+      <div class="news-content">
+        <h3>Stakeholder Engagement and sensitization at Isinkan marketplace</h3>
+        <p class="date">December 2025</p>
+
+        <p class="preview">
+          The agency engaged market leaders and trade unions on consumer
+          protection laws and ethical business practices.
+        </p>
+
+        <p class="more-text">
+          Discussions focused on dispute resolution, transparency in pricing,
+          and strengthening collaboration between traders and government.
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Read More</button>
+          <button class="gallery-btn">View Gallery</button>
+        </div>
+      </div>
+
+      <div class="gallery">
+        <img src="{{ url_for('static', filename='news/gal1.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal2.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal3.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal4.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal5.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal6.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal7.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal8.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal9.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal10.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal11.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal12.jpeg') }}">
+        <img src="{{ url_for('static', filename='news/gal13.jpeg') }}">
+      </div>
+    </div>
+
+
+
+    <!-- NEWS ITEM 1 -->
+    <div class="news-card">
+ <div class="news-image">
+
+  <iframe 
+    src="https://www.youtube.com/embed/TYgfR4ssT-I"
+    class="news-video"
+    title="OSCCPA Safety Standards Video"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+
+  <span class="badge">Safety Standards</span>
+
+</div>
+
+
+      <div class="news-content">
+        <h3>The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure</h3>
+        <p class="date">December 2025</p>
+
+        <p class="preview">
+          The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure.
+        </p>
+
+        <p class="more-text">
+          This follows an inspection by the State competition and consumer protection agency after several warning and sensitization on the danger of roasting goat meat with tires and disturbing sanitary condition of the facility 
+          Watch Video Report.
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Read More</button>
+          <button class="gallery-btn">View Gallery</button>
+        </div>
+      </div>  
+    </div>
+
+
     <!-- NEWS ITEM -->
     <div class="news-card">
 
@@ -407,40 +614,7 @@ During the visit, the Ondo State delegation led by the Administrative Secretary 
       </div>
 
     </div>
-
-    <!-- NEWS ITEM 2 -->
-    <div class="news-card">
-      <div class="news-image">
-        <img src="{{ url_for('static', filename='news/stakeholder.jpg') }}">
-        <span class="badge">Stakeholder Engagement</span>
-      </div>
-
-      <div class="news-content">
-        <h3>Stakeholders Engagement with Traders</h3>
-        <p class="date">December 2025</p>
-
-        <p class="preview">
-          The agency engaged market leaders and trade unions on consumer
-          protection laws and ethical business practices.
-        </p>
-
-        <p class="more-text">
-          Discussions focused on dispute resolution, transparency in pricing,
-          and strengthening collaboration between traders and government.
-        </p>
-
-        <div class="actions">
-          <button class="read-more">Read More</button>
-          <button class="gallery-btn">View Gallery</button>
-        </div>
-      </div>
-
-      <div class="gallery">
-        <img src="{{ url_for('static', filename='news/gallery4.jpg') }}">
-        <img src="{{ url_for('static', filename='news/gallery5.jpg') }}">
-      </div>
-    </div>
-
+ 
   </div>
 </div>
 
@@ -487,6 +661,16 @@ document.addEventListener("DOMContentLoaded", () => {
       e.target.textContent = isOpen ? "Read Less" : "Read More";
     }
   });
+
+  /* ---------------- AUTO PAUSE OTHER VIDEOS ---------------- */
+document.querySelectorAll("video").forEach(video=>{
+  video.addEventListener("play",()=>{
+    document.querySelectorAll("video").forEach(v=>{
+      if(v !== video) v.pause();
+    });
+  });
+});
+
 
   /* ---------------- GALLERY TOGGLE ---------------- */
   document.addEventListener("click", (e) => {

@@ -32,7 +32,7 @@ body{
   padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:sticky;
+  position:fixed;
   top:0;
   z-index:1000;
 }
@@ -686,7 +686,6 @@ nav a:hover{color:var(--lilac-primary)}
 }
 
 
-
 /* FOOTER */
 footer{
   background:#1e1b4b;
@@ -702,25 +701,6 @@ footer h4{color:#fff;margin-bottom:10px}
 footer a{color:#c7d2fe;text-decoration:none}
 footer a:hover{text-decoration:underline}
 
-/* COOKIE */
-.cookie-banner{
-  display:none;
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:rgba(30,27,75,.95);
-  color:#fff;
-  padding:12px;
-  text-align:center;
-}
-.cookie-banner button{
-  margin-left:10px;
-  background:var(--lilac-primary);
-  border:none;
-  color:#fff;
-  padding:6px 12px;
-  cursor:pointer;
-}
 
 /* RESPONSIVE */
 @media(max-width:900px){
@@ -789,16 +769,15 @@ footer a:hover{text-decoration:underline}
   bottom: 20px;
   right: 20px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   z-index: 1000;
 }
 
 /* Chat Buttons */
 .chat-btn {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -941,7 +920,7 @@ footer a:hover{text-decoration:underline}
 <section class="slider-container">
   <div class="slider" id="slider">
     <div class="slide">
-      <img src="{{ url_for('static', filename='Slide/slide1.jpg') }}">
+      <img src="{{ url_for('static', filename='Slide/gov1.jpeg') }}">
       <div class="vignette"></div>
       <div class="slide-text">
         <h2>Protecting Consumers</h2>
@@ -1056,15 +1035,18 @@ footer a:hover{text-decoration:underline}
       <a href="/services">Services</a><br>
       <a href="/complaints">Complaints</a>
     </div>
-<!-- Floating Chat Buttons -->
-<div class="chat-float" aria-label="Chat with us now">
+
+    <!-- Floating Chat Buttons -->
+<div class="chat-float">
   <a href="https://wa.me/2349012345678" target="_blank" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
   </a>
-  <a href="https://m.me/YourFacebookPageID" target="_blank">
-  <img src="{{ url_for('static', filename='logo/facebook.png') }}" width="22"> Chat Now
-</a>
-  <span class="chat-tooltip">Chat with us now</span>
+
+  <a href="https://m.me/YourFacebookPageID" target="_blank" class="chat-btn facebook" aria-label="Chat on Facebook">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+  </a>
+
+  <span class="chat-tooltip">Chat with us</span>
 </div>
   </div>
   <div class="footer-credit">
@@ -1072,10 +1054,6 @@ footer a:hover{text-decoration:underline}
 </div>
 </footer>
 
-<div class="cookie-banner" id="cookieBanner">
-  This website uses cookies.
-  <button onclick="acceptCookies()">Got it</button>
-</div>
 
 <script>
 let index=0;
@@ -1096,14 +1074,6 @@ function toggleMobileMenu(){
 
   menu.classList.toggle("open");
   toggle.classList.toggle("active");
-}
-
-function acceptCookies(){
-  document.getElementById("cookieBanner").style.display="none";
-  document.cookie="cookieConsent=true";
-}
-if(!document.cookie.includes("cookieConsent")){
-  document.getElementById("cookieBanner").style.display="block";
 }
 
 document.querySelectorAll(".read-more-btn").forEach(btn => {
