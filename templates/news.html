@@ -373,6 +373,13 @@ h1{
   background:#8a6fbf;
   color:#fff;
 }
+.news-image video {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
 
 
 </style>
@@ -541,10 +548,38 @@ promoting a fair marketplace and urged consumers to report any suspicious or exp
 
         <div class="actions">
           <button class="read-more">Read More</button>
-          <button class="gallery-btn">View Gallery</button>
         </div>
       </div>  
     </div>
+
+
+<!-- NEWS ITEM 2 -->
+<div class="news-card">
+
+  <!-- Video Preview Section -->
+  <div class="news-image">
+    <video controls poster="{{ url_for('static', filename='gallery/isi1.png') }}">
+      <source src="{{ url_for('static', filename='videos/isinkan1.mp4') }}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <span class="badge">Safety</span>
+  </div>
+
+  <div class="news-content">
+    <h3>Sanitary and Environmental Standards at Isinkan Abbattoir</h3>
+    <p class="date">December 2025</p>
+
+   <div class="actions">
+      <button class="gallery-btn">View More Videos</button>
+    </div>
+  </div>
+<!-- video GALLERY -->
+  <video controls>
+    <source src="{{ url_for('static', filename='videos/isinkan2.mp4') }}">
+  </video>
+</div>
+
+
 
    <!-- NEWS ITEM 2 -->
     <div class="news-card">
