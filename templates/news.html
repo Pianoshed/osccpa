@@ -7,6 +7,7 @@
 <!-- Standard Favicon -->
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -28,15 +29,14 @@ body{
   color:var(--text-dark);
 }
 
-/* ================= HEADER ================= */
 .main-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:10px 6%;
+  padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:sticky;
+  position:fixed;
   top:0;
   z-index:1000;
 }
@@ -44,13 +44,35 @@ body{
 .header-left{
   display:flex;
   align-items:center;
-  gap:14px;
-  max-width:75%;
+  gap:16px;
 }
 
-.logo img{
-  height:65px;
+
+.logo {
+  display: flex;
+  align-items: center;
 }
+
+.logo a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo img {
+  height: 60px; /* adjust if needed */
+}
+
+.logo-tagline {
+  font-family: "Playfair Display", cursive;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: #6b7280;
+}
+
 
 .header-divider{
   width:2px;
@@ -59,17 +81,18 @@ body{
 }
 
 .header-text h2{
-  margin:0;
-  font-size:20px;
-  font-weight:700;
+  font-family:'Poppins',sans-serif;
+  font-size:35px;
   color:var(--lilac-dark);
+  margin:0;
 }
-
 .header-text p{
-  margin:3px 0 0;
   font-size:13px;
+  margin:0;
   color:#555;
 }
+
+
 
 /* ================= NAV ================= */
 nav ul{
@@ -390,7 +413,8 @@ h1{
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+      <span class="logo-tagline">consumer rights first</span></a>
     </div>
     <div class="header-divider"></div>
     <div class="header-text">

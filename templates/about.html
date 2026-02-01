@@ -7,6 +7,7 @@
 
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -16,7 +17,6 @@
   --text-dark:#1f2937;
 }
 
-/* ================= HEADER ================= */
 .main-header{
   display:flex;
   align-items:center;
@@ -24,7 +24,7 @@
   padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:sticky;
+  position:fixed;
   top:0;
   z-index:1000;
 }
@@ -35,7 +35,32 @@
   gap:16px;
 }
 
-.logo img{height:70px;}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo img {
+  height: 60px; /* adjust if needed */
+}
+
+.logo-tagline {
+  font-family: "Playfair Display", cursive;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: #6b7280;
+}
+
 
 .header-divider{
   width:2px;
@@ -45,7 +70,7 @@
 
 .header-text h2{
   font-family:'Poppins',sans-serif;
-  font-size:22px;
+  font-size:35px;
   color:var(--lilac-dark);
   margin:0;
 }
@@ -54,6 +79,8 @@
   margin:0;
   color:#555;
 }
+
+
 
 /* NAV */
 nav ul{
@@ -328,7 +355,8 @@ body{
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+      <a href="/"> <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+      <span class="logo-tagline">consumer rights first</span></a>
     </div>
     <div class="header-divider"></div>
     <div class="header-text">
@@ -378,8 +406,11 @@ body{
     </div>
 
     <div class="smart-card">
-      <h2>Our Mandate</h2>
-      <p>We regulate trade practices, prevent exploitation, and ensure consumers receive value for money.</p>
+      <h2>Our Mission</h2>
+      <p>
+        To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, 
+        while promoting ethical trade practices and sustainable socio-economic development.
+      </p>
     </div>
 
     <div class="smart-card">
@@ -402,7 +433,8 @@ body{
 
     <div class="smart-card">
       <h2>Our Vision</h2>
-      <p>To build a transparent and competitive marketplace that protects all citizens.</p>
+      <p>To establish a fair, safe, and transparent marketplace 
+        where consumer rights are fully protected and respected.</p>
     </div>
 
     <div class="smart-card">

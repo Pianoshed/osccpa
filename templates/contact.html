@@ -7,33 +7,46 @@
 <!-- Standard Favicon -->
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
 <style>
+/* ================= ROOT VARIABLES ================= */
 :root{
-  --primary:#5f4b8b;
-  --primary-light:#f3eefb;
-  --primary-dark:#43317b;
-  --text-dark:#333;
-  --border:#e2d9f3;
+  --lilac-primary:#8b5cf6;
+  --lilac-dark:#6d28d9;
+  --lilac-soft:#f5f3ff;
+
+  /* compatibility aliases (DO NOT REMOVE) */
+  --primary: var(--lilac-primary);
+  --primary-light: var(--lilac-soft);
+
+  --text-dark:#1f2937;
+  --text-muted:#6b7280;
+  --border-light:#e5e7eb;
 }
 
-/* ===== RESET ===== */
-*{box-sizing:border-box;margin:0;padding:0}
+/* ================= RESET ================= */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
 body{
   font-family:'Poppins',sans-serif;
   background:#f6f5fb;
   color:var(--text-dark);
+  line-height:1.6;
 }
 
-/* ================= HEADER (SAME AS NEWS PAGE) ================= */
 .main-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:10px 6%;
+  padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:sticky;
+  position:fixed;
   top:0;
   z-index:1000;
 }
@@ -41,33 +54,55 @@ body{
 .header-left{
   display:flex;
   align-items:center;
-  gap:14px;
-  max-width:75%;
+  gap:16px;
 }
 
-.logo img{height:60px}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo img {
+  height: 60px; /* adjust if needed */
+}
+
+.logo-tagline {
+  font-family: "Playfair Display", cursive;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: #6b7280;
+}
+
 
 .header-divider{
   width:2px;
   height:60px;
-  background:var(--primary);
+  background:var(--lilac-dark);
 }
 
 .header-text h2{
+  font-family:'Poppins',sans-serif;
+  font-size:35px;
+  color:var(--lilac-dark);
   margin:0;
-  font-size:20px;
-  font-weight:700;
-  color:var(--primary);
-  line-height:1.2;
 }
-
 .header-text p{
-  margin-top:4px;
   font-size:13px;
+  margin:0;
   color:#555;
 }
 
-/* NAV */
+/* ================= NAV ================= */
 nav ul{
   display:flex;
   list-style:none;
@@ -78,11 +113,14 @@ nav a{
   text-decoration:none;
   font-weight:600;
   color:#444;
+  transition:color .2s ease;
 }
 
-nav a:hover{color:var(--primary)}
+nav a:hover{
+  color:var(--lilac-primary);
+}
 
-/* MOBILE TOGGLE */
+/* ================= MOBILE TOGGLE ================= */
 .mobile-menu-toggle{
   display:none;
   width:40px;
@@ -110,6 +148,7 @@ nav a:hover{color:var(--primary)}
 .mobile-menu-toggle.active span:nth-child(2){opacity:0}
 .mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg)}
 
+/* ================= MOBILE MENU ================= */
 .mobile-menu{
   position:absolute;
   top:100%;
@@ -128,23 +167,33 @@ nav a:hover{color:var(--primary)}
 
 .mobile-menu a{
   padding:16px 6%;
+  border-bottom:1px solid var(--border-light);
+  color:var(--text-dark);
   text-decoration:none;
-  border-bottom:1px solid #eee;
-  color:#1f2937;
   font-weight:600;
 }
 
-/* ================= PAGE ================= */
+/* ================= PAGE CONTENT ================= */
 .container{
   max-width:1100px;
-  margin:40px auto;
+  margin:120px auto 40px;
   padding:0 20px;
+  margin-top:200px;
 }
 
-h1{text-align:center;color:var(--primary);margin-bottom:8px}
-.subtitle{text-align:center;color:#555;margin-bottom:40px}
+h1{
+  text-align:center;
+  color:var(--primary);
+  margin-bottom:8px;
+}
 
-/* CONTACT CARDS */
+.subtitle{
+  text-align:center;
+  color:var(--text-muted);
+  margin-bottom:40px;
+}
+
+/* ================= CONTACT GRID ================= */
 .contact-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -160,10 +209,30 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
 
-.contact-card h3{color:var(--primary);margin-bottom:12px}
-.contact-card a{text-decoration:none;color:var(--primary);font-weight:600}
+.contact-card h3{
+  color:var(--primary);
+  margin-bottom:12px;
+}
 
-/* FORM */
+.contact-card p{
+  color:var(--text-muted);
+}
+
+.contact-card a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  text-decoration:none;
+  font-weight:600;
+  color:var(--primary);
+}
+
+.contact-card a:hover{
+  color:var(--lilac-dark);
+}
+
+/* ================= FORM ================= */
 .contact-form{
   background:#fff;
   padding:30px;
@@ -173,14 +242,20 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   margin:auto;
 }
 
-.contact-form label{display:block;margin-bottom:6px;font-weight:500}
+.contact-form label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:500;
+}
+
 .contact-form input,
 .contact-form textarea{
   width:100%;
   padding:12px;
   margin-bottom:16px;
-  border:1px solid #ddd;
+  border:1px solid var(--border-light);
   border-radius:8px;
+  font-family:inherit;
 }
 
 .contact-form button{
@@ -191,9 +266,14 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   border-radius:8px;
   font-weight:600;
   cursor:pointer;
+  transition:background .2s ease;
 }
 
-/* WHATSAPP */
+.contact-form button:hover{
+  background:var(--lilac-dark);
+}
+
+/* ================= WHATSAPP ================= */
 .whatsapp-btn{
   position:fixed;
   bottom:20px;
@@ -207,6 +287,7 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   gap:10px;
   font-weight:600;
   text-decoration:none;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
 }
 
 /* ================= RESPONSIVE ================= */
@@ -214,29 +295,30 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   nav{display:none}
   .mobile-menu-toggle{display:flex}
   .header-divider{display:none}
-  .header-text h2{font-size:15px}
-  .header-text p{font-size:12px}
-}
-.contact-card a{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-weight:600;
-  margin-top:6px;
-}
 
+  .header-text h2{
+    font-size:15px;
+  }
 
+  .header-text p{
+    font-size:12px;
+  }
+
+  .logo img{
+    height:48px;
+  }
+}
 
 </style>
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}"></a>
+      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+      <span class="logo-tagline">consumer rights first</span></a>
     </div>
     <div class="header-divider"></div>
     <div class="header-text">
@@ -249,7 +331,7 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/about">About</a></li>
-      <li><a href="/news">News & Activities</a></li>
+      <li><a href="/news">News</a></li>
       <li><a href="/services">Services</a></li>
       <li><a href="/complaints">Complaints</a></li>
       <li><a href="/contact">Contact</a></li>
@@ -259,15 +341,6 @@ h1{text-align:center;color:var(--primary);margin-bottom:8px}
   <button class="mobile-menu-toggle" aria-label="Toggle navigation">
     <span></span><span></span><span></span>
   </button>
-
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/news">News & Activities</a>
-    <a href="/services">Services</a>
-    <a href="/complaints">Complaints</a>
-    <a href="/contact">Contact</a>
-  </div>
 </header>
 
 <!-- ===== PAGE CONTENT ===== -->
