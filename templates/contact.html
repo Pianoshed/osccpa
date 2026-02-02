@@ -1,441 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Us | OCCPA</title>
-<!-- Standard Favicon -->
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | OCCPA</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-/* ================= ROOT VARIABLES ================= */
-:root{
-  --lilac-primary:#8b5cf6;
-  --lilac-dark:#6d28d9;
-  --lilac-soft:#f5f3ff;
+    <style>
+        :root {
+            --lilac-primary: #8b5cf6;
+            --lilac-dark: #6d28d9;
+            --lilac-soft: #f5f3ff;
+            --navy-deep: #0f172a;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --white: #ffffff;
+        }
 
-  /* compatibility aliases (DO NOT REMOVE) */
-  --primary: var(--lilac-primary);
-  --primary-light: var(--lilac-soft);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
 
-  --text-dark:#1f2937;
-  --text-muted:#6b7280;
-  --border-light:#e5e7eb;
-}
+        body {
+            background-color: #f8fafc;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
 
-/* ================= RESET ================= */
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+        /* ================= HEADER (ORIGINAL STYLE) ================= */
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 6%;
+            background: var(--white);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0; width: 100%; z-index: 1000;
+        }
 
-body{
-  font-family:'Poppins',sans-serif;
-  background:#f6f5fb;
-  color:var(--text-dark);
-  line-height:1.6;
-}
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo-box { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+        .logo-box img { height: 55px; width: auto; }
+        .logo-tagline { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: lowercase; }
 
-.main-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 8%;
-  background:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:fixed;
-  top:0;
-  z-index:1000;
-}
+        .header-divider { width: 2px; height: 45px; background: var(--lilac-primary); }
+        .header-title h2 { font-size: 1rem; color: var(--lilac-dark); line-height: 1.2; margin: 0; }
+        .header-title p { font-size: 11px; color: var(--text-light); margin: 0; }
 
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { text-decoration: none; font-weight: 500; color: var(--text-main); font-size: 0.9rem; transition: 0.3s; }
+        nav a:hover { color: var(--lilac-primary); }
 
+        /* ================= MAIN CONTAINER ================= */
+        .container {
+            max-width: 1140px;
+            margin: 140px auto 80px;
+            padding: 0 24px;
+        }
 
-.logo {
-  display: flex;
-  align-items: center;
-}
+        .page-header { text-align: center; margin-bottom: 50px; }
+        .page-header h1 { font-size: 2.2rem; color: var(--navy-deep); margin-bottom: 10px; }
 
-.logo a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-}
+        /* CONTACT CARDS */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
 
-.logo img {
-  height: 60px; /* adjust if needed */
-}
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1); }
+        .card h3 { font-size: 1.1rem; color: var(--lilac-dark); margin-bottom: 10px; }
 
-.logo-tagline {
-  font-family: "Playfair Display", cursive;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: #6b7280;
-}
+        .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .social-icons img { width: 28px; height: 28px; transition: 0.2s; }
 
+        /* FORM BOX */
+        .form-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+        }
 
-.header-divider{
-  width:2px;
-  height:60px;
-  background:var(--lilac-dark);
-}
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--navy-deep); }
+        
+        input, textarea {
+            width: 100%; padding: 12px 16px;
+            border: 2px solid #e2e8f0; border-radius: 10px;
+            font-size: 0.95rem; transition: 0.3s;
+        }
+        input:focus, textarea:focus { outline: none; border-color: var(--lilac-primary); background: #fff; }
 
-.header-text h2{
-  font-family:'Poppins',sans-serif;
-  font-size:35px;
-  color:var(--lilac-dark);
-  margin:0;
-}
-.header-text p{
-  font-size:13px;
-  margin:0;
-  color:#555;
-}
+        .submit-btn {
+            width: 100%; padding: 16px; background: var(--lilac-primary);
+            color: white; border: none; border-radius: 10px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .submit-btn:hover { background: var(--lilac-dark); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
 
-/* ================= NAV ================= */
-nav ul{
-  display:flex;
-  list-style:none;
-  gap:22px;
-}
+        /* JS SUCCESS STATE */
+        #successState { display: none; text-align: center; padding: 40px 0; }
+        .check-icon { font-size: 50px; color: #10b981; margin-bottom: 15px; }
 
-nav a{
-  text-decoration:none;
-  font-weight:600;
-  color:#444;
-  transition:color .2s ease;
-}
+        /* ================= SMART RESPONSIVE FOOTER ================= */
+        .site-footer {
+            background: var(--navy-deep);
+            color: #f1f5f9;
+            padding: 70px 6% 30px;
+            margin-top: 80px;
+        }
 
-nav a:hover{
-  color:var(--lilac-primary);
-}
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 50px;
+            max-width: 1140px;
+            margin: 0 auto;
+        }
 
-/* ================= MOBILE TOGGLE ================= */
-.mobile-menu-toggle{
-  display:none;
-  width:40px;
-  height:40px;
-  background:var(--primary-light);
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  position:relative;
-}
+        /* FIXED LOGO SIZE */
+        .footer-brand img {
+            height: 60px; /* Controlled size */
+            width: auto;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1); /* Makes logo white */
+        }
 
-.mobile-menu-toggle span{
-  position:absolute;
-  width:22px;
-  height:2.5px;
-  background:var(--primary);
-  border-radius:2px;
-  transition:.3s;
-}
+        .footer-brand p { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; max-width: 300px; }
 
-.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px)}
-.mobile-menu-toggle span:nth-child(3){transform:translateY(7px)}
+        .footer-links h4 { color: var(--white); margin-bottom: 20px; font-size: 1rem; border-left: 3px solid var(--lilac-primary); padding-left: 10px; }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .footer-links a:hover { color: var(--lilac-accent); padding-left: 5px; }
 
-.mobile-menu-toggle.active span:nth-child(1){transform:rotate(45deg)}
-.mobile-menu-toggle.active span:nth-child(2){opacity:0}
-.mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg)}
+        .footer-bottom {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 25px;
+            border-top: 1px solid #1e293b;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
 
-/* ================= MOBILE MENU ================= */
-.mobile-menu{
-  position:absolute;
-  top:100%;
-  left:0;
-  width:100%;
-  background:#fff;
-  display:flex;
-  flex-direction:column;
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .4s ease;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
+        /* WHATSAPP FLOAT */
+        .wa-float {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #25D366; color: white; padding: 12px 20px;
+            border-radius: 50px; display: flex; align-items: center; gap: 10px;
+            text-decoration: none; font-weight: 600; z-index: 1000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
-.mobile-menu.open{max-height:500px}
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 992px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .header-divider, .header-title p { display: none; }
+        }
 
-.mobile-menu a{
-  padding:16px 6%;
-  border-bottom:1px solid var(--border-light);
-  color:var(--text-dark);
-  text-decoration:none;
-  font-weight:600;
-}
-
-/* ================= PAGE CONTENT ================= */
-.container{
-  max-width:1100px;
-  margin:120px auto 40px;
-  padding:0 20px;
-  margin-top:200px;
-}
-
-h1{
-  text-align:center;
-  color:var(--primary);
-  margin-bottom:8px;
-}
-
-.subtitle{
-  text-align:center;
-  color:var(--text-muted);
-  margin-bottom:40px;
-}
-
-/* ================= CONTACT GRID ================= */
-.contact-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:30px;
-  margin-bottom:50px;
-}
-
-.contact-card{
-  background:#fff;
-  border-radius:14px;
-  padding:28px 20px;
-  text-align:center;
-  box-shadow:0 8px 25px rgba(0,0,0,.08);
-}
-
-.contact-card h3{
-  color:var(--primary);
-  margin-bottom:12px;
-}
-
-.contact-card p{
-  color:var(--text-muted);
-}
-
-.contact-card a{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
-  text-decoration:none;
-  font-weight:600;
-  color:var(--primary);
-}
-
-.contact-card a:hover{
-  color:var(--lilac-dark);
-}
-
-/* ================= FORM ================= */
-.contact-form{
-  background:#fff;
-  padding:30px;
-  border-radius:14px;
-  box-shadow:0 8px 25px rgba(0,0,0,.08);
-  max-width:700px;
-  margin:auto;
-}
-
-.contact-form label{
-  display:block;
-  margin-bottom:6px;
-  font-weight:500;
-}
-
-.contact-form input,
-.contact-form textarea{
-  width:100%;
-  padding:12px;
-  margin-bottom:16px;
-  border:1px solid var(--border-light);
-  border-radius:8px;
-  font-family:inherit;
-}
-
-.contact-form button{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  padding:12px 28px;
-  border-radius:8px;
-  font-weight:600;
-  cursor:pointer;
-  transition:background .2s ease;
-}
-
-.contact-form button:hover{
-  background:var(--lilac-dark);
-}
-
-/* ================= WHATSAPP ================= */
-.whatsapp-btn{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#25D366;
-  color:#fff;
-  padding:14px 18px;
-  border-radius:50px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:600;
-  text-decoration:none;
-  box-shadow:0 6px 20px rgba(0,0,0,.2);
-}
-
-/* ================= RESPONSIVE ================= */
-@media(max-width:768px){
-  nav{display:none}
-  .mobile-menu-toggle{display:flex}
-  .header-divider{display:none}
-
-  .header-text h2{
-    font-size:15px;
-  }
-
-  .header-text p{
-    font-size:12px;
-  }
-
-  .logo img{
-    height:48px;
-  }
-}
-
-</style>
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+            nav { display: none; }
+            .header-title h2 { font-size: 0.85rem; }
+            .container { margin-top: 110px; }
+        }
+    </style>
 </head>
-
 <body>
 
 <header class="main-header">
-  <div class="header-left">
-    <div class="logo">
-      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-      <span class="logo-tagline">consumer rights first</span></a>
+    <div class="header-left">
+        <a href="/" class="logo-box">
+            <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA Logo">
+            <span class="logo-tagline">consumer rights first</span>
+        </a>
+        <div class="header-divider"></div>
+        <div class="header-title">
+            <h2>Ondo State Competition & Consumer Protection Agency</h2>
+            <p>Committed to Consumer Protection & Fair Trade</p>
+        </div>
     </div>
-    <div class="header-divider"></div>
-    <div class="header-text">
-      <h2>Ondo State Competition & Consumer Protection Agency</h2>
-      <p>Committed to Consumer Protection</p>
-    </div>
-  </div>
-
-  <nav>
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/news">News</a></li>
-      <li><a href="/services">Services</a></li>
-      <li><a href="/complaints">Complaints</a></li>
-      <li><a href="/contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <button class="mobile-menu-toggle" aria-label="Toggle navigation">
-    <span></span><span></span><span></span>
-  </button>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/news">News</a></li>
+            <li><a href="/complaints">Complaints</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
 </header>
 
-<!-- ===== PAGE CONTENT ===== -->
 <div class="container">
-  <h1>Contact OCCPA</h1>
-  <p class="subtitle">Reach us via email, WhatsApp, or the form below</p>
-  <div class="contact-grid">
+    <div class="page-header">
+        <h1>Connect With Us</h1>
+        <p>Our support team is available Monday - Friday, 8am - 4pm.</p>
+    </div>
 
-  <!-- EMAIL -->
-  <div class="contact-card">
-    <h3>Email</h3>
-    <p>info@osccpa.gov.ng</p>
-    <a href="mailto:cpcondo149@gmail.com">Send Email</a>
-  </div>
+    <div class="contact-grid">
+        <div class="card">
+            <h3>Email Address</h3>
+            <p>info@osccpa.gov.ng</p>
+            <p style="font-size: 0.85rem; color: var(--text-light);">Direct: cpcondo149@gmail.com</p>
+        </div>
+        <div class="card">
+            <h3>Social Media</h3>
+            <div class="social-icons">
+                <a href="#"><img src="{{ url_for('static', filename='logo/facebook.png') }}" alt="FB"></a>
+                <a href="#"><img src="{{ url_for('static', filename='logo/x.png') }}" alt="X"></a>
+                <a href="#"><img src="{{ url_for('static', filename='logo/instagram.png') }}" alt="IG"></a>
+            </div>
+            <p style="margin-top: 10px;">@occpa_ondo</p>
+        </div>
+        <div class="card">
+            <h3>Call / WhatsApp</h3>
+            <p>+234 904 335 3001</p>
+            <a href="https://wa.me/2349043353001" style="color: var(--lilac-primary); font-weight: 600; text-decoration: none;">Start a Chat</a>
+        </div>
+    </div>
 
-  <!-- SOCIAL MEDIA -->
-  <div class="contact-card">
-    <h3>Follow Us</h3>
-    <p>Stay connected with OCCPA</p>
+    <div class="form-box">
+        <form id="occpaForm" onsubmit="submitHandle(event)">
+            <div class="form-group">
+                <label>Your Full Name</label>
+                <input type="text" name="name" placeholder="Enter name" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="example@mail.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" placeholder="+234..." required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Message Subject</label>
+                <input type="text" name="subject" required>
+            </div>
+            <div class="form-group">
+                <label>Tell us how we can help</label>
+                <textarea name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn" id="btnTxt">Send Message</button>
+        </form>
 
-    <a href="https://facebook.com/occpa/" target="_blank">
-      <img src="{{ url_for('static', filename='logo/facebook.png') }}" width="22">
-      Facebook
-    </a><br><br>
-
-    <a href="https://twitter.com/occpa" target="_blank">
-      <img src="{{ url_for('static', filename='logo/x.png') }}" width="22">
-      Twitter (X)
-    </a><br><br>
-
-    <a href="https://instagram.com/occpa" target="_blank">
-      <img src="{{ url_for('static', filename='logo/instagram.png') }}" width="22">
-      Instagram
-    </a>
-  </div>
-
-  <!-- WHATSAPP -->
-  <div class="contact-card">
-    <h3>Phone / WhatsApp</h3>
-    <p>Chat directly with our support team</p>
-    <a href="https://wa.me/2349043353001" target="_blank">
-      Start Chat
-    </a>
-  </div>
+        <div id="successState">
+            <div class="check-icon">✔</div>
+            <h2>Submission Successful</h2>
+            <p>Thank you for contacting OCCPA. A representative will review your message and respond shortly.</p>
+            <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Send another message</button>
+        </div>
+    </div>
 </div>
 
-<form method="POST" class="contact-form">
-  <label>Full Name</label>
-  <input type="text" name="name" placeholder="Your full name" required>
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA Logo">
+            <p>The official agency dedicated to protecting the rights of consumers and promoting healthy market competition in Ondo State.</p>
+        </div>
+        
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Agency</a></li>
+                <li><a href="/services">Our Services</a></li>
+                <li><a href="/news">Press Releases</a></li>
+            </ul>
+        </div>
 
-  <label>Email</label>
-  <input type="email" name="email" placeholder="you@example.com" required>
+        <div class="footer-links">
+            <h4>Legal & Support</h4>
+            <ul>
+                <li><a href="/complaints">File a Complaint</a></li>
+                <li><a href="/">Contact Us</a></li>
+                <li><a href="/">Privacy Policy</a></li>
+                <li><a href="/">Terms of Use</a></li>
+            </ul>
+        </div>
+    </div>
 
-  <label>Phone</label>
-  <input type="text" name="phone" placeholder="+2348012345678" required>
+    <div class="footer-bottom">
+        &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech</strong>
+    </div>
+</footer>
 
-  <label>Subject</label>
-  <input type="text" name="subject" placeholder="Subject of your message" required>
-
-  <label>Message</label>
-  <textarea name="message" rows="6" placeholder="Write your message here..." required></textarea>
-
-  <button type="submit">Send Message</button>
-</form>
-
-
-<a href="https://wa.me/2349043353001" class="whatsapp-btn">
-  <img src="{{ url_for('static', filename='logo/whatsapp.png') }}" width="22"> Chat Now
+<a href="https://wa.me/2349043353001" class="wa-float" target="_blank">
+    <span>WhatsApp Support</span>
 </a>
 
 <script>
-document.addEventListener("DOMContentLoaded",()=>{
-  const toggle=document.querySelector(".mobile-menu-toggle");
-  const menu=document.getElementById("mobileMenu");
+    function submitHandle(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnTxt');
+        const form = document.getElementById('occpaForm');
+        const success = document.getElementById('successState');
 
-  toggle.addEventListener("click",()=>{
-    toggle.classList.toggle("active");
-    menu.classList.toggle("open");
-  });
+        btn.innerText = "Sending...";
+        btn.disabled = true;
 
-  document.querySelectorAll(".mobile-menu a").forEach(link=>{
-    link.addEventListener("click",()=>{
-      toggle.classList.remove("active");
-      menu.classList.remove("open");
-    });
-  });
-
-  window.addEventListener("resize",()=>{
-    if(window.innerWidth>768){
-      toggle.classList.remove("active");
-      menu.classList.remove("open");
+        // Simulate processing
+        setTimeout(() => {
+            form.style.display = "none";
+            success.style.display = "block";
+            window.scrollTo({ top: form.offsetTop - 100, behavior: 'smooth' });
+        }, 1500);
     }
-  });
-});
 </script>
-</div>
+
 </body>
 </html>

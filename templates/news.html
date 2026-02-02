@@ -10,186 +10,228 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
 <style>
+/* =========================
+   ROOT VARIABLES
+========================= */
 :root{
-  --lilac-primary:#8a6fbf;
-  --lilac-light:#f3eefb;
-  --lilac-dark:#5f4b8b;
-  --text-dark:#333;
+  --lilac-primary:#8b5cf6;
+  --lilac-dark:#6d28d9;
+  --lilac-soft:#ede9fe;
+  --text-dark:#2b2b2b;
+  --footer-bg:#1e1b4b;
+  --footer-accent:#2d2658;
   --border:#e2d9f3;
 }
 
+/* =========================
+   RESET / BASE
+========================= */
 *{
+  margin:0;
+  padding:0;
   box-sizing:border-box;
 }
 
 body{
-  margin:0;
   font-family:'Poppins',sans-serif;
   background:#faf9fd;
   color:var(--text-dark);
+  overflow-x:hidden;
+  padding-top:90px;
 }
 
+/* =========================
+   HEADER
+========================= */
 .main-header{
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index:1000;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:10px 8%;
   background:#fff;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  position:fixed;
-  top:0;
-  z-index:1000;
+  transition:padding .3s ease;
 }
 
 .header-left{
   display:flex;
   align-items:center;
   gap:16px;
+  min-width:0;
+  flex:1;
 }
 
-
-.logo {
-  display: flex;
-  align-items: center;
+/* LOGO */
+.logo a{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-decoration:none;
 }
 
-.logo a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
+.logo img{
+  height:60px;
+  max-width:100%;
+  object-fit:contain;
 }
 
-.logo img {
-  height: 60px; /* adjust if needed */
+.logo-tagline{
+  font-family:"Playfair Display",cursive;
+  font-size:.75rem;
+  letter-spacing:.08em;
+  color:#6b7280;
 }
 
-.logo-tagline {
-  font-family: "Playfair Display", cursive;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: #6b7280;
-}
-
-
+/* HEADER TEXT */
 .header-divider{
   width:2px;
   height:60px;
   background:var(--lilac-dark);
+  flex-shrink:0;
+}
+
+.header-text{
+  flex:1;
+  min-width:0;
 }
 
 .header-text h2{
   font-family:'Poppins',sans-serif;
-  font-size:35px;
+  font-size:1.5rem;
   color:var(--lilac-dark);
-  margin:0;
+  line-height:1.2;
 }
+
 .header-text p{
   font-size:13px;
-  margin:0;
   color:#555;
 }
 
-
-
-/* ================= NAV ================= */
+/* =========================
+   NAVIGATION
+========================= */
 nav ul{
   display:flex;
   gap:22px;
   list-style:none;
-  margin:0;
-  padding:0;
 }
 
 nav a{
   text-decoration:none;
   font-weight:600;
   color:#444;
+  transition:color .2s ease;
+  white-space:nowrap;
 }
 
 nav a:hover{
   color:var(--lilac-primary);
 }
 
-/* ================= MOBILE MENU ================= */
-.mobile-menu-toggle{
-  display:none;
-  width:42px;
-  height:42px;
-  background:var(--lilac-light);
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-}
-
-.mobile-menu-toggle span{
-  position:absolute;
-  width:22px;
-  height:2.5px;
-  background:var(--lilac-dark);
-  border-radius:2px;
-  transition:.3s ease;
-}
-
-.mobile-menu-toggle span:nth-child(1){transform:translateY(-7px);}
-.mobile-menu-toggle span:nth-child(3){transform:translateY(7px);}
-
-.mobile-menu-toggle.active span:nth-child(1){transform:rotate(45deg);}
-.mobile-menu-toggle.active span:nth-child(2){opacity:0;}
-.mobile-menu-toggle.active span:nth-child(3){transform:rotate(-45deg);}
-
+/* =========================
+   MOBILE MENU
+========================= */
 .mobile-menu{
   position:absolute;
   top:100%;
   left:0;
   width:100%;
   background:#fff;
-  display:flex;
+  display:none;
   flex-direction:column;
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .4s ease;
   box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
-.mobile-menu.open{max-height:500px;}
-
 .mobile-menu a{
-  padding:16px 6%;
-  text-decoration:none;
+  padding:16px 8%;
   border-bottom:1px solid #eee;
-  color:#1f2937;
+  text-decoration:none;
   font-weight:600;
+  color:#333;
 }
 
-/* ================= PAGE ================= */
+.mobile-menu.open{
+  display:flex;
+  animation:slideDown .35s ease;
+}
+
+/* HAMBURGER */
+.mobile-menu-toggle{
+  width:42px;
+  height:42px;
+  display:none;
+  background:var(--lilac-soft);
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  position:relative;
+  flex-shrink:0;
+}
+
+.mobile-menu-toggle span{
+  position:absolute;
+  left:50%;
+  width:22px;
+  height:2.5px;
+  background:var(--lilac-dark);
+  border-radius:2px;
+  transform:translateX(-50%);
+  transition:.35s ease;
+}
+
+.mobile-menu-toggle span:nth-child(1){top:12px}
+.mobile-menu-toggle span:nth-child(2){top:20px}
+.mobile-menu-toggle span:nth-child(3){top:28px}
+
+.mobile-menu-toggle.active span:nth-child(1){
+  transform:translate(-50%,8px) rotate(45deg);
+}
+.mobile-menu-toggle.active span:nth-child(2){
+  opacity:0;
+}
+.mobile-menu-toggle.active span:nth-child(3){
+  transform:translate(-50%,-8px) rotate(-45deg);
+}
+
+/* =========================
+   PAGE CONTAINER
+========================= */
 .container{
   max-width:1200px;
   margin:auto;
-  padding:30px 20px 50px;
+  padding:40px 20px 60px;
 }
 
-h1{
+.page-header{
   text-align:center;
+  margin-bottom:50px;
+}
+
+.page-header h1{
+  font-size:2.5rem;
   color:var(--lilac-dark);
+  margin-bottom:0.5rem;
 }
 
 .subtitle{
-  text-align:center;
   color:#666;
-  margin-bottom:40px;
+  font-size:1.1rem;
+  max-width:700px;
+  margin:0 auto;
 }
 
-/* ================= NEWS GRID ================= */
+/* =========================
+   NEWS GRID
+========================= */
 .news-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
   gap:30px;
+  margin-bottom:40px;
 }
 
 .news-card{
@@ -197,213 +239,762 @@ h1{
   border-radius:16px;
   overflow:hidden;
   box-shadow:0 8px 25px rgba(0,0,0,.08);
-  transition:.3s ease;
+  transition:transform .3s ease, box-shadow .3s ease;
+  display:flex;
+  flex-direction:column;
 }
 
-.news-card:hover{transform:translateY(-4px);}
+.news-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 35px rgba(0,0,0,.12);
+}
 
+/* NEWS IMAGE/VIDEO */
 .news-image{
   position:relative;
+  overflow:hidden;
+  background:#f0f0f0;
 }
 
-.news-image img,
-.news-video{
+.news-image img{
   width:100%;
-  height:220px;
+  height:240px;
   object-fit:cover;
-  border:none;
+  display:block;
+  transition:transform .3s ease;
+}
+
+.news-card:hover .news-image img{
+  transform:scale(1.05);
+}
+
+.news-image video,
+.news-image iframe{
+  width:100%;
+  height:240px;
+  object-fit:cover;
+  display:block;
 }
 
 .badge{
   position:absolute;
-  top:12px;
-  left:12px;
+  top:15px;
+  right:15px;
   background:var(--lilac-primary);
   color:#fff;
-  font-size:12px;
-  padding:5px 12px;
+  font-size:0.75rem;
+  font-weight:600;
+  padding:6px 14px;
   border-radius:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  text-transform:uppercase;
+  letter-spacing:0.05em;
 }
 
+/* NEWS CONTENT */
 .news-content{
   padding:20px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
 .news-content h3{
-  margin:0 0 6px;
-  font-size:18px;
+  margin:0 0 10px;
+  font-size:1.15rem;
   color:var(--lilac-dark);
+  line-height:1.4;
+  font-weight:600;
 }
 
 .date{
-  font-size:12px;
-  color:#777;
-}
-
-.preview,
-.more-text{
-  font-size:14px;
-  line-height:1.6;
-}
-
-/* Read more */
-.more-text{display:none;margin-top:10px;}
-.more-text.show{display:block;}
-
-/* ================= ACTION BUTTONS ================= */
-.actions{
-  margin-top:16px;
+  font-size:0.85rem;
+  color:#999;
+  margin-bottom:12px;
   display:flex;
-  justify-content:space-between;
+  align-items:center;
+  gap:5px;
+}
+
+.date::before{
+  content:"📅";
+  font-size:0.9rem;
+}
+
+.preview{
+  font-size:0.95rem;
+  line-height:1.6;
+  color:#555;
+  margin-bottom:15px;
+}
+
+.more-text{
+  display:none;
+  font-size:0.95rem;
+  line-height:1.7;
+  color:#555;
+  margin-top:10px;
+  padding-top:15px;
+  border-top:1px solid #f0f0f0;
+}
+
+.more-text.show{
+  display:block;
+  animation:fadeIn .3s ease;
+}
+
+/* ACTION BUTTONS */
+.actions{
+  margin-top:auto;
+  padding-top:15px;
+  display:flex;
   gap:10px;
+  flex-wrap:wrap;
+}
+
+.read-more,
+.gallery-btn{
+  padding:10px 20px;
+  border-radius:8px;
+  font-size:0.9rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .3s ease;
+  border:none;
 }
 
 .read-more{
-  background:none;
-  border:none;
-  color:var(--lilac-primary);
-  font-weight:600;
-  cursor:pointer;
+  background:var(--lilac-primary);
+  color:#fff;
+  flex:1;
+  min-width:120px;
+}
+
+.read-more:hover{
+  background:var(--lilac-dark);
+  transform:translateY(-2px);
 }
 
 .gallery-btn{
-  background:var(--lilac-light);
-  border:1px solid var(--border);
-  padding:7px 16px;
-  border-radius:20px;
-  font-size:12px;
-  cursor:pointer;
+  background:var(--lilac-soft);
+  color:var(--lilac-dark);
+  border:2px solid var(--lilac-primary);
+  flex:1;
+  min-width:120px;
 }
 
-/* ================= GALLERY ================= */
+.gallery-btn:hover{
+  background:var(--lilac-primary);
+  color:#fff;
+}
+
+/* =========================
+   GALLERY
+========================= */
 .gallery{
   display:none;
-  padding:15px;
-  border-top:1px solid var(--border);
+  padding:20px;
   background:#faf7ff;
-  grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
-  gap:10px;
+  border-top:2px solid var(--lilac-soft);
+  grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  gap:12px;
 }
 
-.gallery.show{display:grid;}
+.gallery.show{
+  display:grid;
+  animation:slideDown .4s ease;
+}
 
 .gallery img{
   width:100%;
-  height:90px;
+  height:100px;
   object-fit:cover;
   border-radius:8px;
+  cursor:pointer;
+  transition:transform .3s ease, box-shadow .3s ease;
 }
 
-/* ================= TABLET ================= */
-@media(max-width:768px){
-  nav{display:none;}
-  .mobile-menu-toggle{display:flex;}
-  .header-divider{display:none;}
-  .header-left{max-width:85%;}
-  .header-text h2{font-size:15px;}
-  .header-text p{font-size:12px;}
-  .logo img{height:55px;}
+.gallery img:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* ================= MOBILE COMPACT MODE ================= */
-@media(max-width:480px){
-
-  /* tighter grid */
-  .news-grid{
-    gap:16px;
-  }
-
-  /* compact cards */
-  .news-card{
-    border-radius:12px;
-  }
-
-  /* smaller media */
-  .news-image img,
-  .news-video{
-    height:140px;
-  }
-
-  /* reduce padding */
-  .news-content{
-    padding:12px;
-  }
-
-  /* smaller titles */
-  .news-content h3{
-    font-size:15px;
-    line-height:1.25;
-  }
-
-  /* smaller text */
-  .preview,
-  .more-text{
-    font-size:13px;
-  }
-
-  .date{
-    font-size:11px;
-  }
-
-  /* compact buttons */
-  .actions{
-    flex-direction:row;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-
-  .gallery-btn{
-    padding:5px 12px;
-    font-size:11px;
-  }
-
-  .read-more{
-    font-size:12px;
-  }
-
-  /* gallery thumbnails smaller */
-  .gallery img{
-    height:65px;
-  }
-
-  /* shorten preview text */
-  .preview{
-    display:-webkit-box;
-    -webkit-line-clamp:3;
-    -webkit-box-orient:vertical;
-    overflow:hidden;
-  }
-}
-
+/* =========================
+   PAGINATION
+========================= */
 .pagination{
   display:flex;
   justify-content:center;
-  gap:8px;
-  margin-top:40px;
+  gap:10px;
+  margin-top:50px;
+  flex-wrap:wrap;
 }
 
 .pagination button{
-  border:none;
-  padding:8px 14px;
-  border-radius:6px;
-  background:#f3eefb;
+  border:2px solid var(--lilac-soft);
+  padding:10px 18px;
+  border-radius:8px;
+  background:#fff;
   cursor:pointer;
   font-weight:600;
-  color:#5f4b8b;
+  color:var(--lilac-dark);
+  transition:all .3s ease;
+  min-width:45px;
+}
+
+.pagination button:hover{
+  background:var(--lilac-soft);
+  border-color:var(--lilac-primary);
 }
 
 .pagination button.active{
-  background:#8a6fbf;
+  background:var(--lilac-primary);
+  color:#fff;
+  border-color:var(--lilac-primary);
+}
+
+/* =========================
+   FOOTER - CREATIVE DESIGN
+========================= */
+footer{
+  background:linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-accent) 100%);
+  color:#e5e7eb;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Decorative Background Elements */
+footer::before{
+  content:'';
+  position:absolute;
+  top:-50%;
+  right:-10%;
+  width:500px;
+  height:500px;
+  background:radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+footer::after{
+  content:'';
+  position:absolute;
+  bottom:-30%;
+  left:-5%;
+  width:400px;
+  height:400px;
+  background:radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.footer-main{
+  padding:60px 8% 30px;
+  position:relative;
+  z-index:1;
+}
+
+.footer-top{
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:40px;
+  margin-bottom:40px;
+  padding-bottom:40px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+/* Footer Logo Section */
+.footer-brand{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.footer-logo-container{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.footer-logo-container img{
+  height:80px;
+  width:auto;
+  object-fit:contain;
+  filter:brightness(0) invert(1);
+}
+
+.footer-brand-text h3{
+  font-family:'Poppins', sans-serif;
+  font-size:1.3rem;
+  color:#fff;
+  margin-bottom:5px;
+  line-height:1.3;
+}
+
+.footer-brand-text .tagline{
+  font-family:"Playfair Display", cursive;
+  font-size:0.9rem;
+  color:var(--lilac-soft);
+  font-style:italic;
+  letter-spacing:0.05em;
+}
+
+.footer-description{
+  color:#d1d5db;
+  line-height:1.8;
+  font-size:0.95rem;
+}
+
+.footer-mission{
+  background:rgba(139,92,246,0.15);
+  padding:15px 20px;
+  border-radius:10px;
+  border-left:4px solid var(--lilac-primary);
+  margin-top:15px;
+}
+
+.footer-mission p{
+  font-size:0.9rem;
+  color:#e5e7eb;
+  font-style:italic;
+}
+
+/* Footer Columns */
+.footer-column h4{
+  color:#fff;
+  font-size:1.1rem;
+  margin-bottom:20px;
+  font-weight:600;
+  position:relative;
+  padding-bottom:10px;
+}
+
+.footer-column h4::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:40px;
+  height:3px;
+  background:var(--lilac-primary);
+  border-radius:2px;
+}
+
+.footer-column ul{
+  list-style:none;
+}
+
+.footer-column ul li{
+  margin-bottom:12px;
+}
+
+.footer-column a{
+  color:#d1d5db;
+  text-decoration:none;
+  transition:all .3s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.95rem;
+}
+
+.footer-column a::before{
+  content:'→';
+  opacity:0;
+  transform:translateX(-10px);
+  transition:all .3s ease;
+}
+
+.footer-column a:hover{
+  color:#fff;
+  padding-left:5px;
+}
+
+.footer-column a:hover::before{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* Contact Info */
+.contact-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:15px;
+  color:#d1d5db;
+  font-size:0.9rem;
+}
+
+.contact-item .icon{
+  color:var(--lilac-primary);
+  font-size:1.2rem;
+  margin-top:2px;
+  flex-shrink:0;
+}
+
+/* Social Media */
+.social-links{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+
+.social-link{
+  width:45px;
+  height:45px;
+  background:rgba(255,255,255,0.1);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  text-decoration:none;
+  transition:all .3s ease;
+  font-size:1.2rem;
+}
+
+.social-link:hover{
+  background:var(--lilac-primary);
+  transform:translateY(-3px);
+  box-shadow:0 5px 15px rgba(139,92,246,0.4);
+}
+
+/* Footer Bottom */
+.footer-bottom{
+  padding:25px 8%;
+  background:rgba(0,0,0,0.2);
+  position:relative;
+  z-index:1;
+}
+
+.footer-bottom-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+.footer-credit{
+  color:#9ca3af;
+  font-size:0.9rem;
+}
+
+.footer-credit strong{
+  color:var(--lilac-primary);
+  font-weight:600;
+}
+
+.footer-links{
+  display:flex;
+  gap:25px;
+}
+
+.footer-links a{
+  color:#9ca3af;
+  text-decoration:none;
+  font-size:0.9rem;
+  transition:color .3s ease;
+}
+
+.footer-links a:hover{
   color:#fff;
 }
-.news-image video {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 10px;
+
+/* =========================
+   CHAT FLOAT
+========================= */
+.chat-float{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  z-index:999;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
+.chat-btn{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  transition:transform .3s ease;
+  position:relative;
+}
 
+.chat-btn:hover{
+  transform:scale(1.1);
+}
+
+.chat-btn.whatsapp{
+  background:#25D366;
+}
+
+.chat-btn.facebook{
+  background:#1877F2;
+}
+
+.chat-btn img{
+  width:35px;
+  height:35px;
+}
+
+.chat-tooltip{
+  position:absolute;
+  right:70px;
+  background:#333;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:6px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+  font-size:0.85rem;
+}
+
+.chat-float:hover .chat-tooltip{
+  opacity:1;
+}
+
+/* =========================
+   MOBILE OPTIMIZATION
+========================= */
+@media(max-width:1024px){
+  .header-text h2{
+    font-size:1.2rem;
+  }
+  
+  nav ul{
+    gap:15px;
+  }
+  
+  nav a{
+    font-size:0.9rem;
+  }
+
+  .footer-top{
+    grid-template-columns:1fr 1fr;
+    gap:35px;
+  }
+
+  .footer-brand{
+    grid-column:1 / -1;
+  }
+
+  /* Hide services column on tablet */
+  .footer-column:nth-child(3){
+    display:none;
+  }
+}
+
+@media(max-width:768px){
+
+  body{
+    padding-top:70px;
+  }
+
+  .main-header{
+    padding:10px 5%;
+  }
+
+  nav{display:none}
+  .mobile-menu-toggle{display:flex}
+
+  .header-divider,
+  .header-text p{
+    display:none;
+  }
+
+  .header-text h2{
+    font-size:14px;
+    text-align:left;
+  }
+
+  .logo img{
+    height:48px;
+  }
+
+  .logo-tagline{
+    font-size:0.65rem;
+  }
+
+  /* PAGE CONTENT */
+  .container{
+    padding:30px 15px 50px;
+  }
+
+  .page-header h1{
+    font-size:2rem;
+  }
+
+  .subtitle{
+    font-size:1rem;
+  }
+
+  .news-grid{
+    grid-template-columns:1fr;
+    gap:25px;
+  }
+
+  .news-image img,
+  .news-image video,
+  .news-image iframe{
+    height:200px;
+  }
+
+  .actions{
+    flex-direction:row;
+  }
+
+  .read-more,
+  .gallery-btn{
+    flex:1;
+  }
+
+  /* FOOTER - MOBILE */
+  .footer-main{
+    padding:40px 5% 20px;
+  }
+
+  .footer-top{
+    grid-template-columns:1fr;
+    gap:30px;
+  }
+
+  .footer-brand{
+    grid-column:1;
+  }
+
+  .footer-logo-container{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .footer-logo-container img{
+    height:60px;
+  }
+
+  /* Hide services and contact columns on mobile */
+  .footer-column:nth-child(3),
+  .footer-column:nth-child(4){
+    display:none;
+  }
+
+  .footer-bottom{
+    padding:20px 5%;
+  }
+
+  .footer-bottom-content{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .footer-links{
+    display:none; /* Hide footer links on mobile */
+  }
+
+  .chat-float{
+    bottom:20px;
+    right:20px;
+  }
+
+  .chat-btn{
+    width:50px;
+    height:50px;
+  }
+
+  .chat-btn img{
+    width:28px;
+    height:28px;
+  }
+}
+
+@media(max-width:480px){
+
+  .page-header h1{
+    font-size:1.7rem;
+  }
+
+  .subtitle{
+    font-size:0.9rem;
+  }
+
+  .news-content h3{
+    font-size:1rem;
+  }
+
+  .news-image img,
+  .news-image video,
+  .news-image iframe{
+    height:180px;
+  }
+
+  .preview,
+  .more-text{
+    font-size:0.9rem;
+  }
+
+  .gallery{
+    grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+    gap:8px;
+    padding:15px;
+  }
+
+  .gallery img{
+    height:80px;
+  }
+
+  .pagination button{
+    padding:8px 14px;
+    font-size:0.85rem;
+  }
+
+  .footer-brand-text h3{
+    font-size:1.1rem;
+  }
+
+  .social-links{
+    justify-content:center;
+  }
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes slideDown{
+  from{
+    opacity:0;
+    transform:translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+  }
+  to{
+    opacity:1;
+  }
+}
+
+/* =========================
+   MOTION SAFETY
+========================= */
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation:none!important;
+    transition:none!important;
+  }
+}
 
 </style>
 </head>
@@ -413,8 +1004,10 @@ h1{
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <a href="/"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-      <span class="logo-tagline">consumer rights first</span></a>
+      <a href="/">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+        <span class="logo-tagline">consumer rights first</span>
+      </a>
     </div>
     <div class="header-divider"></div>
     <div class="header-text">
@@ -449,36 +1042,33 @@ h1{
 </header>
 
 
-  <div class="container">
-  <h1>News & Recent Activities</h1>
-  <p class="subtitle">
-    Updates on OCCPA interventions, stakeholder engagements, and market activities
-  </p>
+<div class="container">
+  <div class="page-header">
+    <h1>News & Recent Activities</h1>
+    <p class="subtitle">
+      Updates on OCCPA interventions, stakeholder engagements, and market activities across Ondo State
+    </p>
+  </div>
 
   <div class="news-grid">
 
-<!-- NEWS ITEM -->
+    <!-- NEWS ITEM 1 -->
     <div class="news-card">
-
       <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}" alt="Market Regulation">
         <span class="badge">Market Regulation</span>
       </div>
 
       <div class="news-content">
-        <h3>Ondo Consumer Protection Agency Enforces Fair Trade Compliance in Akure filling stations</h3>
-        <p class="date">Dec, 2025</p>
+        <h3>Ondo Consumer Protection Agency Enforces Fair Trade Compliance in Akure Filling Stations</h3>
+        <p class="date">Dec 2025</p>
 
         <p class="preview">
-The Ondo State Competitive and Consumer Protection Agency (OCCPA) carried out an enforcement 
-exercise in malls 
-across Akure, focusing on expired products, hygiene standards, and fair pricing practices.
+          The Ondo State Competitive and Consumer Protection Agency (OCCPA) carried out an enforcement exercise in malls across Akure, focusing on expired products, hygiene standards, and fair pricing practices.
         </p>
 
         <p class="more-text">
-The agency inspected product expiry dates, assessed cleanliness and safety conditions, 
-and engaged traders on compliance with consumer protection regulations. OSCCPA reaffirmed its commitment 
-to safeguarding consumers and ensuring a safe, transparent, and competitive marketplace.
+          The agency inspected product expiry dates, assessed cleanliness and safety conditions, and engaged traders on compliance with consumer protection regulations. OSCCPA reaffirmed its commitment to safeguarding consumers and ensuring a safe, transparent, and competitive marketplace.
         </p>
 
         <div class="actions">
@@ -489,36 +1079,30 @@ to safeguarding consumers and ensuring a safe, transparent, and competitive mark
 
       <!-- IMAGE GALLERY -->
       <div class="gallery">
-        <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/m2.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/m3.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/m4.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}" alt="Gallery 1">
+        <img src="{{ url_for('static', filename='gallery/m2.jpeg') }}" alt="Gallery 2">
+        <img src="{{ url_for('static', filename='gallery/m3.jpeg') }}" alt="Gallery 3">
+        <img src="{{ url_for('static', filename='gallery/m4.jpeg') }}" alt="Gallery 4">
       </div>
     </div>
-    
 
-<!-- NEWS ITEM -->
+    <!-- NEWS ITEM 2 -->
     <div class="news-card">
-
       <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}" alt="Market Regulation">
         <span class="badge">Market Regulation</span>
       </div>
 
       <div class="news-content">
-        <h3>Ondo Consumer Protection Agency Enforces Fair Trade Compliance in Akure filling stations</h3>
-        <p class="date">Dec, 2025</p>
+        <h3>Ondo Consumer Protection Agency Enforces Fair Trade Compliance in Akure Filling Stations</h3>
+        <p class="date">Dec 2025</p>
 
         <p class="preview">
-      The Ondo State Competitive and Consumer Protection Agency (OCCPA) 
-      has intensified its enforcement activities in Akure malls, 
-      clamping down on unfair trade practices to protect consumers.
+          The Ondo State Competitive and Consumer Protection Agency (OCCPA) has intensified its enforcement activities in Akure malls, clamping down on unfair trade practices to protect consumers.
         </p>
 
         <p class="more-text">
-The agency conducted inspections to ensure businesses comply with pricing transparency, 
-product quality standards, and fair business conduct. OSCCPA reiterated its commitment to 
-promoting a fair marketplace and urged consumers to report any suspicious or exploitative practices for prompt action.
+          The agency conducted inspections to ensure businesses comply with pricing transparency, product quality standards, and fair business conduct. OSCCPA reiterated its commitment to promoting a fair marketplace and urged consumers to report any suspicious or exploitative practices for prompt action.
         </p>
 
         <div class="actions">
@@ -529,45 +1113,39 @@ promoting a fair marketplace and urged consumers to report any suspicious or exp
 
       <!-- IMAGE GALLERY -->
       <div class="gallery">
-        <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/f2.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/f3.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/f4.jpeg') }}">
-         <img src="{{ url_for('static', filename='gallery/f5.jpeg') }}">
-          <img src="{{ url_for('static', filename='gallery/f6.jpeg') }}">
-           <img src="{{ url_for('static', filename='gallery/f7.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}" alt="Gallery 1">
+        <img src="{{ url_for('static', filename='gallery/f2.jpeg') }}" alt="Gallery 2">
+        <img src="{{ url_for('static', filename='gallery/f3.jpeg') }}" alt="Gallery 3">
+        <img src="{{ url_for('static', filename='gallery/f4.jpeg') }}" alt="Gallery 4">
+        <img src="{{ url_for('static', filename='gallery/f5.jpeg') }}" alt="Gallery 5">
+        <img src="{{ url_for('static', filename='gallery/f6.jpeg') }}" alt="Gallery 6">
+        <img src="{{ url_for('static', filename='gallery/f7.jpeg') }}" alt="Gallery 7">
       </div>
     </div>
-    
 
-
-<!-- NEWS ITEM 1 -->
+    <!-- NEWS ITEM 3 - VIDEO -->
     <div class="news-card">
- <div class="news-image">
+      <div class="news-image">
+        <iframe 
+          src="https://www.youtube.com/embed/TYgfR4ssT-I"
+          title="OSCCPA Safety Standards Video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+        <span class="badge">Safety Standards</span>
+      </div>
 
-  <iframe 
-    src="https://www.youtube.com/embed/TYgfR4ssT-I"
-    class="news-video"
-    title="OSCCPA Safety Standards Video"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen>
-  </iframe>
-
-  <span class="badge">Safety Standards</span>
-
-</div>
       <div class="news-content">
-        <h3>The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure</h3>
+        <h3>Ondo State Government Orders Closure of Semi-Mechanized Abattoir in Isinkan Area of Akure</h3>
         <p class="date">December 2025</p>
 
         <p class="preview">
-          The Ondo State Government has issued a close down of the  Semi-Mechanized Abattoir in Isinkan Area of Akure.
+          The Ondo State Government has issued a close down order for the Semi-Mechanized Abattoir in Isinkan Area of Akure following safety concerns.
         </p>
 
         <p class="more-text">
-          This follows an inspection by the State competition and consumer protection agency after several warning and sensitization on the danger of roasting goat meat with tires and disturbing sanitary condition of the facility 
-          Watch Video Report.
+          This follows an inspection by the State Competition and Consumer Protection Agency after several warnings and sensitization on the danger of roasting goat meat with tires and disturbing sanitary conditions of the facility. Watch the video report for more details.
         </p>
 
         <div class="actions">
@@ -576,47 +1154,47 @@ promoting a fair marketplace and urged consumers to report any suspicious or exp
       </div>  
     </div>
 
-
-<!-- NEWS ITEM 2 -->
-<div class="news-card">
-
-  <!-- Video Preview Section -->
-  <div class="news-image">
-    <video controls poster="{{ url_for('static', filename='gallery/isi1.png') }}">
-      <source src="{{ url_for('static', filename='videos/isinkan1.mp4') }}" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-     <video controls>
-    <source src="{{ url_for('static', filename='videos/isinkan2.mp4') }}">
-  </video>
-    <span class="badge">Safety</span>
-  </div>
-
-  <div class="news-content">
-    <h3>Sanitary and Environmental Standards at Isinkan Abbattoir</h3>
-    <p class="date">December 2025</p>
-   </div>
-</div>
-
-   <!-- NEWS ITEM 2 -->
+    <!-- NEWS ITEM 4 - LOCAL VIDEO -->
     <div class="news-card">
       <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/gal1.jpeg') }}">
+        <video controls poster="{{ url_for('static', filename='gallery/isi1.png') }}">
+          <source src="{{ url_for('static', filename='videos/isinkan1.mp4') }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <span class="badge">Safety</span>
+      </div>
+
+      <div class="news-content">
+        <h3>Sanitary and Environmental Standards at Isinkan Abattoir</h3>
+        <p class="date">December 2025</p>
+
+        <p class="preview">
+          Documentary footage showing the sanitary and environmental conditions at the Isinkan Abattoir that led to the closure order.
+        </p>
+
+        <div class="actions">
+          <button class="read-more">Watch Video</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWS ITEM 5 -->
+    <div class="news-card">
+      <div class="news-image">
+        <img src="{{ url_for('static', filename='gallery/gal1.jpeg') }}" alt="Sensitization">
         <span class="badge">Sensitization</span>
       </div>
 
       <div class="news-content">
-        <h3>Stakeholder Engagement and sensitization at Isinkan marketplace</h3>
+        <h3>Stakeholder Engagement and Sensitization at Isinkan Marketplace</h3>
         <p class="date">December 2025</p>
 
         <p class="preview">
-          The agency engaged market leaders and trade unions on consumer
-          protection laws and ethical business practices.
+          The agency engaged market leaders and trade unions on consumer protection laws and ethical business practices.
         </p>
 
         <p class="more-text">
-          Discussions focused on dispute resolution, transparency in pricing,
-          and strengthening collaboration between traders and government.
+          Discussions focused on dispute resolution, transparency in pricing, and strengthening collaboration between traders and government. The engagement was aimed at fostering a culture of compliance and consumer rights awareness in the marketplace.
         </p>
 
         <div class="actions">
@@ -626,80 +1204,71 @@ promoting a fair marketplace and urged consumers to report any suspicious or exp
       </div>
 
       <div class="gallery">
-        <img src="{{ url_for('static', filename='gallery/gal1.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal2.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal3.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal4.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal5.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal6.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal7.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal8.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal9.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal10.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal11.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal12.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/gal13.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/gal1.jpeg') }}" alt="Gallery 1">
+        <img src="{{ url_for('static', filename='gallery/gal2.jpeg') }}" alt="Gallery 2">
+        <img src="{{ url_for('static', filename='gallery/gal3.jpeg') }}" alt="Gallery 3">
+        <img src="{{ url_for('static', filename='gallery/gal4.jpeg') }}" alt="Gallery 4">
+        <img src="{{ url_for('static', filename='gallery/gal5.jpeg') }}" alt="Gallery 5">
+        <img src="{{ url_for('static', filename='gallery/gal6.jpeg') }}" alt="Gallery 6">
+        <img src="{{ url_for('static', filename='gallery/gal7.jpeg') }}" alt="Gallery 7">
+        <img src="{{ url_for('static', filename='gallery/gal8.jpeg') }}" alt="Gallery 8">
+        <img src="{{ url_for('static', filename='gallery/gal9.jpeg') }}" alt="Gallery 9">
+        <img src="{{ url_for('static', filename='gallery/gal10.jpeg') }}" alt="Gallery 10">
+        <img src="{{ url_for('static', filename='gallery/gal11.jpeg') }}" alt="Gallery 11">
+        <img src="{{ url_for('static', filename='gallery/gal12.jpeg') }}" alt="Gallery 12">
+        <img src="{{ url_for('static', filename='gallery/gal13.jpeg') }}" alt="Gallery 13">
       </div>
     </div>
 
-
-<!-- NEWS ITEM 2 -->
+    <!-- NEWS ITEM 6 -->
     <div class="news-card">
       <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/a1.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/a1.jpeg') }}" alt="Awareness">
         <span class="badge">Awareness</span>
       </div>
 
       <div class="news-content">
-        <h3>sensitization and Awareness campaign at the 2025 annual conference of the Association of Female Skilled Artisans initiatives</h3>
+        <h3>Sensitization and Awareness Campaign at the 2025 Annual Conference of the Association of Female Skilled Artisans Initiatives</h3>
         <p class="date">December 2025</p>
 
         <p class="preview">
-          The agency engaged skilled female artisans,  leaders and trade unions on consumer
-          protection laws and ethical business practices.
+          The agency engaged skilled female artisans, leaders and trade unions on consumer protection laws and ethical business practices.
+        </p>
+
+        <p class="more-text">
+          This initiative aimed to empower women entrepreneurs with knowledge about their rights and responsibilities in the marketplace, promoting fair trade and consumer protection awareness among female business owners.
         </p>
 
         <div class="actions">
+          <button class="read-more">Read More</button>
           <button class="gallery-btn">View Gallery</button>
         </div>
       </div>
 
       <div class="gallery">
-        <img src="{{ url_for('static', filename='gallery/a1.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/a2.jpeg') }}">
-        <img src="{{ url_for('static', filename='gallery/a3.jpeg') }}">
+        <img src="{{ url_for('static', filename='gallery/a1.jpeg') }}" alt="Gallery 1">
+        <img src="{{ url_for('static', filename='gallery/a2.jpeg') }}" alt="Gallery 2">
+        <img src="{{ url_for('static', filename='gallery/a3.jpeg') }}" alt="Gallery 3">
       </div>
     </div>
 
-
-
-    <!-- NEWS ITEM -->
+    <!-- NEWS ITEM 7 -->
     <div class="news-card">
-
       <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}">
-        <span class="badge">Market Regulation</span>
+        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}" alt="Partnership">
+        <span class="badge">Partnership</span>
       </div>
 
       <div class="news-content">
         <h3>Ondo State Consumer Protection Agency Strengthens Ties with FCCPC</h3>
-        <p class="date">April, 16, 2025</p>
+        <p class="date">April 16, 2025</p>
 
         <p class="preview">
-        In a strategic move to deepen consumer protection and promote fair competition in Ondo State, the Ondo State Competition and Consumer Protection Agency has undertaken a high-level familiarization visit to the Federal Competition and Consumer Protection Commission (FCCPC) in Abuja.
+          In a strategic move to deepen consumer protection and promote fair competition in Ondo State, the Ondo State Competition and Consumer Protection Agency has undertaken a high-level familiarization visit to the Federal Competition and Consumer Protection Commission (FCCPC) in Abuja.
         </p>
 
         <p class="more-text">
-The visit, which marks a significant step in regulatory collaboration, was aimed at fostering knowledge sharing, replicating best practices, and exploring avenues for joint initiatives between the two agencies.
-
-The FCCPC, Nigeria’s apex consumer protection and competition regulator, plays a critical role in safeguarding consumer rights and ensuring a fair marketplace. Its mandate spans across key areas including consumer protection, competition regulation, and business education. The Commission is renowned for its robust mechanisms in handling consumer complaints, regulating market conduct, and educating both businesses and consumers on their rights and responsibilities.
-
-During the visit, the Ondo State delegation led by the Administrative Secretary Hajia Kudirat Ola engaged extensively with FCCPC officials on topics central to strengthening consumer protection frameworks at the subnational level.
-          Speaking during the engagement, the Administrative Secretary, Hajia Kudirat Ola, emphasized their commitment to building a responsive, transparent, and effective consumer protection system that reflects global best practices while addressing local realities.
-
-"The visit has been an eye-opener," said one senior official from the Ondo State agency. "We now have clearer insights into how to strengthen our complaint resolution systems, raise consumer awareness, and ensure that businesses in Ondo State adhere to fair trade practices."
-          The FCCPC lauded the initiative, reaffirming its readiness to support state-level agencies in advancing the national goal of a consumer-centric and competition-friendly economy. As more states take proactive steps toward building their regulatory capacities, partnerships like this signal a positive shift toward a more decentralized and efficient consumer protection landscape in Nigeria.
-
+          The visit, which marks a significant step in regulatory collaboration, was aimed at fostering knowledge sharing, replicating best practices, and exploring avenues for joint initiatives between the two agencies. The FCCPC, Nigeria's apex consumer protection and competition regulator, plays a critical role in safeguarding consumer rights and ensuring a fair marketplace. During the visit, the Ondo State delegation led by the Administrative Secretary Hajia Kudirat Ola engaged extensively with FCCPC officials on topics central to strengthening consumer protection frameworks at the subnational level.
         </p>
 
         <div class="actions">
@@ -708,48 +1277,162 @@ During the visit, the Ondo State delegation led by the Administrative Secretary 
         </div>
       </div>
 
-      <!-- IMAGE GALLERY -->
       <div class="gallery">
-        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}">
-        <img src="{{ url_for('static', filename='gallery/fcpc2.jpg') }}">
-        <img src="{{ url_for('static', filename='gallery/fcpc3.jpg') }}">
-        <img src="{{ url_for('static', filename='gallery/fcpc4.jpg') }}">
+        <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}" alt="Gallery 1">
+        <img src="{{ url_for('static', filename='gallery/fcpc2.jpg') }}" alt="Gallery 2">
+        <img src="{{ url_for('static', filename='gallery/fcpc3.jpg') }}" alt="Gallery 3">
+        <img src="{{ url_for('static', filename='gallery/fcpc4.jpg') }}" alt="Gallery 4">
       </div>
     </div>
 
-      <!-- NEWS CARD 2 -->
-      <div class="news-card">
-        <div class="news-image">
-          <img src="{{ url_for('static', filename='gallery/atwap.jpg') }}" alt="Consumer Awareness">
-          <span class="news-date">Nov 2025</span>
-        </div>
-        <div class="news-content">
-          <h3>Agency partners ATWAP on quality standard in Ondo</h3>
-          <p class="preview">
-            In efforts to ensure quality water is consumed by the people, the Competitive and Consumer Protection Agency(CCPA) has partnered Association of Table Water Producers (ATWAP) in Ondo State.
-            The partnership is focusing on how to strengthen consumer protection and water quality standards in Ondo State.
-          </p>
-          <p class="more-text">
-            The partnership is focusing on how to strengthen consumer protection and water quality standards in Ondo State.
-            <br><br>
-            In her address at the meeting attended by the National President of ATWAP, Dr. Mrs. Clementia Ativie, and the association’s executives in Akure, the state capital, on Thursday, the Administrative Secretary of CCPA, Hajia Kudirat Ola explained that “the strategic meeting is aimed at fostering collaboration and ensuring compliance with consumer protection standards in the state.”
-            <br><br>
-            <!-- You can keep the rest of the content here -->
-          </p>
-          <div class="actions">
+    <!-- NEWS ITEM 8 -->
+    <div class="news-card">
+      <div class="news-image">
+        <img src="{{ url_for('static', filename='gallery/atwap.jpg') }}" alt="Consumer Awareness">
+        <span class="badge">Partnership</span>
+      </div>
+
+      <div class="news-content">
+        <h3>Agency Partners ATWAP on Quality Standards in Ondo</h3>
+        <p class="date">November 2025</p>
+
+        <p class="preview">
+          In efforts to ensure quality water is consumed by the people, the Competitive and Consumer Protection Agency (CCPA) has partnered with the Association of Table Water Producers (ATWAP) in Ondo State.
+        </p>
+
+        <p class="more-text">
+          The partnership is focusing on how to strengthen consumer protection and water quality standards in Ondo State. In her address at the meeting attended by the National President of ATWAP, Dr. Mrs. Clementia Ativie, and the association's executives in Akure, the state capital, the Administrative Secretary of CCPA, Hajia Kudirat Ola explained that "the strategic meeting is aimed at fostering collaboration and ensuring compliance with consumer protection standards in the state."
+        </p>
+
+        <div class="actions">
           <button class="read-more">Read More</button>
-          <button class="gallery-btn">View Gallery</button>
         </div>
       </div>
     </div>
-
-
-
 
   </div>
   
-    <div id="pagination" class="pagination"></div>
+  <div id="pagination" class="pagination"></div>
 </div>
+
+
+<footer>
+  <div class="footer-main">
+    <div class="footer-top">
+      
+      <!-- FOOTER BRAND WITH LOGO -->
+      <div class="footer-brand">
+        <div class="footer-logo-container">
+          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+          <div class="footer-brand-text">
+            <h3>Ondo State Competition & Consumer Protection Agency</h3>
+            <span class="tagline">consumer rights first</span>
+          </div>
+        </div>
+        
+        <p class="footer-description">
+          Dedicated to protecting consumer rights and promoting fair competition across Ondo State. We ensure transparency, accountability, and justice in the marketplace.
+        </p>
+
+        <div class="footer-mission">
+          <p><strong>Our Mission:</strong>  
+          To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting 
+          ethical trade practices and sustainable socio-economic development across Ondo State.</p>
+        </div>
+
+        <!-- Social Media -->
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook">
+            <span>f</span>
+          </a>
+          <a href="#" class="social-link" aria-label="Twitter">
+            <span>𝕏</span>
+          </a>
+          <a href="#" class="social-link" aria-label="Instagram">
+            <span>📷</span>
+          </a>
+          <a href="#" class="social-link" aria-label="LinkedIn">
+            <span>in</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="footer-column">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/news">News & Activities</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="footer-column">
+        <h4>Our Services</h4>
+        <ul>
+          <li><a href="/complaints">File a Complaint</a></li>
+          <li><a href="/services">Consumer Advocacy</a></li>
+          <li><a href="/services">Market Surveillance</a></li>
+          <li><a href="/services">Business Compliance</a></li>
+          <li><a href="/services">Public Education</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT INFO -->
+      <div class="footer-column">
+        <h4>Contact Us</h4>
+        <div class="contact-item">
+          <span class="icon">📍</span>
+          <span>Ondo State Secretariat Annex<br>Ilesha/Owo Akure, Ondo State, Nigeria</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon">📧</span>
+          <span>info@occpa.on.gov.ng</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon">📞</span>
+          <span>+234 904 335 3001</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon">⏰</span>
+          <span>Mon - Fri: 8AM - 5PM</span>
+        </div>
+      </div>
+
+    </div> <!-- END footer-top -->
+  </div> <!-- END footer-main -->
+
+  <!-- FOOTER BOTTOM -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <div class="footer-credit">
+        © 2026 OSCCPA. All rights reserved. | Powered by <strong>Euphoria Tech</strong>
+      </div>
+      <div class="footer-links">
+        <a href="/">Privacy Policy</a>
+        <a href="/">Terms of Service</a>
+        <a href="/">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating Chat Buttons -->
+<div class="chat-float">
+  <a href="https://wa.me/2349043353001" target="_blank" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+  </a>
+
+  <a href="https://m.me/occpa" target="_blank" class="chat-btn facebook" aria-label="Chat on Facebook">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+  </a>
+
+  <span class="chat-tooltip">Chat with us</span>
+</div>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -796,48 +1479,52 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ---------------- AUTO PAUSE OTHER VIDEOS ---------------- */
-document.querySelectorAll("video").forEach(video=>{
-  video.addEventListener("play",()=>{
-    document.querySelectorAll("video").forEach(v=>{
-      if(v !== video) v.pause();
+  document.querySelectorAll("video").forEach(video => {
+    video.addEventListener("play", () => {
+      document.querySelectorAll("video").forEach(v => {
+        if(v !== video) v.pause();
+      });
     });
   });
-});
 
-/* ---------------- PAGINATION (5 PER PAGE) ---------------- */
-const cards = document.querySelectorAll(".news-card");
-const perPage = 5;
-let currentPage = 1;
+  /* ---------------- PAGINATION (5 PER PAGE) ---------------- */
+  const cards = document.querySelectorAll(".news-card");
+  const perPage = 5;
+  let currentPage = 1;
 
-function showPage(page){
-  currentPage = page;
-  const start = (page - 1) * perPage;
-  const end = start + perPage;
+  function showPage(page){
+    currentPage = page;
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
 
-  cards.forEach((card, index) => {
-    card.style.display = (index >= start && index < end) ? "block" : "none";
-  });
+    cards.forEach((card, index) => {
+      card.style.display = (index >= start && index < end) ? "block" : "none";
+    });
 
-  renderPagination();
-}
-
-function renderPagination(){
-  const totalPages = Math.ceil(cards.length / perPage);
-  const pagination = document.getElementById("pagination");
-  pagination.innerHTML = "";
-
-  for(let i=1; i<=totalPages; i++){
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    if(i === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => showPage(i));
-    pagination.appendChild(btn);
+    renderPagination();
+    
+    // Scroll to top of news grid
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
-}
 
-showPage(1);
+  function renderPagination(){
+    const totalPages = Math.ceil(cards.length / perPage);
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
 
+    for(let i = 1; i <= totalPages; i++){
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      if(i === currentPage) btn.classList.add("active");
+      btn.addEventListener("click", () => showPage(i));
+      pagination.appendChild(btn);
+    }
+  }
 
+  showPage(1);
 
   /* ---------------- GALLERY TOGGLE ---------------- */
   document.addEventListener("click", (e) => {
