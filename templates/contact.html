@@ -12,10 +12,15 @@
             --lilac-primary: #8b5cf6;
             --lilac-dark: #6d28d9;
             --lilac-soft: #f5f3ff;
+            --lilac-medium: #a78bfa;
+            --lilac-light: #c4b5fd;
+            --lilac-accent: #7c3aed;
+            --purple-deep: #5b21b6;
             --navy-deep: #0f172a;
             --text-main: #334155;
             --text-light: #64748b;
             --white: #ffffff;
+            --gradient-lilac: linear-gradient(135deg, #6d28d9, #8b5cf6, #a78bfa);
         }
 
         * {
@@ -55,6 +60,135 @@
         nav ul { display: flex; list-style: none; gap: 25px; }
         nav a { text-decoration: none; font-weight: 500; color: var(--text-main); font-size: 0.9rem; transition: 0.3s; }
         nav a:hover { color: var(--lilac-primary); }
+
+        /* ================= HAMBURGER MENU ================= */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--lilac-accent);
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        .hamburger.active span {
+            background: var(--purple-deep);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+            z-index: 999;
+            border-bottom: 2px solid var(--lilac-light);
+        }
+
+        .mobile-nav.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            padding: 20px 6%;
+        }
+
+        .mobile-nav li {
+            margin-bottom: 12px;
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .mobile-nav a:hover,
+        .mobile-nav a:active {
+            background: var(--lilac-soft);
+            color: var(--lilac-dark);
+            border-left-color: var(--lilac-primary);
+            transform: translateX(5px);
+        }
+
+        /* Mobile Header Title */
+        .mobile-page-title {
+            display: none;
+            flex-direction: column;
+            text-align: center;
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .mobile-page-title h2 {
+            font-size: 0.75rem;
+            color: var(--lilac-dark);
+            font-weight: 600;
+            line-height: 1.3;
+            margin: 0;
+            background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mobile-page-title p {
+            font-size: 0.55rem;
+            color: #7c3aed;
+            margin: 2px 0 0 0;
+            font-weight: 500;
+        }
 
         /* ================= MAIN CONTAINER ================= */
         .container {
@@ -116,10 +250,7 @@
             font-weight: 700; cursor: pointer; transition: 0.3s;
         }
         .submit-btn:hover { background: var(--lilac-dark); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
-
-        /* JS SUCCESS STATE */
-        #successState { display: none; text-align: center; padding: 40px 0; }
-        .check-icon { font-size: 50px; color: #10b981; margin-bottom: 15px; }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* ================= SMART RESPONSIVE FOOTER ================= */
         .site-footer {
@@ -139,10 +270,10 @@
 
         /* FIXED LOGO SIZE */
         .footer-brand img {
-            height: 60px; /* Controlled size */
+            height: 60px;
             width: auto;
             margin-bottom: 20px;
-            filter: brightness(0) invert(1); /* Makes logo white */
+            filter: brightness(0) invert(1);
         }
 
         .footer-brand p { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; max-width: 300px; }
@@ -180,9 +311,67 @@
         @media (max-width: 768px) {
             .form-row { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+            
+            /* Hide desktop nav, show hamburger */
             nav { display: none; }
-            .header-title h2 { font-size: 0.85rem; }
+            .hamburger { display: flex; }
+            
+            /* Show mobile page title */
+            .mobile-page-title { display: flex; }
+            
+            .header-title { display: none; }
+            .header-divider { display: none; }
+            
+            .main-header {
+                padding: 12px 4%;
+            }
+            
+            .logo-box img {
+                height: 45px;
+            }
+            
+            .logo-tagline {
+                font-size: 0.55rem;
+            }
+            
             .container { margin-top: 110px; }
+            
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-box {
+                padding: 25px 20px;
+            }
+            
+            .wa-float {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-page-title h2 {
+                font-size: 0.65rem;
+            }
+            
+            .mobile-page-title p {
+                font-size: 0.5rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .logo-box img {
+                height: 40px;
+            }
         }
     </style>
 </head>
@@ -200,6 +389,14 @@
             <p>Committed to Consumer Protection & Fair Trade</p>
         </div>
     </div>
+    
+    <!-- Mobile Page Title -->
+    <div class="mobile-page-title">
+        <h2>Ondo State Competition & Consumer Protection Agency</h2>
+        <p>Committed to Consumer Protection</p>
+    </div>
+    
+    <!-- Desktop Navigation -->
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
@@ -209,7 +406,25 @@
             <li><a href="/contact">Contact</a></li>
         </ul>
     </nav>
+    
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 </header>
+
+<!-- Mobile Navigation Menu -->
+<div class="mobile-nav" id="mobileNav">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/news">News</a></li>
+        <li><a href="/complaints">Complaints</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+</div>
 
 <div class="container">
     <div class="page-header">
@@ -239,40 +454,54 @@
         </div>
     </div>
 
-    <div class="form-box">
-        <form id="occpaForm" method="POST" action="{{ url_for('contact') }}">
-            <div class="form-group">
-                <label>Your Full Name</label>
-                <input type="text" name="name" placeholder="Enter name" required>
+  <div class="form-box">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" style="margin-bottom: 30px; padding: 18px 24px; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 5px solid #10b981; border-radius: 12px; color: #065f46; font-weight: 500; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 12px; animation: slideInDown 0.4s ease;">
+                        <span style="font-size: 1.5rem; color: #10b981;">✓</span>
+                        <span style="flex: 1; font-size: 1rem;">{{ message }}</span>
+                    </div>
+                {% endfor %}
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" placeholder="example@mail.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" name="phone" placeholder="+234..." required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Message Subject</label>
-                <input type="text" name="subject" required>
-            </div>
-            <div class="form-group">
-                <label>Tell us how we can help</label>
-                <textarea name="message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="submit-btn" id="btnTxt">Send Message</button>
-        </form>
+        {% endif %}
+    {% endwith %}
+    
+    <div id="js-message-container"></div>
 
-        <div id="successState">
-            <div class="check-icon">✔</div>
-            <h2>Submission Successful</h2>
-            <p>Thank you for contacting OCCPA. A representative will review your message and respond shortly.</p>
-            <button onclick="location.reload()" style="margin-top: 25px; background: none; border: 1px solid #ccc; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Send another message</button>
+    <form id="occpaForm" method="POST" action="{{ url_for('contact') }}">
+        <div class="form-group">
+            <label for="name">Your Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter name" required>
         </div>
-    </div>
+        
+        <div class="form-row" style="display: flex; gap: 20px;">
+            <div class="form-group" style="flex: 1;">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+234...">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="subject">Message Subject</label>
+            <input type="text" id="subject" name="subject" required>
+        </div>
+
+        <div class="form-group">
+            <label for="message">Tell us how we can help</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+            <span id="btnTxt">Send Message</span>
+            <span id="btnSpinner" style="display: none;">Sending...</span>
+        </button>
+    </form>
 </div>
 
 <footer class="site-footer">
@@ -296,7 +525,7 @@
             <h4>Legal & Support</h4>
             <ul>
                 <li><a href="/complaints">File a Complaint</a></li>
-                <li><a href="/">Contact Us</a></li>
+                <li><a href="/contact">Contact Us</a></li>
                 <li><a href="/">Privacy Policy</a></li>
                 <li><a href="/">Terms of Use</a></li>
             </ul>
@@ -313,22 +542,47 @@
 </a>
 
 <script>
-    function submitHandle(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btnTxt');
-        const form = document.getElementById('occpaForm');
-        const success = document.getElementById('successState');
+    // Hamburger Menu Toggle
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
 
-        btn.innerText = "Sending...";
-        btn.disabled = true;
+    hamburger.addEventListener('click', function() {
+        this.classList.toggle('active');
+        mobileNav.classList.toggle('active');
+    });
 
-        // Simulate processing
-        setTimeout(() => {
-            form.style.display = "none";
-            success.style.display = "block";
-            window.scrollTo({ top: form.offsetTop - 100, behavior: 'smooth' });
-        }, 1500);
-    }
+    // Close mobile menu when clicking on a link
+    const mobileLinks = mobileNav.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const isClickInsideNav = mobileNav.contains(event.target);
+        const isClickOnHamburger = hamburger.contains(event.target);
+        
+        if (!isClickInsideNav && !isClickOnHamburger && mobileNav.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+        }
+    });
+
+
+const form = document.getElementById('occpaForm');
+const btnTxt = document.getElementById('btnTxt');
+const btnSpinner = document.getElementById('btnSpinner');
+
+form.addEventListener('submit', function() {
+    // Disable button to prevent double submission
+    document.getElementById('submitBtn').disabled = true;
+    // Toggle text to show progress
+    btnTxt.style.display = 'none';
+    btnSpinner.style.display = 'inline';
+});
 </script>
 
 </body>
