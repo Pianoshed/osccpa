@@ -87,6 +87,11 @@ def admin_login():
         flash("Invalid username or password")
     return render_template("admin_login.html")
 
+@app.before_request
+def redirect_to_www():
+    if request.host == "occpa.on.gov.ng" :
+        return redirect("https://www.occpa.on.gov.ng" + request.full_path, code=301)
+
 @app.route("/admin/logout")
 @login_required
 def admin_logout():
