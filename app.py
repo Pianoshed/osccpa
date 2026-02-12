@@ -11,7 +11,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
 
-# --- Database Configuration ---
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'complaints.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,9 +22,6 @@ migrate = Migrate(app, db)
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# -----------------------------
-# Database Models (Required for Migrate)
-# -----------------------------
 class Admin(db.Model):
     __tablename__ = 'admins'
     id = db.Column(db.Integer, primary_key=True)
@@ -56,9 +52,6 @@ class Complaint(db.Model):
     status = db.Column(db.String(50), default="Pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# -----------------------------
-# Login decorator
-# -----------------------------
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -67,16 +60,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# -----------------------------
-# Admin login/logout/change password
-# -----------------------------
+
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         
-        # FIXED: Using SQLAlchemy query instead of raw sqlite3
         admin = Admin.query.filter_by(username=username).first()
 
         if admin and check_password_hash(admin.password, password):
@@ -124,9 +114,7 @@ def change_password():
 
     return render_template("change_password.html")
 
-# -----------------------------
-# Public routes
-# -----------------------------
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -143,9 +131,6 @@ def services():
 def news():
     return render_template("news.html")
 
-# -----------------------------
-# Forms
-# -----------------------------
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
@@ -188,9 +173,7 @@ def complaints():
         return redirect(url_for("complaints"))
     return render_template("complaints.html")
 
-# -----------------------------
-# Admin dashboard
-# -----------------------------
+
 @app.route("/admin/dashboard")
 @login_required
 def admin_dashboard():

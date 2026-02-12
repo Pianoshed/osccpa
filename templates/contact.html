@@ -36,7 +36,6 @@
             line-height: 1.6;
         }
 
-        /* ================= HEADER (ORIGINAL STYLE) ================= */
         .main-header {
             display: flex;
             align-items: center;
@@ -61,7 +60,6 @@
         nav a { text-decoration: none; font-weight: 500; color: var(--text-main); font-size: 0.9rem; transition: 0.3s; }
         nav a:hover { color: var(--lilac-primary); }
 
-        /* ================= HAMBURGER MENU ================= */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -162,7 +160,6 @@
             transform: translateX(5px);
         }
 
-        /* Mobile Header Title */
         .mobile-page-title {
             display: none;
             flex-direction: column;
@@ -190,8 +187,7 @@
             font-weight: 500;
         }
 
-        /* ================= MAIN CONTAINER ================= */
-        .container {
+           .container {
             max-width: 1140px;
             margin: 140px auto 80px;
             padding: 0 24px;
@@ -200,7 +196,7 @@
         .page-header { text-align: center; margin-bottom: 50px; }
         .page-header h1 { font-size: 2.2rem; color: var(--navy-deep); margin-bottom: 10px; }
 
-        /* CONTACT CARDS */
+
         .contact-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -223,7 +219,6 @@
         .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
         .social-icons img { width: 28px; height: 28px; transition: 0.2s; }
 
-        /* FORM BOX */
         .form-box {
             background: var(--white);
             padding: 40px;
@@ -252,7 +247,7 @@
         .submit-btn:hover { background: var(--lilac-dark); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* ================= SMART RESPONSIVE FOOTER ================= */
+
         .site-footer {
             background: var(--navy-deep);
             color: #f1f5f9;
@@ -268,7 +263,7 @@
             margin: 0 auto;
         }
 
-        /* FIXED LOGO SIZE */
+
         .footer-brand img {
             height: 60px;
             width: auto;
@@ -293,7 +288,7 @@
             color: #64748b;
         }
 
-        /* WHATSAPP FLOAT */
+
         .wa-float {
             position: fixed; bottom: 30px; right: 30px;
             background: #25D366; color: white; padding: 12px 20px;
@@ -302,7 +297,6 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        /* RESPONSIVE BREAKPOINTS */
         @media (max-width: 992px) {
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .header-divider, .header-title p { display: none; }
@@ -390,13 +384,11 @@
         </div>
     </div>
     
-    <!-- Mobile Page Title -->
     <div class="mobile-page-title">
         <h2>Ondo State Competition & Consumer Protection Agency</h2>
         <p>Committed to Consumer Protection</p>
     </div>
     
-    <!-- Desktop Navigation -->
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
@@ -407,7 +399,6 @@
         </ul>
     </nav>
     
-    <!-- Hamburger Menu -->
     <div class="hamburger" id="hamburger">
         <span></span>
         <span></span>
@@ -415,7 +406,6 @@
     </div>
 </header>
 
-<!-- Mobile Navigation Menu -->
 <div class="mobile-nav" id="mobileNav">
     <ul>
         <li><a href="/">Home</a></li>
@@ -542,7 +532,6 @@
 </a>
 
 <script>
-    // Hamburger Menu Toggle
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
@@ -551,7 +540,6 @@
         mobileNav.classList.toggle('active');
     });
 
-    // Close mobile menu when clicking on a link
     const mobileLinks = mobileNav.querySelectorAll('a');
     mobileLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -560,7 +548,6 @@
         });
     });
 
-    // Close mobile menu when clicking outside
     document.addEventListener('click', function(event) {
         const isClickInsideNav = mobileNav.contains(event.target);
         const isClickOnHamburger = hamburger.contains(event.target);
@@ -577,9 +564,7 @@ const btnTxt = document.getElementById('btnTxt');
 const btnSpinner = document.getElementById('btnSpinner');
 
 form.addEventListener('submit', function() {
-    // Disable button to prevent double submission
     document.getElementById('submitBtn').disabled = true;
-    // Toggle text to show progress
     btnTxt.style.display = 'none';
     btnSpinner.style.display = 'inline';
 });

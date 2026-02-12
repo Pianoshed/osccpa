@@ -20,7 +20,6 @@
   --text-dark:#1f2937;
 }
 
-/* ================= HEADER ================= */
 body{
   font-family:'Roboto',sans-serif;
   margin:0;
@@ -92,8 +91,6 @@ body{
 }
 
 
-
-/* Desktop Nav */
 nav ul{
   display:flex;
   list-style:none;
@@ -108,7 +105,6 @@ nav a{
 }
 nav a:hover{color:var(--lilac-primary);}
 
-/* Mobile Menu */
 .mobile-menu-toggle{
   display:none;
   width:42px;
@@ -156,7 +152,6 @@ nav a:hover{color:var(--lilac-primary);}
   font-weight:600;
 }
 
-/* Responsive Header */
 @media(max-width:768px){
   nav{display:none;}
   .mobile-menu-toggle{display:flex;}
@@ -165,7 +160,6 @@ nav a:hover{color:var(--lilac-primary);}
   .header-text p{font-size:12px;}
 }
 
-/* ================= HERO WITH IMAGE ================= */
 .services-hero{
   position:relative;
   background:url("{{ url_for('static', filename='gallery/partnerncdc.jpg') }}") center/cover no-repeat;
@@ -197,7 +191,6 @@ nav a:hover{color:var(--lilac-primary);}
   line-height:1.6;
 }
 
-/* ================= SECTIONS ================= */
 .section{
   padding:80px 10%;
 }
@@ -214,7 +207,6 @@ nav a:hover{color:var(--lilac-primary);}
   max-width:900px;
 }
 
-/* ================= SERVICES GRID ================= */
 .services-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -235,7 +227,6 @@ nav a:hover{color:var(--lilac-primary);}
   margin-bottom:10px;
 }
 
-/* ================= PROCESS ================= */
 .process{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -253,7 +244,6 @@ nav a:hover{color:var(--lilac-primary);}
   color:var(--lilac-dark);
 }
 
-/* ================= CTA ================= */
 .cta{
   background:var(--lilac-primary);
   color:#fff;
@@ -275,7 +265,6 @@ nav a:hover{color:var(--lilac-primary);}
   font-weight:600;
 }
 
-/* ================= MOBILE COMPACT MODE ================= */
 @media(max-width:768px){
   .services-hero{padding:70px 6%;}
   .services-hero h1{font-size:26px;}
@@ -301,7 +290,6 @@ nav a:hover{color:var(--lilac-primary);}
   .step p{font-size:13px;}
 }
 
-/* Extra Small Phones */
 @media(max-width:480px){
   .services-grid,.process{grid-template-columns:1fr;}
   .section h2{font-size:22px;}
@@ -312,7 +300,6 @@ nav a:hover{color:var(--lilac-primary);}
 
 <body>
 
-<!-- ================= HEADER ================= -->
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
@@ -351,7 +338,6 @@ nav a:hover{color:var(--lilac-primary);}
   </div>
 </header>
 
-<!-- ================= HERO ================= -->
 <section class="services-hero">
   <div class="services-hero-overlay">
     <h1>Our Consumer Services</h1>
@@ -362,7 +348,6 @@ nav a:hover{color:var(--lilac-primary);}
   </div>
 </section>
 
-<!-- ================= SERVICES ================= -->
 <section class="section">
   <h2>What We Do</h2>
   <p>
@@ -380,7 +365,6 @@ nav a:hover{color:var(--lilac-primary);}
   </div>
 </section>
 
-<!-- ================= PROCESS ================= -->
 <section class="section light">
   <h2>How to File a Complaint</h2>
   <div class="process">
@@ -391,14 +375,12 @@ nav a:hover{color:var(--lilac-primary);}
   </div>
 </section>
 
-<!-- ================= CTA ================= -->
 <section class="cta">
   <h2>Need Assistance or Have a Complaint?</h2>
   <p>Our team is ready to assist you.</p>
   <a href="/complaints">File a Complaint</a>
 </section>
 
-<!-- ================= JS ================= -->
 <script>
 function toggleMobileMenu(){
   document.getElementById("mobileMenu").classList.toggle("open");

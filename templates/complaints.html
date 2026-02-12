@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
     <style>
-        /* ================= VARIABLES & RESET ================= */
         :root {
             --lilac-primary: #8b5cf6;
             --lilac-dark: #6d28d9;
@@ -179,7 +178,6 @@
             transform: translateX(5px);
         }
 
-        /* ================= HERO & FORM ================= */
         .complaint-hero { position: relative; background: url("{{ url_for('static', filename='Slide/m1.jpeg') }}") center/cover no-repeat; padding: 80px 5% 120px; color: var(--white); text-align: center; }
         .complaint-hero::before { content: ""; position: absolute; inset: 0; background: rgba(76, 29, 149, 0.85); }
         .hero-content { position: relative; z-index: 1; }
@@ -283,13 +281,11 @@
         </div>
     </div>
     
-    <!-- Mobile Page Title -->
-    <div class="mobile-page-title">
+     <div class="mobile-page-title">
         <h2>Ondo State Competition & Consumer Protection Agency</h2>
         <p>Committed to Consumer Protection</p>
     </div>
-    
-    <!-- Desktop Navigation -->
+
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
@@ -301,7 +297,6 @@
         </ul>
     </nav>
     
-    <!-- Hamburger Menu -->
     <div class="hamburger" id="hamburger">
         <span></span>
         <span></span>
@@ -309,7 +304,6 @@
     </div>
 </header>
 
-<!-- Mobile Navigation Menu -->
 <div class="mobile-nav" id="mobileNav">
     <ul>
         <li><a href="/">Home</a></li>
@@ -449,7 +443,6 @@
 </footer>
 
 <script>
-    // Hamburger Menu Toggle
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
 
@@ -458,7 +451,6 @@
         mobileNav.classList.toggle('active');
     });
 
-    // Close mobile menu when clicking on a link
     const mobileLinks = mobileNav.querySelectorAll('a');
     mobileLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -467,7 +459,6 @@
         });
     });
 
-    // Close mobile menu when clicking outside
     document.addEventListener('click', function(event) {
         const isClickInsideNav = mobileNav.contains(event.target);
         const isClickOnHamburger = hamburger.contains(event.target);
@@ -478,7 +469,6 @@
         }
     });
 
-    // Form submission handler (original logic preserved)
     const complaintForm = document.getElementById("complaintForm");
     const submitBtn = document.getElementById("submitBtn");
     const formSection = document.getElementById("formSection");

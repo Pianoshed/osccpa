@@ -29,7 +29,6 @@ body{
   color:#333;
 }
 
-/* HEADER */
 header{
   background:var(--white);
   padding:16px 6%;
@@ -75,7 +74,6 @@ header h2{
   padding:0 16px;
 }
 
-/* TABS */
 .tabs{
   display:flex;
   gap:10px;
@@ -121,7 +119,6 @@ header h2{
   cursor:pointer;
 }
 
-/* TABLE */
 .table-box{
   background:var(--white);
   border-radius:14px;
@@ -153,7 +150,6 @@ tbody tr:hover{
   background:#faf9fd;
 }
 
-/* STATUS */
 .status-select{
   padding:6px;
   border-radius:8px;
@@ -172,7 +168,6 @@ tbody tr:hover{
 .progress{background:#cfe2ff;color:#084298}
 .resolved{background:#d1e7dd;color:#0f5132}
 
-/* BUTTONS */
 .btn{
   background:none;
   border:none;
@@ -185,7 +180,6 @@ tbody tr:hover{
 .delete-btn{color:var(--danger)}
 .file-btn{color:var(--info)}
 
-/* MODAL */
 .modal{
   display:none;
   position:fixed;
@@ -215,7 +209,6 @@ tbody tr:hover{
   cursor:pointer;
 }
 
-/* HIDE TABLE SECTIONS */
 .tab-content{
   display:none;
 }
@@ -224,7 +217,6 @@ tbody tr:hover{
   display:block;
 }
 
-/* RESPONSIVE */
 @media(max-width:768px){
   header{
     padding:14px;
@@ -249,13 +241,11 @@ tbody tr:hover{
 
 <div class="container">
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="complaintsTab">Complaints</button>
     <button class="tab-btn" data-tab="contactsTab">Contacts</button>
   </div>
 
-  <!-- COMPLAINTS TAB -->
   <div class="tab-content active" id="complaintsTab">
 
     <div class="filters">
@@ -322,7 +312,6 @@ tbody tr:hover{
     </div>
   </div>
 
-  <!-- CONTACTS TAB -->
   <div class="tab-content" id="contactsTab">
 
     <div class="filters">
@@ -376,7 +365,6 @@ tbody tr:hover{
 
 </div>
 
-<!-- COMPLAINT MODAL -->
 <div class="modal" id="complaintModal">
   <div class="modal-content">
     <span class="close" onclick="closeComplaintModal()">×</span>
@@ -389,7 +377,6 @@ tbody tr:hover{
   </div>
 </div>
 
-<!-- CONTACT MODAL -->
 <div class="modal" id="contactModal">
   <div class="modal-content">
     <span class="close" onclick="closeContactModal()">×</span>
@@ -407,7 +394,6 @@ tbody tr:hover{
 </a>
 
 <script>
-/* TAB SWITCHING */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
@@ -417,7 +403,6 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-/* COMPLAINT MODAL */
 function openComplaintModal(name,business,type,details,status,date){
   cName.textContent=name;
   cBusiness.textContent=business;
@@ -428,7 +413,6 @@ function openComplaintModal(name,business,type,details,status,date){
 }
 function closeComplaintModal(){ complaintModal.style.display="none"; }
 
-/* CONTACT MODAL */
 function openContactModal(name,email,subject,message,status,date){
   mName.textContent=name;
   mEmail.textContent=email;
@@ -439,8 +423,6 @@ function openContactModal(name,email,subject,message,status,date){
 }
 function closeContactModal(){ contactModal.style.display="none"; }
 
-/* FILTERS */
-// Complaints
 complaintsDate.onchange = complaintsFilter;
 function complaintsFilter(){
   const s=complaintsSearch.value.toLowerCase();
@@ -454,7 +436,6 @@ function complaintsFilter(){
   });
 }
 
-// Contacts
 contactsSearch.onkeyup = contactsFilter;
 contactsDate.onchange = contactsFilter;
 function contactsFilter(){

@@ -10,9 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 
 <style>
-/* =========================
-   ROOT VARIABLES
-========================= */
 :root{
   --lilac-primary:#8b5cf6;
   --lilac-dark:#6d28d9;
@@ -22,9 +19,6 @@
   --footer-accent:#2d2658;
 }
 
-/* =========================
-   RESET / BASE
-========================= */
 *{
   margin:0;
   padding:0;
@@ -38,9 +32,6 @@ body{
   overflow-x:hidden;
 }
 
-/* =========================
-   HEADER
-========================= */
 .main-header{
   position:fixed;
   top:0;
@@ -109,9 +100,6 @@ body{
   color:#555;
 }
 
-/* =========================
-   NAVIGATION
-========================= */
 nav ul{
   display:flex;
   gap:22px;
@@ -130,9 +118,6 @@ nav a:hover{
   color:var(--lilac-primary);
 }
 
-/* =========================
-   MOBILE MENU
-========================= */
 .mobile-menu{
   position:absolute;
   top:100%;
@@ -195,9 +180,6 @@ nav a:hover{
   transform:translate(-50%,-8px) rotate(-45deg);
 }
 
-/* =========================
-   HERO SECTION
-========================= */
 .about-hero{
   position:relative;
   padding:150px 10% 100px;
@@ -247,9 +229,6 @@ nav a:hover{
   animation:fadeInUp 1s ease;
 }
 
-/* =========================
-   SECTIONS
-========================= */
 .section{
   padding:80px 8%;
 }
@@ -277,9 +256,6 @@ nav a:hover{
   margin:0 auto;
 }
 
-/* =========================
-   SMART GRID
-========================= */
 .smart-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
@@ -388,9 +364,6 @@ nav a:hover{
   color:var(--lilac-dark);
 }
 
-/* =========================
-   TEAM SECTION
-========================= */
 .team-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -472,9 +445,6 @@ nav a:hover{
   z-index:1;
 }
 
-/* =========================
-   IMPACT STATS
-========================= */
 .stats-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -531,9 +501,6 @@ nav a:hover{
   z-index:1;
 }
 
-/* =========================
-   FOOTER - CREATIVE DESIGN
-========================= */
 footer{
   background:linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-accent) 100%);
   color:#e5e7eb;
@@ -541,7 +508,6 @@ footer{
   overflow:hidden;
 }
 
-/* Decorative Background Elements */
 footer::before{
   content:'';
   position:absolute;
@@ -581,7 +547,6 @@ footer::after{
   border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-/* Footer Logo Section */
 .footer-brand{
   display:flex;
   flex-direction:column;
@@ -693,7 +658,6 @@ footer::after{
   transform:translateX(0);
 }
 
-/* Contact Info */
 .contact-item{
   display:flex;
   align-items:flex-start;
@@ -710,7 +674,6 @@ footer::after{
   flex-shrink:0;
 }
 
-/* Social Media */
 .social-links{
   display:flex;
   gap:12px;
@@ -737,7 +700,6 @@ footer::after{
   box-shadow:0 5px 15px rgba(139,92,246,0.4);
 }
 
-/* Footer Bottom */
 .footer-bottom{
   padding:25px 8%;
   background:rgba(0,0,0,0.2);
@@ -779,9 +741,6 @@ footer::after{
   color:#fff;
 }
 
-/* =========================
-   CHAT FLOAT
-========================= */
 .chat-float{
   position:fixed;
   bottom:30px;
@@ -839,9 +798,6 @@ footer::after{
   opacity:1;
 }
 
-/* =========================
-   MOBILE OPTIMIZATION
-========================= */
 @media(max-width:1024px){
   .header-text h2{
     font-size:1.2rem;
@@ -938,7 +894,6 @@ footer::after{
     font-size:1.3rem;
   }
 
-  /* FOOTER */
   .footer-main{
     padding:40px 5% 20px;
   }
@@ -1035,9 +990,6 @@ footer::after{
   }
 }
 
-/* =========================
-   ANIMATIONS
-========================= */
 @keyframes fadeInUp{
   from{
     opacity:0;
@@ -1075,7 +1027,6 @@ footer::after{
 
 <body>
 
-<!-- HEADER -->
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
@@ -1116,13 +1067,11 @@ footer::after{
   </div>
 </header>
 
-<!-- HERO -->
 <section class="about-hero">
   <h1>About the Agency</h1>
   <p>OCCPA safeguards consumer rights and promotes fair competition across Ondo State, ensuring transparency, accountability, and justice in the marketplace.</p>
 </section>
 
-<!-- WHO / MANDATE / RESPONSIBILITIES -->
 <section class="section light">
   <div class="section-header">
     <h2>Our Foundation</h2>
@@ -1158,7 +1107,6 @@ footer::after{
   </div>
 </section>
 
-<!-- VISION & VALUES -->
 <section class="section">
   <div class="section-header">
     <h2>Our Vision & Values</h2>
@@ -1186,7 +1134,6 @@ footer::after{
   </div>
 </section>
 
-<!-- TEAM -->
 <section class="section light">
   <div class="section-header">
     <h2>Our Leadership Team</h2>
@@ -1220,7 +1167,6 @@ footer::after{
   </div>
 </section>
 
-<!-- IMPACT -->
 <section class="section">
   <div class="section-header">
     <h2>Our Impact</h2>
@@ -1250,7 +1196,6 @@ footer::after{
   <div class="footer-main">
     <div class="footer-top">
       
-      <!-- FOOTER BRAND WITH LOGO -->
       <div class="footer-brand">
         <div class="footer-logo-container">
           <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
@@ -1270,7 +1215,6 @@ footer::after{
           ethical trade practices and sustainable socio-economic development across Ondo State.</p>
         </div>
 
-        <!-- Social Media -->
         <div class="social-links">
           <a href="#" class="social-link" aria-label="Facebook">
             <span>f</span>
@@ -1287,7 +1231,6 @@ footer::after{
         </div>
       </div>
 
-      <!-- QUICK LINKS -->
       <div class="footer-column">
         <h4>Quick Links</h4>
         <ul>
@@ -1299,7 +1242,6 @@ footer::after{
         </ul>
       </div>
 
-      <!-- SERVICES -->
       <div class="footer-column">
         <h4>Our Services</h4>
         <ul>
@@ -1332,10 +1274,9 @@ footer::after{
         </div>
       </div>
 
-    </div> <!-- END footer-top -->
-  </div> <!-- END footer-main -->
+    </div> 
+  </div> 
 
-  <!-- FOOTER BOTTOM -->
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-credit">
@@ -1350,7 +1291,6 @@ footer::after{
   </div>
 </footer>
 
-<!-- Floating Chat Buttons -->
 <div class="chat-float">
   <a href="https://wa.me/2349043353001" target="_blank" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
@@ -1364,14 +1304,13 @@ footer::after{
 </div>
 
 
-<!-- SCRIPTS -->
 <script>
 function toggleMobileMenu(){
   document.getElementById("mobileMenu").classList.toggle("open");
   document.querySelector(".mobile-menu-toggle").classList.toggle("active");
 }
 
-/* Fade-in animation on scroll */
+
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if(e.isIntersecting){ 
