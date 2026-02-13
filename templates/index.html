@@ -1275,7 +1275,6 @@ footer::after{
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. BACK TO TOP LOGIC
     const backToTopBtn = document.getElementById("backToTop");
     if (backToTopBtn) {
         window.addEventListener("scroll", () => {
@@ -1291,17 +1290,14 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 2. MOBILE MENU LOGIC
     const menuToggle = document.querySelector(".mobile-menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
     
-    // We define this globally for the onclick in your HTML, or handle it here:
     window.toggleMobileMenu = function() {
         mobileMenu.classList.toggle("open");
         menuToggle.classList.toggle("active");
     };
 
-    // 3. SLIDER LOGIC
     let index = 0;
     const slides = document.querySelectorAll(".slide");
     const slider = document.getElementById("slider");
@@ -1315,14 +1311,12 @@ document.addEventListener("DOMContentLoaded", function() {
         window.nextSlide = function() { showSlide(index + 1); };
         window.prevSlide = function() { showSlide(index - 1); };
 
-        // Auto-slide every 6 seconds
         setInterval(nextSlide, 6000);
     }
 
-    // 4. READ MORE LOGIC
     document.querySelectorAll(".read-more-btn").forEach(btn => {
         btn.addEventListener("click", function () {
-            const moreText = this.previousElementSibling; // Targets .more-text
+            const moreText = this.previousElementSibling; 
             if (moreText) {
                 if (moreText.style.display === "block") {
                     moreText.style.display = "none";
