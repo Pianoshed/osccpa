@@ -22,7 +22,7 @@
 }
 
 
-{
+*{
   margin:0;
   padding:0;
   box-sizing:border-box;
@@ -929,6 +929,47 @@ footer::after{
   }
 }
 
+.back-to-top {
+  position: fixed;
+  bottom: 170px; /* Positioned above the chat buttons */
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--lilac-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 998;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background-color: var(--lilac-dark);
+  transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 150px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
 </style>
 
 </head>
@@ -1233,40 +1274,69 @@ footer::after{
 
 
 <script>
-let index=0;
-const slides=document.querySelectorAll(".slide");
-const slider=document.getElementById("slider");
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. BACK TO TOP LOGIC
+    const backToTopBtn = document.getElementById("backToTop");
+    if (backToTopBtn) {
+        window.addEventListener("scroll", () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add("show");
+            } else {
+                backToTopBtn.classList.remove("show");
+            }
+        });
 
-function showSlide(i){
-  index=(i+slides.length)%slides.length;
-  slider.style.transform=`translateX(${-index*100}%)`;
-}
-function nextSlide(){showSlide(index+1)}
-function prevSlide(){showSlide(index-1)}
-setInterval(nextSlide,6000);
-
-function toggleMobileMenu(){
-  const menu = document.getElementById("mobileMenu");
-  const toggle = document.querySelector(".mobile-menu-toggle");
-
-  menu.classList.toggle("open");
-  toggle.classList.toggle("active");
-}
-
-document.querySelectorAll(".read-more-btn").forEach(btn => {
-  btn.addEventListener("click", function () {
-    const moreText = this.previousElementSibling;
-
-    if (moreText.style.display === "block") {
-      moreText.style.display = "none";
-      this.textContent = "View More";
-    } else {
-      moreText.style.display = "block";
-      this.textContent = "View Less";
+        backToTopBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
     }
-  });
+
+    // 2. MOBILE MENU LOGIC
+    const menuToggle = document.querySelector(".mobile-menu-toggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+    
+    // We define this globally for the onclick in your HTML, or handle it here:
+    window.toggleMobileMenu = function() {
+        mobileMenu.classList.toggle("open");
+        menuToggle.classList.toggle("active");
+    };
+
+    // 3. SLIDER LOGIC
+    let index = 0;
+    const slides = document.querySelectorAll(".slide");
+    const slider = document.getElementById("slider");
+
+    if (slider && slides.length > 0) {
+        function showSlide(i) {
+            index = (i + slides.length) % slides.length;
+            slider.style.transform = `translateX(${-index * 100}%)`;
+        }
+
+        window.nextSlide = function() { showSlide(index + 1); };
+        window.prevSlide = function() { showSlide(index - 1); };
+
+        // Auto-slide every 6 seconds
+        setInterval(nextSlide, 6000);
+    }
+
+    // 4. READ MORE LOGIC
+    document.querySelectorAll(".read-more-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const moreText = this.previousElementSibling; // Targets .more-text
+            if (moreText) {
+                if (moreText.style.display === "block") {
+                    moreText.style.display = "none";
+                    this.textContent = "View More";
+                } else {
+                    moreText.style.display = "block";
+                    this.textContent = "View Less";
+                }
+            }
+        });
+    });
 });
 </script>
 
+<button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
 </body>
 </html>
