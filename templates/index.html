@@ -196,131 +196,116 @@ nav a:hover { color: var(--lilac-primary); }
 
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
   align-items: start;
 }
 
 .news-card {
   background: #fff; border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.07);
+  box-shadow: 0 4px 16px rgba(0,0,0,.07);
   overflow: hidden; transition: transform .3s;
   display: flex; flex-direction: column;
 }
-.news-card:hover { transform: translateY(-5px); }
+.news-card:hover { transform: translateY(-4px); }
 
+/* ── media wrapper ── */
 .news-image {
   position: relative; overflow: hidden;
   background: #1a1a2e;
 }
 
 .news-image img {
-  width: 100%; height: 170px;
+  width: 100%; height: 150px;
   object-fit: cover; display: block;
 }
 
-/* ── Facebook embed wrapper ── */
+/* ── Facebook iframe wrapper ── */
 .news-image.fb-card {
-  background: #1a1a2e;
-  min-height: 220px;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
+  background: #000;
+  position: relative;
+  width: 100%;
+  /* 9:16 aspect ratio capped for card layout */
+  padding-top: 160%; /* taller portrait ratio for reels */
   overflow: hidden;
 }
-.news-image.fb-card .fb-video {
-  width: 100% !important;
-  min-height: 220px;
+.news-image.fb-card iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
   display: block;
-}
-.news-image.fb-card .fb-video span,
-.news-image.fb-card .fb-video iframe {
-  width: 100% !important;
-  min-height: 220px !important;
+  pointer-events: auto;
 }
 
 /* ── NERC external-link banner ── */
 .news-ext-banner {
   display: flex; align-items: center; justify-content: center;
   flex-direction: column; gap: 8px;
-  height: 150px;
+  height: 130px;
   background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
-  padding: 20px;
+  padding: 16px;
   text-align: center;
 }
 .news-ext-banner .ext-label {
-  font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+  font-size: .7rem; font-weight: 700; letter-spacing: .12em;
   text-transform: uppercase; color: rgba(255,255,255,.75);
 }
 .news-ext-banner .ext-source {
-  font-size: .9rem; font-weight: 600; color: #fff;
+  font-size: .85rem; font-weight: 600; color: #fff;
 }
 .news-ext-banner .ext-read-link {
   display: inline-flex; align-items: center; gap: 5px;
-  margin-top: 4px; padding: 6px 14px;
+  margin-top: 4px; padding: 5px 12px;
   background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
   border-radius: 5px; color: #fff; text-decoration: none;
-  font-size: .8rem; font-weight: 600;
+  font-size: .75rem; font-weight: 600;
   transition: background .25s;
 }
 .news-ext-banner .ext-read-link:hover { background: rgba(255,255,255,.28); }
 
 /* ── Date badge ── */
 .news-date {
-  position: absolute; top: 10px; right: 10px;
+  position: absolute; top: 8px; right: 8px;
   background: var(--lilac-primary); color: #fff;
-  padding: 4px 10px; border-radius: 5px;
-  font-size: .75rem; font-weight: 600;
-  pointer-events: none;
+  padding: 3px 8px; border-radius: 5px;
+  font-size: .7rem; font-weight: 600;
+  pointer-events: none; z-index: 2;
 }
 
 /* ── Card body ── */
 .news-content {
-  padding: 1rem 1.1rem 1.2rem;
+  padding: .8rem 1rem 1rem;
   flex: 1; display: flex; flex-direction: column;
 }
 .news-content h3 {
-  color: var(--lilac-dark); font-size: .88rem;
-  margin-bottom: .75rem; line-height: 1.45; font-weight: 600;
+  color: var(--lilac-dark); font-size: .82rem;
+  margin-bottom: .65rem; line-height: 1.4; font-weight: 600;
 }
-.news-content .preview  { color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .7rem; flex: 1; }
-.news-content .more-text { display: none; color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .7rem; }
+.news-content .preview  { color: #555; font-size: .78rem; line-height: 1.6; margin-bottom: .6rem; flex: 1; }
+.news-content .more-text { display: none; color: #555; font-size: .78rem; line-height: 1.6; margin-bottom: .6rem; }
 
 .read-more-btn {
   align-self: flex-start;
   background: var(--lilac-soft); color: var(--lilac-dark);
-  border: none; padding: 7px 16px; border-radius: 5px;
-  cursor: pointer; font-weight: 600; font-size: .8rem;
+  border: none; padding: 6px 14px; border-radius: 5px;
+  cursor: pointer; font-weight: 600; font-size: .75rem;
   transition: background .25s, color .25s;
+  text-decoration: none; display: inline-block;
 }
 .read-more-btn:hover { background: var(--lilac-primary); color: #fff; }
 
-/* Facebook fallback link (shown if SDK fails) */
-.fb-fallback {
-  display: none;
-  width: 100%;
-  min-height: 220px;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
-  background: linear-gradient(135deg, #1877F2, #0a5dc2);
-  padding: 20px;
-  text-align: center;
-}
-.fb-fallback .fb-icon {
-  font-size: 2.5rem;
-  color: #fff;
-}
-.fb-fallback a {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 18px;
-  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
-  border-radius: 6px; color: #fff; text-decoration: none;
-  font-size: .85rem; font-weight: 600;
+/* Facebook watch link */
+.fb-watch-link {
+  align-self: flex-start;
+  background: #1877F2; color: #fff;
+  padding: 6px 14px; border-radius: 5px;
+  font-weight: 600; font-size: .75rem;
+  text-decoration: none; display: inline-block;
   transition: background .25s;
 }
-.fb-fallback a:hover { background: rgba(255,255,255,.35); }
+.fb-watch-link:hover { background: #0a5dc2; }
 
 .news-footer { text-align: center; margin-top: 2rem; }
 
@@ -476,6 +461,7 @@ footer::after {
   .footer-top { grid-template-columns: 1fr 1fr; gap: 35px; }
   .footer-brand { grid-column: 1 / -1; }
   .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  .news-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ══════════════════════════════
@@ -521,10 +507,14 @@ footer::after {
     display: flex; flex-wrap: nowrap;
     overflow-x: auto; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    gap: 14px; padding-bottom: 8px;
+    gap: 12px; padding-bottom: 10px;
   }
   .news-grid::-webkit-scrollbar { display: none; }
-  .news-card { min-width: 80%; scroll-snap-align: start; }
+  /* Show ~2.2 cards on mobile so users know to scroll */
+  .news-card { min-width: 68%; max-width: 68%; scroll-snap-align: start; }
+
+  /* Facebook embed on mobile — taller for reel aspect */
+  .news-image.fb-card { padding-top: 155%; }
 
   /* Footer */
   .footer-main { padding: 40px 5% 20px; }
@@ -556,9 +546,13 @@ footer::after {
   .about-img .title-role { font-size: .64rem; }
   .about-text h2 { font-size: 1.1rem; }
 
-  .news-card   { min-width: 88%; }
+  /* Show ~1.2 cards at 480px — just enough peek to invite scrolling */
+  .news-card   { min-width: 78%; max-width: 78%; }
   .news-header h2 { font-size: 1.6rem; }
   .header-text h2 { font-size: 12px; }
+
+  /* tighter fb embed on small phones */
+  .news-image.fb-card { padding-top: 145%; }
 
   .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .gallery-header h2 { font-size: 1.6rem; }
@@ -571,12 +565,6 @@ footer::after {
 </head>
 
 <body>
-
-<!-- ══ FACEBOOK SDK ══ -->
-<div id="fb-root"></div>
-<script async defer crossorigin="anonymous"
-  src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0">
-</script>
 
 <!-- ══ HEADER ══ -->
 <header class="main-header">
@@ -736,84 +724,72 @@ footer::after {
     <!-- ── CARD 2 — Facebook Video 1 ── -->
     <div class="news-card">
       <div class="news-image fb-card">
-        <div class="fb-video"
-             data-href="https://web.facebook.com/share/v/1BTqf4av5T/"
-             data-width="auto"
-             data-allowfullscreen="true"
-             data-autoplay="false"
-             data-show-text="false">
-        </div>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
       </div>
       <div class="news-content">
         <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-        <a href="https://web.facebook.com/share/v/1BTqf4av5T/"
+        <a href="https://web.facebook.com/reel/933525072786066/"
            target="_blank" rel="noopener noreferrer"
-           class="read-more-btn" style="text-decoration:none;">
-          Watch on Facebook ↗
-        </a>
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
     <!-- ── CARD 3 — Facebook Video 2 ── -->
     <div class="news-card">
       <div class="news-image fb-card">
-        <div class="fb-video"
-             data-href="https://web.facebook.com/share/v/14UQCXuQDtd/"
-             data-width="auto"
-             data-allowfullscreen="true"
-             data-autoplay="false"
-             data-show-text="false">
-        </div>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1853786275175803%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-        <a href="https://web.facebook.com/share/v/14UQCXuQDtd/"
+        <h3>OCCPA Consumer Sensitization Drive Across Ondo State</h3>
+        <a href="https://web.facebook.com/reel/1853786275175803/"
            target="_blank" rel="noopener noreferrer"
-           class="read-more-btn" style="text-decoration:none;">
-          Watch on Facebook ↗
-        </a>
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
     <!-- ── CARD 4 — Facebook Video 3 ── -->
     <div class="news-card">
       <div class="news-image fb-card">
-        <div class="fb-video"
-             data-href="https://web.facebook.com/share/v/18VzMNzy71/"
-             data-width="auto"
-             data-allowfullscreen="true"
-             data-autoplay="false"
-             data-show-text="false">
-        </div>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1840859706594273%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-        <a href="https://web.facebook.com/share/v/18VzMNzy71/"
+        <h3>Market Surveillance &amp; Enforcement Operations by OCCPA</h3>
+        <a href="https://web.facebook.com/reel/1840859706594273/"
            target="_blank" rel="noopener noreferrer"
-           class="read-more-btn" style="text-decoration:none;">
-          Watch on Facebook ↗
-        </a>
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
     <!-- ── CARD 5 — Facebook Video 4 ── -->
     <div class="news-card">
       <div class="news-image fb-card">
-        <div class="fb-video"
-             data-href="https://web.facebook.com/share/v/1JAYEWeFoC/"
-             data-width="auto"
-             data-allowfullscreen="true"
-             data-autoplay="false"
-             data-show-text="false">
-        </div>
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F26279987428370429%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-        <a href="https://web.facebook.com/share/v/1JAYEWeFoC/"
+        <h3>OCCPA Public Awareness Campaign: Know Your Consumer Rights</h3>
+        <a href="https://web.facebook.com/reel/26279987428370429/"
            target="_blank" rel="noopener noreferrer"
-           class="read-more-btn" style="text-decoration:none;">
-          Watch on Facebook ↗
-        </a>
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
@@ -960,9 +936,8 @@ document.addEventListener("DOMContentLoaded", function () {
   window.prevSlide = function () { showSlide(index - 1); };
   setInterval(window.nextSlide, 6000);
 
-  /* ── Read more / less ── */
+  /* ── Read more / less (NERC card only) ── */
   document.querySelectorAll(".read-more-btn").forEach(function (btn) {
-    /* Skip anchor tags (Watch on Facebook links) */
     if (btn.tagName === "A") return;
     btn.addEventListener("click", function () {
       const moreText = this.previousElementSibling;
@@ -972,11 +947,6 @@ document.addEventListener("DOMContentLoaded", function () {
       this.textContent = expanded ? "View More" : "View Less";
     });
   });
-
-  /* ── FB SDK re-parse on load (catches late SDK init) ── */
-  window.fbAsyncInit = function () {
-    FB.init({ xfbml: true, version: "v19.0" });
-  };
 
 });
 </script>

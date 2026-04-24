@@ -142,10 +142,26 @@ nav a.active { color: var(--lilac-primary); border-bottom: 2px solid var(--lilac
 }
 .news-card:hover .news-image img { transform: scale(1.05); }
 
-.news-image video,
-.news-image iframe {
+.news-image video {
   width: 100%; height: 240px;
   display: block; border: none;
+}
+
+/* ── Facebook iframe embed — aspect-ratio based ── */
+.news-image.fb-card {
+  position: relative;
+  width: 100%;
+  padding-top: 170%; /* portrait reel ratio */
+  background: #000;
+  overflow: hidden;
+}
+.news-image.fb-card iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 /* ── NERC external banner ── */
@@ -181,8 +197,20 @@ nav a.active { color: var(--lilac-primary); border-bottom: 2px solid var(--lilac
   padding: 5px 14px; border-radius: 20px;
   text-transform: uppercase; letter-spacing: .06em;
   box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  pointer-events: none;
+  pointer-events: none; z-index: 2;
 }
+
+/* ── Facebook watch button ── */
+.fb-watch-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #1877F2; color: #fff;
+  padding: 9px 18px; border-radius: 8px;
+  font-weight: 600; font-size: .85rem;
+  text-decoration: none;
+  transition: background .25s;
+  margin-top: auto;
+}
+.fb-watch-link:hover { background: #0a5dc2; }
 
 /* ── card body ── */
 .news-content {
@@ -396,9 +424,11 @@ footer::after {
   .news-grid { grid-template-columns: 1fr; gap: 22px; }
 
   .news-image img,
-  .news-image video,
-  .news-image iframe { height: 200px; }
-  .news-ext-banner   { height: 180px; }
+  .news-image video { height: 200px; }
+  .news-ext-banner  { height: 180px; }
+
+  /* Slightly shorter fb embed on tablet */
+  .news-image.fb-card { padding-top: 150%; }
 
   .footer-main { padding: 40px 5% 20px; }
   .footer-top  { grid-template-columns: 1fr; gap: 30px; }
@@ -422,6 +452,9 @@ footer::after {
   .subtitle        { font-size: .9rem; }
   .news-content h3 { font-size: 1rem; }
   .preview, .more-text { font-size: .9rem; }
+
+  /* Compact fb embed on small phones */
+  .news-image.fb-card { padding-top: 140%; }
 
   .gallery {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -502,49 +535,83 @@ footer::after {
 
   <div class="news-grid" id="newsGrid">
 
-    <!-- ── CARD 3 — Video ── -->
+    <!-- ══ CARD 1 — Facebook VID1 ══ -->
     <div class="news-card">
-      <div class="news-image">
-        <video controls preload="metadata">
-          <source src="{{ url_for('static', filename='videos/vid2.mp4') }}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <span class="news-badge">Safety</span>
+      <div class="news-image fb-card">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+        <span class="badge">Enforcement</span>
       </div>
       <div class="news-content">
         <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <a href="https://web.facebook.com/reel/933525072786066/"
+           target="_blank" rel="noopener noreferrer"
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
-    <!-- ── CARD 4 — Video ── -->
+    <!-- ══ CARD 2 — Facebook VID2 ══ -->
     <div class="news-card">
-      <div class="news-image">
-        <video controls preload="metadata">
-          <source src="{{ url_for('static', filename='videos/vid3.mp4') }}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <span class="news-badge">Safety</span>
+      <div class="news-image fb-card">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1853786275175803%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+        <span class="badge">Sensitization</span>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <h3>OCCPA Consumer Sensitization Drive Across Ondo State</h3>
+        <a href="https://web.facebook.com/reel/1853786275175803/"
+           target="_blank" rel="noopener noreferrer"
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
- <!-- ── CARD 2 — Video ── -->
+
+    <!-- ══ CARD 3 — Facebook VID3 ══ -->
     <div class="news-card">
-      <div class="news-image">
-        <video controls preload="metadata">
-          <source src="{{ url_for('static', filename='videos/vid1.mp4') }}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <span class="news-badge">Safety</span>
+      <div class="news-image fb-card">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1840859706594273%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+        <span class="badge">Market Watch</span>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <h3>Market Surveillance &amp; Enforcement Operations by OCCPA</h3>
+        <a href="https://web.facebook.com/reel/1840859706594273/"
+           target="_blank" rel="noopener noreferrer"
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
       </div>
     </div>
 
+    <!-- ══ CARD 4 — Facebook VID4 ══ -->
+    <div class="news-card">
+      <div class="news-image fb-card">
+        <iframe
+          src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F26279987428370429%2F&show_text=false&width=267&t=0"
+          scrolling="no" frameborder="0"
+          allowfullscreen="true"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+        </iframe>
+        <span class="badge">Awareness</span>
+      </div>
+      <div class="news-content">
+        <h3>OCCPA Public Awareness Campaign: Know Your Consumer Rights</h3>
+        <a href="https://web.facebook.com/reel/26279987428370429/"
+           target="_blank" rel="noopener noreferrer"
+           class="fb-watch-link">&#9654; Watch on Facebook</a>
+      </div>
+    </div>
 
-    <!-- ── CARD 1 — NERC (external article) ── -->
+    <!-- ══ CARD 5 — NERC (external article) ══ -->
     <div class="news-card">
       <div class="news-image">
         <div class="news-ext-banner">
@@ -576,7 +643,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 2 — Malls ── -->
+    <!-- ══ CARD 6 — Malls ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}" alt="Mall Inspection">
@@ -604,7 +671,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 3 — Filling Stations ── -->
+    <!-- ══ CARD 7 — Filling Stations ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}" alt="Filling Station Inspection">
@@ -635,7 +702,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 4 — Abattoir YouTube ── -->
+    <!-- ══ CARD 8 — Abattoir YouTube ══ -->
     <div class="news-card">
       <div class="news-image">
         <iframe
@@ -643,7 +710,8 @@ footer::after {
           title="OCCPA Abattoir Safety Standards"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
+          allowfullscreen
+          style="width:100%;height:240px;display:block;border:none;">
         </iframe>
         <span class="badge">Safety Standards</span>
       </div>
@@ -662,7 +730,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 5 — Abattoir Video ── -->
+    <!-- ══ CARD 9 — Abattoir Video ══ -->
     <div class="news-card">
       <div class="news-image">
         <video controls poster="{{ url_for('static', filename='gallery/isi1.png') }}">
@@ -683,7 +751,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 6 — Isinkan Sensitization ── -->
+    <!-- ══ CARD 10 — Isinkan Sensitization ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/gal1.jpeg') }}" alt="Sensitization">
@@ -720,7 +788,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 7 — Female Artisans ── -->
+    <!-- ══ CARD 11 — Female Artisans ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/a1.jpeg') }}" alt="Awareness Campaign">
@@ -747,7 +815,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 8 — FCCPC ── -->
+    <!-- ══ CARD 12 — FCCPC ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/fcpc1.jpg') }}" alt="FCCPC Partnership">
@@ -775,7 +843,7 @@ footer::after {
       </div>
     </div>
 
-    <!-- ── CARD 9 — ATWAP ── -->
+    <!-- ══ CARD 13 — ATWAP ══ -->
     <div class="news-card">
       <div class="news-image">
         <img src="{{ url_for('static', filename='gallery/atwap.jpg') }}" alt="ATWAP Partnership">
@@ -788,7 +856,7 @@ footer::after {
           The Competitive and Consumer Protection Agency (CCPA) has partnered with the Association of Table Water Producers (ATWAP) in Ondo State to ensure quality water is consumed by the people.
         </p>
         <p class="more-text">
-          The partnership focuses on strengthening consumer protection and water quality standards. Administrative Secretary Hajia Kudirat Ola explained that "the strategic meeting is aimed at fostering collaboration and ensuring compliance with consumer protection standards in the state." The meeting was attended by ATWAP National President Dr. Mrs. Clementia Ativie.
+          The partnership focuses on strengthening consumer protection and water quality standards. Administrative Secretary Hajia Kudirat Ola explained that the strategic meeting is aimed at fostering collaboration and ensuring compliance with consumer protection standards in the state. The meeting was attended by ATWAP National President Dr. Mrs. Clementia Ativie.
         </p>
         <div class="actions">
           <button class="read-more">Read More</button>
