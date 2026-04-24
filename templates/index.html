@@ -188,92 +188,141 @@ nav a:hover { color: var(--lilac-primary); }
 /* ══════════════════════════════
    NEWS
 ══════════════════════════════ */
-.news-section { padding: 80px 8%; background: linear-gradient(180deg, #f6f4ff, #fff); }
-.news-header  { text-align: center; margin-bottom: 3rem; }
-.news-header h2 { font-size: 2.5rem; color: var(--lilac-dark); margin-bottom: .5rem; }
-.news-header p  { color: #666; font-size: 1.1rem; }
+.news-section { padding: 60px 8%; background: linear-gradient(180deg, #f6f4ff, #fff); }
 
-/* Grid: auto-fit so cards stay wide enough */
+.news-header  { text-align: center; margin-bottom: 2.5rem; }
+.news-header h2 { font-size: 2rem; color: var(--lilac-dark); margin-bottom: .4rem; }
+.news-header p  { color: #666; font-size: 1rem; }
+
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
   align-items: start;
 }
 
-/* ── news card ── */
 .news-card {
-  background: #fff; border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.08);
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.07);
   overflow: hidden; transition: transform .3s;
   display: flex; flex-direction: column;
 }
-.news-card:hover { transform: translateY(-6px); }
+.news-card:hover { transform: translateY(-5px); }
 
-/* ── image wrapper ── */
-.news-image { position: relative; overflow: hidden; }
+.news-image {
+  position: relative; overflow: hidden;
+  background: #1a1a2e;
+}
+
 .news-image img {
-  width: 100%; height: 220px;
+  width: 100%; height: 170px;
   object-fit: cover; display: block;
 }
 
-/* ── NERC external-link banner (replaces broken img+iframe) ── */
+/* ── Facebook embed wrapper ── */
+.news-image.fb-card {
+  background: #1a1a2e;
+  min-height: 220px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+}
+.news-image.fb-card .fb-video {
+  width: 100% !important;
+  min-height: 220px;
+  display: block;
+}
+.news-image.fb-card .fb-video span,
+.news-image.fb-card .fb-video iframe {
+  width: 100% !important;
+  min-height: 220px !important;
+}
+
+/* ── NERC external-link banner ── */
 .news-ext-banner {
   display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 10px;
-  height: 160px;
+  flex-direction: column; gap: 8px;
+  height: 150px;
   background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
-  padding: 24px;
+  padding: 20px;
   text-align: center;
 }
-.news-ext-banner .ext-icon {
-  font-size: 2.2rem; line-height: 1;
-}
 .news-ext-banner .ext-label {
-  font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+  font-size: .72rem; font-weight: 700; letter-spacing: .12em;
   text-transform: uppercase; color: rgba(255,255,255,.75);
 }
 .news-ext-banner .ext-source {
-  font-size: .95rem; font-weight: 600; color: #fff;
+  font-size: .9rem; font-weight: 600; color: #fff;
 }
 .news-ext-banner .ext-read-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 4px; padding: 7px 18px;
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 4px; padding: 6px 14px;
   background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
-  border-radius: 6px; color: #fff; text-decoration: none;
-  font-size: .85rem; font-weight: 600;
+  border-radius: 5px; color: #fff; text-decoration: none;
+  font-size: .8rem; font-weight: 600;
   transition: background .25s;
 }
 .news-ext-banner .ext-read-link:hover { background: rgba(255,255,255,.28); }
 
-/* ── date badge ── */
+/* ── Date badge ── */
 .news-date {
-  position: absolute; top: 12px; right: 12px;
+  position: absolute; top: 10px; right: 10px;
   background: var(--lilac-primary); color: #fff;
-  padding: 5px 12px; border-radius: 6px;
-  font-size: .82rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 5px;
+  font-size: .75rem; font-weight: 600;
   pointer-events: none;
 }
 
-/* ── card body ── */
-.news-content { padding: 1.4rem; flex: 1; display: flex; flex-direction: column; }
-.news-content h3 {
-  color: var(--lilac-dark); font-size: 1.05rem;
-  margin-bottom: .9rem; line-height: 1.45;
+/* ── Card body ── */
+.news-content {
+  padding: 1rem 1.1rem 1.2rem;
+  flex: 1; display: flex; flex-direction: column;
 }
-.news-content .preview  { color: #555; line-height: 1.65; margin-bottom: .8rem; flex: 1; }
-.news-content .more-text { display: none; color: #555; line-height: 1.65; margin-bottom: .8rem; }
+.news-content h3 {
+  color: var(--lilac-dark); font-size: .88rem;
+  margin-bottom: .75rem; line-height: 1.45; font-weight: 600;
+}
+.news-content .preview  { color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .7rem; flex: 1; }
+.news-content .more-text { display: none; color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .7rem; }
 
 .read-more-btn {
   align-self: flex-start;
   background: var(--lilac-soft); color: var(--lilac-dark);
-  border: none; padding: 9px 20px; border-radius: 6px;
-  cursor: pointer; font-weight: 600; font-size: .9rem;
+  border: none; padding: 7px 16px; border-radius: 5px;
+  cursor: pointer; font-weight: 600; font-size: .8rem;
   transition: background .25s, color .25s;
 }
 .read-more-btn:hover { background: var(--lilac-primary); color: #fff; }
 
-.news-footer { text-align: center; margin-top: 2.5rem; }
+/* Facebook fallback link (shown if SDK fails) */
+.fb-fallback {
+  display: none;
+  width: 100%;
+  min-height: 220px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(135deg, #1877F2, #0a5dc2);
+  padding: 20px;
+  text-align: center;
+}
+.fb-fallback .fb-icon {
+  font-size: 2.5rem;
+  color: #fff;
+}
+.fb-fallback a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px;
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+  border-radius: 6px; color: #fff; text-decoration: none;
+  font-size: .85rem; font-weight: 600;
+  transition: background .25s;
+}
+.fb-fallback a:hover { background: rgba(255,255,255,.35); }
+
+.news-footer { text-align: center; margin-top: 2rem; }
 
 /* ══════════════════════════════
    FOOTER
@@ -467,14 +516,15 @@ footer::after {
   .gallery-header h2 { font-size: 1.8rem; }
 
   /* News — horizontal scroll on mobile */
+  .news-section { padding: 40px 5%; }
   .news-grid {
     display: flex; flex-wrap: nowrap;
     overflow-x: auto; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    gap: 16px; padding-bottom: 8px;
+    gap: 14px; padding-bottom: 8px;
   }
   .news-grid::-webkit-scrollbar { display: none; }
-  .news-card { min-width: 82%; scroll-snap-align: start; }
+  .news-card { min-width: 80%; scroll-snap-align: start; }
 
   /* Footer */
   .footer-main { padding: 40px 5% 20px; }
@@ -506,8 +556,8 @@ footer::after {
   .about-img .title-role { font-size: .64rem; }
   .about-text h2 { font-size: 1.1rem; }
 
-  .news-card   { min-width: 90%; }
-  .news-header h2 { font-size: 1.8rem; }
+  .news-card   { min-width: 88%; }
+  .news-header h2 { font-size: 1.6rem; }
   .header-text h2 { font-size: 12px; }
 
   .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -521,6 +571,12 @@ footer::after {
 </head>
 
 <body>
+
+<!-- ══ FACEBOOK SDK ══ -->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous"
+  src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0">
+</script>
 
 <!-- ══ HEADER ══ -->
 <header class="main-header">
@@ -648,10 +704,9 @@ footer::after {
 
   <div class="news-grid">
 
-    <!-- ── CARD 1 — NERC (external article, no local image) ── -->
+    <!-- ── CARD 1 — NERC (external article) ── -->
     <div class="news-card">
       <div class="news-image">
-        <!-- Styled banner links directly to the Vanguard article -->
         <div class="news-ext-banner">
           <span class="ext-label">External Article</span>
           <span class="ext-source">Vanguard News</span>
@@ -666,72 +721,99 @@ footer::after {
       <div class="news-content">
         <h3>NERC Outlines Steps for Resolving Electricity Complaints Nationwide</h3>
         <p class="preview">
-          The Nigerian Electricity Regulatory Commission (NERC) has issued a step-by-step guide for consumers facing power supply and billing issues, urging them to follow established complaint channels for prompt resolution.
+          The Nigerian Electricity Regulatory Commission (NERC) has issued a step-by-step guide for consumers facing power supply and billing issues, urging them to follow established complaint channels.
         </p>
         <p class="more-text">
-          According to NERC, consumers should first contact their Distribution Company (DisCo) customer care unit for faults, outages, metering concerns, or billing disputes. Where a complaint remains unresolved, customers in states with a State Electricity Regulator (SER) should escalate to that authority. For all others, NERC's call centre is available:<br><br>
+          According to NERC, consumers should first contact their Distribution Company (DisCo) customer care unit for faults, outages, metering concerns, or billing disputes. Where a complaint remains unresolved, customers in states with a State Electricity Regulator (SER) should escalate to that authority.<br><br>
           &#128222; <strong>0201 344 4331</strong> &nbsp;|&nbsp; <strong>0908 899 9244</strong><br>
           &#128231; consumeraffairs@nerc.gov.ng<br><br>
-          OCCPA encourages all Ondo State residents to make use of these channels to assert their consumer rights.
+          OCCPA encourages all Ondo State residents to use these channels to assert their consumer rights.
         </p>
         <button class="read-more-btn">View More</button>
       </div>
     </div>
 
-    <!-- ── CARD 2 — Filling Stations ── -->
+    <!-- ── CARD 2 — Facebook Video 1 ── -->
     <div class="news-card">
-      <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/f1.jpeg') }}" alt="Filling Station Inspection">
-        <span class="news-date">Nov 2025</span>
+      <div class="news-image fb-card">
+        <div class="fb-video"
+             data-href="https://web.facebook.com/share/v/1BTqf4av5T/"
+             data-width="auto"
+             data-allowfullscreen="true"
+             data-autoplay="false"
+             data-show-text="false">
+        </div>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Akure Filling Stations</h3>
-        <p class="preview">
-          The Ondo State Competitive and Consumer Protection Agency (OCCPA) has intensified enforcement actions against unfair trade practices in filling stations across Akure.
-        </p>
-        <p class="more-text">
-          During routine inspections, the agency monitored business activities to ensure compliance with consumer protection regulations, including transparent pricing, product quality standards, and fair commercial practices.<br><br>
-          OCCPA reaffirmed its mandate to safeguard consumer rights and promote a fair, competitive marketplace across the state.
-        </p>
-        <button class="read-more-btn">View More</button>
+        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <a href="https://web.facebook.com/share/v/1BTqf4av5T/"
+           target="_blank" rel="noopener noreferrer"
+           class="read-more-btn" style="text-decoration:none;">
+          Watch on Facebook ↗
+        </a>
       </div>
     </div>
 
-    <!-- ── CARD 3 — Malls ── -->
+    <!-- ── CARD 3 — Facebook Video 2 ── -->
     <div class="news-card">
-      <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/m1.jpeg') }}" alt="Mall Inspection">
-        <span class="news-date">Nov 2025</span>
+      <div class="news-image fb-card">
+        <div class="fb-video"
+             data-href="https://web.facebook.com/share/v/14UQCXuQDtd/"
+             data-width="auto"
+             data-allowfullscreen="true"
+             data-autoplay="false"
+             data-show-text="false">
+        </div>
       </div>
       <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Akure Malls</h3>
-        <p class="preview">
-          OCCPA has intensified enforcement actions against unfair trade practices in malls across Akure, monitoring businesses for pricing transparency, quality standards, and fair trade compliance.
-        </p>
-        <p class="more-text">
-          During routine inspections, the agency monitored business activities to ensure compliance with consumer protection regulations, including transparent pricing, product quality standards, and fair commercial practices.<br><br>
-          OCCPA reaffirmed its mandate to safeguard consumer rights and promote a fair, competitive marketplace across the state.
-        </p>
-        <button class="read-more-btn">View More</button>
+        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <a href="https://web.facebook.com/share/v/14UQCXuQDtd/"
+           target="_blank" rel="noopener noreferrer"
+           class="read-more-btn" style="text-decoration:none;">
+          Watch on Facebook ↗
+        </a>
       </div>
     </div>
 
-    <!-- ── CARD 4 — NSCDC Partnership ── -->
+    <!-- ── CARD 4 — Facebook Video 3 ── -->
     <div class="news-card">
-      <div class="news-image">
-        <img src="{{ url_for('static', filename='gallery/partnerncdc.jpg') }}" alt="NSCDC Partnership">
-        <span class="news-date">Jan 2026</span>
+      <div class="news-image fb-card">
+        <div class="fb-video"
+             data-href="https://web.facebook.com/share/v/18VzMNzy71/"
+             data-width="auto"
+             data-allowfullscreen="true"
+             data-autoplay="false"
+             data-show-text="false">
+        </div>
       </div>
       <div class="news-content">
-        <h3>Safety of Consumers: NSCDC Partners Ondo Consumer Protection Agency</h3>
-        <p class="preview">
-          In a bid to ensure the safety and well-being of consumers in Ondo State, OCCPA has solicited the partnership of the NSCDC, Ondo State command.
-        </p>
-        <p class="more-text">
-          This partnership is to protect and promote the rights of consumers — safeguarding their right to safety, competitive pricing, value for purchase, standardised goods &amp; services, and access to a consumer redress platform.<br><br>
-          The partnership was formalised during a familiarization visit to State Commandant CC Oluyemi Joshua by Administrative Secretary Hajia Kudirat Ola and her management team.
-        </p>
-        <button class="read-more-btn">View More</button>
+        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <a href="https://web.facebook.com/share/v/18VzMNzy71/"
+           target="_blank" rel="noopener noreferrer"
+           class="read-more-btn" style="text-decoration:none;">
+          Watch on Facebook ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- ── CARD 5 — Facebook Video 4 ── -->
+    <div class="news-card">
+      <div class="news-image fb-card">
+        <div class="fb-video"
+             data-href="https://web.facebook.com/share/v/1JAYEWeFoC/"
+             data-width="auto"
+             data-allowfullscreen="true"
+             data-autoplay="false"
+             data-show-text="false">
+        </div>
+      </div>
+      <div class="news-content">
+        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+        <a href="https://web.facebook.com/share/v/1JAYEWeFoC/"
+           target="_blank" rel="noopener noreferrer"
+           class="read-more-btn" style="text-decoration:none;">
+          Watch on Facebook ↗
+        </a>
       </div>
     </div>
 
@@ -796,7 +878,7 @@ footer::after {
         <h4>Contact Us</h4>
         <div class="contact-item">
           <span class="icon">&#128205;</span>
-          <span>Ondo State Secretariat Annex<br>Ilesha/Owo Akure, Ondo State, Nigeria</span>
+          <span>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</span>
         </div>
         <div class="contact-item">
           <span class="icon">&#128231;</span>
@@ -818,7 +900,7 @@ footer::after {
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-credit">
-        &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech</strong>
+        &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech 08134812419</strong>
       </div>
       <div class="footer-links">
         <a href="/">Privacy Policy</a>
@@ -880,6 +962,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ── Read more / less ── */
   document.querySelectorAll(".read-more-btn").forEach(function (btn) {
+    /* Skip anchor tags (Watch on Facebook links) */
+    if (btn.tagName === "A") return;
     btn.addEventListener("click", function () {
       const moreText = this.previousElementSibling;
       if (!moreText) return;
@@ -888,6 +972,11 @@ document.addEventListener("DOMContentLoaded", function () {
       this.textContent = expanded ? "View More" : "View Less";
     });
   });
+
+  /* ── FB SDK re-parse on load (catches late SDK init) ── */
+  window.fbAsyncInit = function () {
+    FB.init({ xfbml: true, version: "v19.0" });
+  };
 
 });
 </script>
