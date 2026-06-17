@@ -7,34 +7,45 @@
 
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-/* ── CSS VARIABLES ── */
+/* CSS VARIABLES */
 :root {
   --lilac-primary: #8b5cf6;
   --lilac-dark: #6d28d9;
   --lilac-soft: #ede9fe;
+  --lilac-light: #f5f3ff;
   --text-dark: #2b2b2b;
+  --text-muted: #6b7280;
   --footer-bg: #1e1b4b;
   --footer-accent: #2d2658;
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.35s ease;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,.12);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-/* ── RESET ── */
+/* RESET */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+html { scroll-behavior: smooth; }
 body {
   font-family: 'Roboto', sans-serif;
   background: #f7f5ff;
   color: var(--text-dark);
   overflow-x: hidden;
   padding-top: 90px;
+  line-height: 1.6;
 }
 
-/* ══════════════════════════════
-   HEADER
-══════════════════════════════ */
+/* HEADER */
 .main-header {
   position: fixed; top: 0; width: 100%; z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
@@ -42,37 +53,47 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,.08);
 }
 .header-left { display: flex; align-items: center; gap: 16px; min-width: 0; flex: 1; }
-
 .logo a { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
 .logo img { height: 60px; max-width: 100%; object-fit: contain; }
 .logo-tagline { font-family: "Playfair Display", cursive; font-size: .75rem; letter-spacing: .08em; color: #6b7280; }
-
 .header-divider { width: 2px; height: 60px; background: var(--lilac-dark); flex-shrink: 0; }
-
 .header-text { flex: 1; min-width: 0; }
 .header-text h2 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--lilac-dark); line-height: 1.2; }
 .header-text p  { font-size: 13px; color: #555; }
-
 nav ul { display: flex; gap: 22px; list-style: none; }
-nav a  { text-decoration: none; font-weight: 600; color: #444; transition: color .2s; white-space: nowrap; }
-nav a:hover { color: var(--lilac-primary); }
+nav a  { 
+  text-decoration: none; font-weight: 600; color: #444; 
+  transition: color var(--transition-fast); white-space: nowrap;
+  position: relative; padding-bottom: 4px;
+}
+nav a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; background: var(--lilac-primary);
+  transition: width var(--transition-medium);
+}
+nav a:hover, nav a:focus { color: var(--lilac-primary); outline: none; }
+nav a:hover::after, nav a:focus::after { width: 100%; }
 
 /* Mobile toggle */
 .mobile-menu-toggle {
-  width: 42px; height: 42px; display: none;
+  width: 44px; height: 44px; display: none;
   background: var(--lilac-soft); border: none; border-radius: 10px;
   cursor: pointer; position: relative; flex-shrink: 0;
+  align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
 }
+.mobile-menu-toggle:hover { background: #ddd6fe; }
+.mobile-menu-toggle:focus-visible { outline: 2px solid var(--lilac-primary); outline-offset: 2px; }
 .mobile-menu-toggle span {
   position: absolute; left: 50%; width: 22px; height: 2.5px;
   background: var(--lilac-dark); border-radius: 2px;
-  transform: translateX(-50%); transition: .35s ease;
+  transform: translateX(-50%); transition: var(--transition-medium);
 }
-.mobile-menu-toggle span:nth-child(1) { top: 12px; }
-.mobile-menu-toggle span:nth-child(2) { top: 20px; }
-.mobile-menu-toggle span:nth-child(3) { top: 28px; }
+.mobile-menu-toggle span:nth-child(1) { top: 13px; }
+.mobile-menu-toggle span:nth-child(2) { top: 21px; }
+.mobile-menu-toggle span:nth-child(3) { top: 29px; }
 .mobile-menu-toggle.active span:nth-child(1) { transform: translate(-50%, 8px) rotate(45deg); }
-.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
 .mobile-menu-toggle.active span:nth-child(3) { transform: translate(-50%, -8px) rotate(-45deg); }
 
 /* Mobile menu */
@@ -80,153 +101,432 @@ nav a:hover { color: var(--lilac-primary); }
   position: absolute; top: 100%; left: 0; width: 100%;
   background: #fff; display: none; flex-direction: column;
   box-shadow: 0 10px 25px rgba(0,0,0,.15);
+  max-height: 0; overflow: hidden; transition: max-height var(--transition-medium);
 }
 .mobile-menu a {
   padding: 16px 8%; border-bottom: 1px solid #eee;
   text-decoration: none; font-weight: 600; color: #333;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-.mobile-menu.open { display: flex; animation: slideDown .35s ease; }
-
+.mobile-menu a:hover, .mobile-menu a:focus {
+  background: var(--lilac-soft); color: var(--lilac-dark); outline: none;
+}
+.mobile-menu.open { 
+  display: flex; 
+  max-height: 500px;
+  animation: slideDown .35s ease;
+}
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ══════════════════════════════
-   SLIDER
-══════════════════════════════ */
+/* SLIDER */
 .slider-container { position: relative; overflow: hidden; }
 .slider { display: flex; transition: transform .6s ease; }
 .slide  { min-width: 100%; position: relative; }
 .slide img { width: 100%; height: 680px; object-fit: cover; display: block; }
-
 .vignette { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,.65), rgba(0,0,0,.2)); }
-
 .slide-text {
   position: absolute; top: 50%; left: 10%;
   transform: translateY(-50%); color: #fff; max-width: 580px;
 }
 .slide-text h2 { font-size: 3.5rem; font-weight: 700; margin-bottom: .9rem; line-height: 1.15; }
 .slide-text p  { font-size: 1.2rem; margin-bottom: 1.6rem; line-height: 1.6; opacity: .92; }
-
 .slide-cta {
   display: inline-block; padding: 13px 30px;
   background: var(--lilac-primary); color: #fff;
   text-decoration: none; border-radius: 8px;
   font-weight: 600; font-size: 1rem;
-  transition: background .3s, transform .2s;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer; border: none;
 }
-.slide-cta:hover { background: var(--lilac-dark); transform: translateY(-2px); }
-
+.slide-cta:hover, .slide-cta:focus {
+  background: var(--lilac-dark); transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(109,40,217,.35); outline: none;
+}
+.slide-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .prev, .next {
   position: absolute; top: 50%; transform: translateY(-50%);
   background: rgba(0,0,0,.25); border: none; color: #fff;
   font-size: 22px; padding: 10px 14px; border-radius: 50%;
-  cursor: pointer; opacity: .4; transition: opacity .3s; z-index: 10;
+  cursor: pointer; opacity: .4; transition: opacity var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+  z-index: 10; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
 }
 .prev { left: 20px; }
 .next { right: 20px; }
+.prev:hover, .next:hover, .prev:focus, .next:focus {
+  opacity: .9; background: rgba(0,0,0,.5); outline: none;
+}
+.prev:focus-visible, .next:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .slider-container:hover .prev,
 .slider-container:hover .next { opacity: .8; }
+.slider-dots {
+  position: absolute; bottom: 20px; left: 50%;
+  transform: translateX(-50%); display: flex; gap: 10px; z-index: 10;
+}
+.slider-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,.4); border: 2px solid transparent;
+  cursor: pointer; transition: all var(--transition-fast);
+}
+.slider-dot.active { background: #fff; transform: scale(1.2); }
+.slider-dot:hover { background: rgba(255,255,255,.7); }
+.slider-dot:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-/* ══════════════════════════════
-   ABOUT
-══════════════════════════════ */
+/* ABOUT - REDESIGNED PROFESSIONAL */
 .about {
-  display: flex; gap: 50px; padding: 70px 8%;
-  background: #f4f6fa; flex-wrap: wrap; align-items: flex-start;
+  padding: 80px 8%;
+  background: linear-gradient(135deg, #f4f6fa 0%, #f0eeff 50%, #f4f6fa 100%);
+  position: relative;
+  overflow: hidden;
 }
-.about-img { text-align: center; flex-shrink: 0; }
-.about-img img {
-  max-width: 320px; width: 100%; border-radius: 8px;
-  transition: transform .3s; margin-bottom: 1rem;
+.about::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(139,92,246,.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
-.about-img img:hover { transform: scale(1.03); }
-.about-img h3        { margin: 1rem 0 .5rem; color: var(--lilac-dark); font-size: 1.25rem; }
-.about-img .title-role { color: #666; font-style: italic; }
-
-.about-text { flex: 1; min-width: 280px; }
-.about-text h2 { font-size: 2rem; color: var(--lilac-dark); margin-bottom: 1rem; }
-.about-text p  { line-height: 1.8; margin-bottom: 1.5rem; color: #555; }
-
-.know-more-btn {
-  display: inline-block; padding: 12px 30px;
-  background: var(--lilac-primary); color: #fff;
-  text-decoration: none; border-radius: 8px;
-  font-weight: 600; transition: background .3s;
+.about::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(139,92,246,.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
-.know-more-btn:hover { background: var(--lilac-dark); }
+.about-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
 
-/* ══════════════════════════════
-   GALLERY
-══════════════════════════════ */
+/* Left: Image Column */
+.about-image-col {
+  position: relative;
+}
+.about-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.about-image-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: 20px;
+  width: 100%; height: 100%;
+  border: 3px solid var(--lilac-primary);
+  border-radius: var(--radius-lg);
+  z-index: 0;
+  opacity: 0.3;
+}
+.about-img-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 380px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: block;
+  transition: transform var(--transition-medium);
+}
+.about-img-main:hover {
+  transform: translateY(-4px);
+}
+
+/* Floating badge card */
+.about-badge {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+  min-width: 200px;
+  border-left: 4px solid var(--lilac-primary);
+}
+.about-badge h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: .95rem;
+  color: var(--lilac-dark);
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.about-badge p {
+  font-size: .8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Stats row under image */
+.about-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 40px;
+  padding-left: 10px;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--lilac-dark);
+  line-height: 1;
+}
+.stat-label {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* Right: Text Column */
+.about-text-col {
+  padding-top: 10px;
+}
+.about-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--lilac-soft);
+  color: var(--lilac-dark);
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: .8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 20px;
+}
+.about-label i {
+  font-size: .7rem;
+}
+.about-text-col h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.4rem;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.about-text-col h2 span {
+  color: var(--lilac-primary);
+}
+.about-lead {
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+.about-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: var(--lilac-soft);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lilac-primary);
+  font-size: 1rem;
+}
+.feature-text h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: .85rem;
+  color: var(--text-dark);
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+.feature-text p {
+  font-size: .78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.about-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.about-cta-row .know-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: var(--lilac-primary);
+  color: #fff;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: .95rem;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  border: none;
+}
+.about-cta-row .know-more-btn:hover,
+.about-cta-row .know-more-btn:focus {
+  background: var(--lilac-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(109,40,217,.3);
+  outline: none;
+}
+.about-cta-row .know-more-btn:focus-visible {
+  outline: 2px solid var(--lilac-primary);
+  outline-offset: 3px;
+}
+.about-cta-row .know-more-btn i {
+  font-size: .8rem;
+  transition: transform var(--transition-fast);
+}
+.about-cta-row .know-more-btn:hover i {
+  transform: translateX(3px);
+}
+.about-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--lilac-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: color var(--transition-fast);
+}
+.about-contact-link:hover,
+.about-contact-link:focus {
+  color: var(--lilac-primary);
+  outline: none;
+}
+.about-contact-link i {
+  width: 36px;
+  height: 36px;
+  background: var(--lilac-soft);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.about-contact-link:hover i {
+  background: var(--lilac-primary);
+  color: #fff;
+}
+
+/* GALLERY - DESKTOP (masonry) */
 .gallery-section { padding: 70px 8%; background: #fff; }
 .gallery-header   { text-align: center; margin-bottom: 2.5rem; }
 .gallery-header h2 { font-size: 2.5rem; color: var(--lilac-dark); margin-bottom: .5rem; }
 .gallery-header p  { color: #666; font-size: 1.1rem; }
-
 .gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  columns: 3;
+  column-gap: 14px;
   margin-bottom: 2rem;
 }
 .gallery-card {
-  border-radius: 10px; overflow: hidden;
-  aspect-ratio: 3/4; background: #f0eeff;
+  break-inside: avoid;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f0eeff;
   border: 1px solid #e5e0ff;
+  margin-bottom: 14px;
+  display: block;
+  position: relative;
 }
 .gallery-card img {
-  width: 100%; height: 100%;
-  object-fit: contain; display: block;
-  padding: 6px; transition: transform .4s;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  transition: transform .4s ease;
 }
 .gallery-card:hover img { transform: scale(1.04); }
-
+.gallery-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(109,40,217,.3), transparent 60%);
+  opacity: 0; transition: opacity var(--transition-medium);
+  pointer-events: none;
+}
+.gallery-card:hover::after { opacity: 1; }
 .gallery-footer { text-align: center; margin-top: 2rem; }
+.gallery-scroll-hint {
+  display: none;
+  text-align: center;
+  color: #888;
+  font-size: .85rem;
+  margin-bottom: 1rem;
+  animation: bounceHint 2s infinite;
+}
+@keyframes bounceHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
 
-/* ══════════════════════════════
-   NEWS
-══════════════════════════════ */
+/* NEWS */
 .news-section { padding: 60px 8%; background: linear-gradient(180deg, #f6f4ff, #fff); }
-
 .news-header  { text-align: center; margin-bottom: 2.5rem; }
 .news-header h2 { font-size: 2rem; color: var(--lilac-dark); margin-bottom: .4rem; }
 .news-header p  { color: #666; font-size: 1rem; }
-
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
   align-items: start;
 }
-
 .news-card {
   background: #fff; border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.07);
-  overflow: hidden; transition: transform .3s;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden; transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   display: flex; flex-direction: column;
+  height: 100%;
 }
-.news-card:hover { transform: translateY(-4px); }
-
-/* ── media wrapper ── */
+.news-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .news-image {
   position: relative; overflow: hidden;
   background: #1a1a2e;
 }
-
 .news-image img {
-  width: 100%; height: 150px;
+  width: 100%; height: 180px;
   object-fit: cover; display: block;
 }
-
-/* ── Facebook iframe wrapper ── */
 .news-image.fb-card {
   background: #000;
   position: relative;
   width: 100%;
-  /* 9:16 aspect ratio capped for card layout */
-  padding-top: 160%; /* taller portrait ratio for reels */
+  padding-top: 177.78%;
   overflow: hidden;
 }
 .news-image.fb-card iframe {
@@ -238,12 +538,18 @@ nav a:hover { color: var(--lilac-primary); }
   display: block;
   pointer-events: auto;
 }
-
-/* ── NERC external-link banner ── */
+.fb-fallback {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1877F2, #0a5dc2);
+  color: #fff; text-align: center; padding: 20px;
+}
+.fb-fallback i { font-size: 2.5rem; margin-bottom: 10px; }
+.fb-fallback p { font-size: .9rem; margin-bottom: 12px; }
 .news-ext-banner {
   display: flex; align-items: center; justify-content: center;
   flex-direction: column; gap: 8px;
-  height: 130px;
+  height: 160px;
   background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
   padding: 16px;
   text-align: center;
@@ -257,61 +563,61 @@ nav a:hover { color: var(--lilac-primary); }
 }
 .news-ext-banner .ext-read-link {
   display: inline-flex; align-items: center; gap: 5px;
-  margin-top: 4px; padding: 5px 12px;
+  margin-top: 4px; padding: 6px 14px;
   background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
   border-radius: 5px; color: #fff; text-decoration: none;
   font-size: .75rem; font-weight: 600;
-  transition: background .25s;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
-.news-ext-banner .ext-read-link:hover { background: rgba(255,255,255,.28); }
-
-/* ── Date badge ── */
+.news-ext-banner .ext-read-link:hover, .news-ext-banner .ext-read-link:focus {
+  background: rgba(255,255,255,.28); transform: translateY(-1px); outline: none;
+}
+.news-ext-banner .ext-read-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .news-date {
   position: absolute; top: 8px; right: 8px;
   background: var(--lilac-primary); color: #fff;
-  padding: 3px 8px; border-radius: 5px;
+  padding: 4px 10px; border-radius: 6px;
   font-size: .7rem; font-weight: 600;
   pointer-events: none; z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
-
-/* ── Card body ── */
 .news-content {
-  padding: .8rem 1rem 1rem;
+  padding: 1rem 1.2rem 1.2rem;
   flex: 1; display: flex; flex-direction: column;
 }
 .news-content h3 {
-  color: var(--lilac-dark); font-size: .82rem;
+  color: var(--lilac-dark); font-size: .9rem;
   margin-bottom: .65rem; line-height: 1.4; font-weight: 600;
 }
-.news-content .preview  { color: #555; font-size: .78rem; line-height: 1.6; margin-bottom: .6rem; flex: 1; }
-.news-content .more-text { display: none; color: #555; font-size: .78rem; line-height: 1.6; margin-bottom: .6rem; }
-
+.news-content .preview  { color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .6rem; flex: 1; }
+.news-content .more-text { display: none; color: #555; font-size: .82rem; line-height: 1.6; margin-bottom: .6rem; }
 .read-more-btn {
   align-self: flex-start;
   background: var(--lilac-soft); color: var(--lilac-dark);
-  border: none; padding: 6px 14px; border-radius: 5px;
-  cursor: pointer; font-weight: 600; font-size: .75rem;
-  transition: background .25s, color .25s;
-  text-decoration: none; display: inline-block;
+  border: none; padding: 8px 16px; border-radius: 6px;
+  cursor: pointer; font-weight: 600; font-size: .8rem;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
-.read-more-btn:hover { background: var(--lilac-primary); color: #fff; }
-
-/* Facebook watch link */
+.read-more-btn:hover, .read-more-btn:focus {
+  background: var(--lilac-primary); color: #fff; transform: translateY(-1px); outline: none;
+}
+.read-more-btn:focus-visible { outline: 2px solid var(--lilac-primary); outline-offset: 2px; }
+.read-more-btn.expanded { background: var(--lilac-primary); color: #fff; }
 .fb-watch-link {
   align-self: flex-start;
   background: #1877F2; color: #fff;
-  padding: 6px 14px; border-radius: 5px;
-  font-weight: 600; font-size: .75rem;
-  text-decoration: none; display: inline-block;
-  transition: background .25s;
+  padding: 8px 16px; border-radius: 6px;
+  font-weight: 600; font-size: .8rem;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
-.fb-watch-link:hover { background: #0a5dc2; }
-
+.fb-watch-link:hover, .fb-watch-link:focus {
+  background: #0a5dc2; transform: translateY(-1px); outline: none;
+}
+.fb-watch-link:focus-visible { outline: 2px solid #1877F2; outline-offset: 2px; }
 .news-footer { text-align: center; margin-top: 2rem; }
 
-/* ══════════════════════════════
-   FOOTER
-══════════════════════════════ */
+/* FOOTER */
 footer {
   background: linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-accent) 100%);
   color: #e5e7eb; position: relative; overflow: hidden;
@@ -328,14 +634,12 @@ footer::after {
   background: radial-gradient(circle, rgba(139,92,246,.08) 0%, transparent 70%);
   border-radius: 50%; pointer-events: none;
 }
-
 .footer-main { padding: 60px 8% 30px; position: relative; z-index: 1; }
 .footer-top {
   display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
   gap: 40px; margin-bottom: 40px; padding-bottom: 40px;
   border-bottom: 1px solid rgba(255,255,255,.1);
 }
-
 .footer-brand { display: flex; flex-direction: column; gap: 20px; }
 .footer-logo-container { display: flex; align-items: center; gap: 15px; }
 .footer-logo-container img {
@@ -356,7 +660,6 @@ footer::after {
   border-radius: 10px; border-left: 4px solid var(--lilac-primary);
 }
 .footer-mission p { font-size: .9rem; color: #e5e7eb; font-style: italic; }
-
 .footer-column h4 {
   color: #fff; font-size: 1.1rem; margin-bottom: 20px;
   font-weight: 600; position: relative; padding-bottom: 10px;
@@ -370,36 +673,36 @@ footer::after {
 .footer-column ul li { margin-bottom: 12px; }
 .footer-column a {
   color: #d1d5db; text-decoration: none;
-  transition: all .3s; display: inline-flex;
+  transition: all var(--transition-fast); display: inline-flex;
   align-items: center; gap: 8px; font-size: .95rem;
 }
 .footer-column a::before {
-  content: '→'; opacity: 0;
-  transform: translateX(-10px); transition: all .3s;
+  content: '\f054'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  font-size: .6rem; opacity: 0;
+  transform: translateX(-10px); transition: all var(--transition-fast);
 }
-.footer-column a:hover { color: #fff; padding-left: 5px; }
-.footer-column a:hover::before { opacity: 1; transform: translateX(0); }
-
+.footer-column a:hover, .footer-column a:focus { color: #fff; padding-left: 5px; outline: none; }
+.footer-column a:hover::before, .footer-column a:focus::before { opacity: 1; transform: translateX(0); }
+.footer-column a:focus-visible { outline: 2px solid var(--lilac-primary); outline-offset: 2px; border-radius: 2px; }
 .contact-item {
   display: flex; align-items: flex-start;
   gap: 12px; margin-bottom: 15px;
   color: #d1d5db; font-size: .9rem;
 }
-.contact-item .icon { color: var(--lilac-primary); font-size: 1.2rem; margin-top: 2px; flex-shrink: 0; }
-
+.contact-item .icon { color: var(--lilac-primary); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; width: 20px; text-align: center; }
 .social-links { display: flex; gap: 12px; margin-top: 20px; }
 .social-link {
   width: 45px; height: 45px;
   background: rgba(255,255,255,.1); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; text-decoration: none; font-size: 1.2rem;
-  transition: all .3s;
+  color: #fff; text-decoration: none; font-size: 1.1rem;
+  transition: all var(--transition-fast);
 }
-.social-link:hover {
+.social-link:hover, .social-link:focus {
   background: var(--lilac-primary); transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(139,92,246,.4);
+  box-shadow: 0 5px 15px rgba(139,92,246,.4); outline: none;
 }
-
+.social-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .footer-bottom { padding: 25px 8%; background: rgba(0,0,0,.2); position: relative; z-index: 1; }
 .footer-bottom-content {
   display: flex; justify-content: space-between;
@@ -408,12 +711,11 @@ footer::after {
 .footer-credit { color: #9ca3af; font-size: .9rem; }
 .footer-credit strong { color: var(--lilac-primary); font-weight: 600; }
 .footer-links { display: flex; gap: 25px; }
-.footer-links a { color: #9ca3af; text-decoration: none; font-size: .9rem; transition: color .3s; }
-.footer-links a:hover { color: #fff; }
+.footer-links a { color: #9ca3af; text-decoration: none; font-size: .9rem; transition: color var(--transition-fast); }
+.footer-links a:hover, .footer-links a:focus { color: #fff; outline: none; }
+.footer-links a:focus-visible { outline: 2px solid var(--lilac-primary); outline-offset: 2px; border-radius: 2px; }
 
-/* ══════════════════════════════
-   FLOATING CHAT & BACK-TO-TOP
-══════════════════════════════ */
+/* FLOATING CHAT & BACK-TO-TOP */
 .chat-float {
   position: fixed; bottom: 30px; right: 30px;
   z-index: 999; display: flex; flex-direction: column; gap: 15px;
@@ -421,102 +723,181 @@ footer::after {
 .chat-btn {
   width: 60px; height: 60px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,.2); transition: transform .3s;
+  box-shadow: var(--shadow-md); transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   text-decoration: none;
 }
-.chat-btn:hover { transform: scale(1.1); }
+.chat-btn:hover, .chat-btn:focus { transform: scale(1.1); box-shadow: var(--shadow-lg); outline: none; }
+.chat-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .chat-btn.whatsapp  { background: #25D366; }
 .chat-btn.facebook  { background: #1877F2; }
-.chat-btn img { width: 35px; height: 35px; }
-
+.chat-btn img { width: 32px; height: 32px; }
 .chat-tooltip {
-  position: absolute; right: 70px;
-  background: #333; color: #fff; padding: 8px 12px;
-  border-radius: 6px; white-space: nowrap;
+  position: absolute; right: 75px; top: 50%; transform: translateY(-50%);
+  background: #333; color: #fff; padding: 8px 14px;
+  border-radius: 8px; white-space: nowrap;
   opacity: 0; pointer-events: none;
-  transition: opacity .3s; font-size: .85rem;
+  transition: opacity var(--transition-fast); font-size: .85rem;
+  box-shadow: var(--shadow-sm);
+}
+.chat-tooltip::after {
+  content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #333;
 }
 .chat-float:hover .chat-tooltip { opacity: 1; }
-
 .back-to-top {
   position: fixed; bottom: 170px; right: 30px;
   width: 50px; height: 50px;
   background: var(--lilac-primary); color: #fff;
   border-radius: 50%; display: flex; align-items: center;
-  justify-content: center; font-size: 24px;
+  justify-content: center; font-size: 20px;
   cursor: pointer; border: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,.15);
-  opacity: 0; visibility: hidden; transition: all .3s; z-index: 998;
+  box-shadow: var(--shadow-md);
+  opacity: 0; visibility: hidden; transition: all var(--transition-fast); z-index: 998;
 }
 .back-to-top.show { opacity: 1; visibility: visible; }
-.back-to-top:hover { background: var(--lilac-dark); transform: translateY(-5px); }
+.back-to-top:hover, .back-to-top:focus {
+  background: var(--lilac-dark); transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(109,40,217,.35); outline: none;
+}
+.back-to-top:focus-visible { outline: 2px solid var(--lilac-primary); outline-offset: 3px; }
 
-/* ══════════════════════════════
-   RESPONSIVE — 1024 px
-══════════════════════════════ */
+/* RESPONSIVE - 1024 px */
 @media (max-width: 1024px) {
   .header-text h2 { font-size: 1.2rem; }
   nav ul { gap: 15px; }
   nav a  { font-size: .9rem; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 35px; }
   .footer-brand { grid-column: 1 / -1; }
-  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
-  .news-grid { grid-template-columns: repeat(3, 1fr); }
+  .gallery-grid { columns: 3; }
+  .news-grid { grid-template-columns: repeat(2, 1fr); }
+  .slide img { height: 500px; }
+  .slide-text h2 { font-size: 2.8rem; }
+
+  .about-inner {
+    grid-template-columns: 1fr 1.1fr;
+    gap: 40px;
+  }
+  .about-text-col h2 { font-size: 2rem; }
+  .about-img-main { max-width: 320px; }
 }
 
-/* ══════════════════════════════
-   RESPONSIVE — 768 px
-══════════════════════════════ */
+/* RESPONSIVE - 768 px */
 @media (max-width: 768px) {
   body { padding-top: 70px; }
   .main-header { padding: 10px 5%; }
   nav { display: none; }
   .mobile-menu-toggle { display: flex; }
   .header-divider, .header-text p { display: none; }
-  .header-text h2 { font-size: 14px; }
+  .header-text h2 { font-size: 14px; line-height: 1.3; }
   .logo img { height: 48px; }
   .logo-tagline { font-size: .65rem; }
 
-  /* Slider */
   .slide img { height: 380px; }
   .slide-text {
     left: 50%; transform: translate(-50%, -50%);
-    text-align: center; padding: 0 16px; max-width: 90%;
+    text-align: center; padding: 0 20px; max-width: 92%;
   }
-  .slide-text h2 { font-size: 2rem; }
+  .slide-text h2 { font-size: 1.8rem; }
   .slide-text p  { font-size: .95rem; }
   .slide-cta     { font-size: .9rem; padding: 10px 22px; }
+  .slider-dots { bottom: 15px; }
 
-  /* About */
-  .about { flex-direction: row; flex-wrap: nowrap; align-items: flex-start; gap: 16px; padding: 40px 5%; }
-  .about-img { flex: 0 0 auto; text-align: left; }
-  .about-img img { max-width: 110px; width: 110px; margin-bottom: .4rem; }
-  .about-img h3  { font-size: .72rem; margin: .4rem 0 .2rem; line-height: 1.3; }
-  .about-img .title-role { font-size: .68rem; }
-  .about-text    { flex: 1; min-width: 0; }
-  .about-text h2 { font-size: 1.2rem; }
+  .about {
+    padding: 50px 5%;
+  }
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  .about-image-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .about-image-wrapper {
+    margin: 0 auto;
+  }
+  .about-image-wrapper::before {
+    top: 12px; left: 12px;
+  }
+  .about-img-main {
+    max-width: 280px;
+  }
+  .about-badge {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .about-stats {
+    justify-content: center;
+    padding-left: 0;
+    margin-top: 30px;
+  }
+  .about-text-col {
+    padding-top: 0;
+  }
+  .about-text-col h2 {
+    font-size: 1.6rem;
+  }
+  .about-features {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .about-cta-row {
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-  /* Gallery */
-  .gallery-section { padding: 50px 5%; }
-  .gallery-grid    { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .gallery-header h2 { font-size: 1.8rem; }
+  .gallery-section { padding: 50px 0 50px 5%; }
+  .gallery-header  { padding-right: 5%; }
+  .gallery-scroll-hint { display: block; padding-right: 5%; }
 
-  /* News — horizontal scroll on mobile */
+  .gallery-grid {
+    columns: unset;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding-right: 5%;
+    padding-bottom: 12px;
+    margin-bottom: 0;
+  }
+  .gallery-grid::-webkit-scrollbar { display: none; }
+
+  .gallery-card {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+    margin-bottom: 0;
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+  }
+  .gallery-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-footer { padding-right: 5%; }
+
   .news-section { padding: 40px 5%; }
   .news-grid {
     display: flex; flex-wrap: nowrap;
     overflow-x: auto; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    gap: 12px; padding-bottom: 10px;
+    gap: 14px; padding-bottom: 10px;
   }
   .news-grid::-webkit-scrollbar { display: none; }
-  /* Show ~2.2 cards on mobile so users know to scroll */
-  .news-card { min-width: 68%; max-width: 68%; scroll-snap-align: start; }
+  .news-card { min-width: 78%; max-width: 78%; scroll-snap-align: start; }
 
-  /* Facebook embed on mobile — taller for reel aspect */
   .news-image.fb-card { padding-top: 155%; }
 
-  /* Footer */
   .footer-main { padding: 40px 5% 20px; }
   .footer-top  { grid-template-columns: 1fr; gap: 30px; }
   .footer-brand { grid-column: 1; }
@@ -527,51 +908,61 @@ footer::after {
   .footer-links { flex-direction: column; gap: 10px; }
 
   .chat-float { bottom: 20px; right: 20px; }
-  .chat-btn   { width: 50px; height: 50px; }
-  .chat-btn img { width: 28px; height: 28px; }
+  .chat-btn   { width: 52px; height: 52px; }
+  .chat-btn img { width: 26px; height: 26px; }
   .back-to-top { bottom: 150px; right: 20px; width: 45px; height: 45px; }
 }
 
-/* ══════════════════════════════
-   RESPONSIVE — 480 px
-══════════════════════════════ */
+/* RESPONSIVE - 480 px */
 @media (max-width: 480px) {
   .slide img   { height: 300px; }
   .slide-text h2 { font-size: 1.4rem; }
   .slide-text p  { font-size: .88rem; }
   .slide-cta     { font-size: .85rem; padding: 9px 18px; }
 
-  .about-img img { max-width: 90px; width: 90px; }
-  .about-img h3  { font-size: .68rem; }
-  .about-img .title-role { font-size: .64rem; }
-  .about-text h2 { font-size: 1.1rem; }
+  .about-img-main { max-width: 240px; }
+  .about-text-col h2 { font-size: 1.4rem; }
+  .about-badge { min-width: 180px; padding: 12px 16px; }
+  .about-badge h4 { font-size: .85rem; }
+  .stat-number { font-size: 1.5rem; }
+  .stat-label { font-size: .7rem; }
+  .about-stats { gap: 16px; }
 
-  /* Show ~1.2 cards at 480px — just enough peek to invite scrolling */
-  .news-card   { min-width: 78%; max-width: 78%; }
+  .gallery-card { flex: 0 0 78%; }
+  .gallery-header h2 { font-size: 1.6rem; }
+
+  .news-card   { min-width: 85%; max-width: 85%; }
   .news-header h2 { font-size: 1.6rem; }
-  .header-text h2 { font-size: 12px; }
+  .header-text h2 { font-size: 11px; }
 
-  /* tighter fb embed on small phones */
   .news-image.fb-card { padding-top: 145%; }
 
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .gallery-header h2 { font-size: 1.6rem; }
   .footer-brand-text h3 { font-size: 1.1rem; }
   .social-links { justify-content: center; }
+
+  .chat-float { gap: 10px; }
+  .back-to-top { bottom: 140px; }
 }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { 
+  *, *::before, *::after { 
+    animation: none !important; 
+    transition: none !important; 
+    scroll-behavior: auto !important;
+  } 
+}
 </style>
+<base target="_blank">
 </head>
 
 <body>
 
-<!-- ══ HEADER ══ -->
+<!-- HEADER -->
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <a href="/">
-        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+      <a href="/" aria-label="OSCCPA Home">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="eager">
         <span class="logo-tagline">consumer rights first</span>
       </a>
     </div>
@@ -582,7 +973,7 @@ footer::after {
     </div>
   </div>
 
-  <nav>
+  <nav aria-label="Main navigation">
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/about">About</a></li>
@@ -593,27 +984,27 @@ footer::after {
     </ul>
   </nav>
 
-  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
     <span></span><span></span><span></span>
   </button>
 
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/news">News &amp; Activities</a>
-    <a href="/services">Services</a>
-    <a href="/complaints">Complaints</a>
-    <a href="/contact">Contact</a>
+  <div class="mobile-menu" id="mobileMenu" role="menu">
+    <a href="/" role="menuitem">Home</a>
+    <a href="/about" role="menuitem">About</a>
+    <a href="/news" role="menuitem">News &amp; Activities</a>
+    <a href="/services" role="menuitem">Services</a>
+    <a href="/complaints" role="menuitem">Complaints</a>
+    <a href="/contact" role="menuitem">Contact</a>
   </div>
 </header>
 
 
-<!-- ══ SLIDER ══ -->
-<section class="slider-container">
+<!-- SLIDER -->
+<section class="slider-container" aria-label="Featured slides">
   <div class="slider" id="slider">
 
-    <div class="slide">
-      <img src="{{ url_for('static', filename='Slide/slide1.jpg') }}" alt="Know Your Power Rights">
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+      <img src="{{ url_for('static', filename='Slide/slide1.jpg') }}" alt="Know Your Power Rights" loading="eager">
       <div class="vignette"></div>
       <div class="slide-text">
         <h2>Know Your Power Rights</h2>
@@ -622,8 +1013,8 @@ footer::after {
       </div>
     </div>
 
-    <div class="slide">
-      <img src="{{ url_for('static', filename='Slide/slide2.jpg') }}" alt="Consumer Rights">
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
+      <img src="{{ url_for('static', filename='Slide/slide2.jpg') }}" alt="Consumer Rights" loading="lazy">
       <div class="vignette"></div>
       <div class="slide-text">
         <h2>Consumer Rights</h2>
@@ -631,51 +1022,140 @@ footer::after {
       </div>
     </div>
 
-    <div class="slide">
-      <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities">
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
+      <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
     </div>
 
-    <div class="slide">
-      <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities">
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
+      <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
     </div>
 
   </div>
-  <button class="prev" onclick="prevSlide()">&#10094;</button>
-  <button class="next" onclick="nextSlide()">&#10095;</button>
+  <button class="prev" onclick="prevSlide()" aria-label="Previous slide">&#10094;</button>
+  <button class="next" onclick="nextSlide()" aria-label="Next slide">&#10095;</button>
+  <div class="slider-dots" id="sliderDots" aria-label="Slide navigation"></div>
 </section>
 
 
-<!-- ══ ABOUT ══ -->
-<section class="about">
-  <div class="about-img">
-    <img src="{{ url_for('static', filename='exec/as.jpg') }}" alt="Hajia Kudirat Ola">
-    <h3>Hajia Modelelayo Kudirat Ola</h3>
-    <p class="title-role">The Administrative Secretary</p>
-  </div>
-  <div class="about-text">
-    <h2>Who We Are</h2>
-    <p>The Ondo State Consumer Protection Agency is dedicated to protecting consumer rights and promoting fair, transparent market practices. We are committed to addressing consumer complaints, enforcing compliance, and strengthening public confidence in the marketplace. Our mission is to serve the people with integrity, professionalism, and efficiency. Together, we will ensure a safe and fair trading environment for all citizens.</p>
-    <a href="/about" class="know-more-btn">Learn More</a>
+<!-- ABOUT - REDESIGNED -->
+<section class="about" aria-labelledby="about-heading">
+  <div class="about-inner">
+
+    <!-- Left: Image Column -->
+    <div class="about-image-col">
+      <div class="about-image-wrapper">
+        <img 
+          src="{{ url_for('static', filename='exec/as.jpg') }}" 
+          alt="Hajia Modelelayo Kudirat Ola, Administrative Secretary of OSCCPA" 
+          class="about-img-main"
+          loading="lazy"
+        >
+        <div class="about-badge">
+          <h4>Hajia Modelelayo Kudirat Ola</h4>
+          <p>Administrative Secretary</p>
+        </div>
+      </div>
+
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Complaints Resolved</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Markets Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Consumer Support</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Text Column -->
+    <div class="about-text-col">
+      <div class="about-label">
+        <i class="fas fa-shield-alt"></i>
+        About Us
+      </div>
+
+      <h2 id="about-heading">Who We <span>Are</span></h2>
+
+      <p class="about-lead">
+        The Ondo State Consumer Protection Agency is dedicated to protecting consumer rights and promoting fair, transparent market practices. We address complaints, enforce compliance, and strengthen public confidence in the marketplace.
+      </p>
+
+      <div class="about-features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-gavel"></i>
+          </div>
+          <div class="feature-text">
+            <h4>Enforcement</h4>
+            <p>Robust market surveillance and compliance monitoring across all sectors.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <div class="feature-text">
+            <h4>Advocacy</h4>
+            <p>Public education and consumer rights awareness campaigns statewide.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <div class="feature-text">
+            <h4>Mediation</h4>
+            <p>Fair dispute resolution between consumers and businesses.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="feature-text">
+            <h4>Policy</h4>
+            <p>Evidence-based regulations for sustainable market development.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-cta-row">
+        <a href="/about" class="know-more-btn">
+          Learn More <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="/contact" class="about-contact-link">
+          <i class="fas fa-phone"></i>
+          Contact Our Team
+        </a>
+      </div>
+    </div>
+
   </div>
 </section>
 
 
-<!-- ══ GALLERY ══ -->
-<section class="gallery-section">
+<!-- GALLERY -->
+<section class="gallery-section" aria-labelledby="gallery-heading">
   <div class="gallery-header">
-    <h2>Gallery</h2>
+    <h2 id="gallery-heading">Gallery</h2>
     <p>A glimpse of our activities across Ondo State</p>
   </div>
+  <div class="gallery-scroll-hint"><i class="fas fa-hand-point-right"></i> Swipe to see more</div>
   <div class="gallery-grid">
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal14.jpg') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal15.png') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal16.png') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal17.png') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal18.png') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal19.jpg') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal20.jpg') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal21.jpg') }}"  alt="Agency Activity"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal22.jpg') }}"  alt="Agency Activity"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal14.jpg') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal15.png') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal16.png') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal17.png') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal18.png') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal19.jpg') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal20.jpg') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal21.jpg') }}" alt="Agency Activity" loading="lazy"></div>
+    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal22.jpg') }}" alt="Agency Activity" loading="lazy"></div>
   </div>
   <div class="gallery-footer">
     <a href="/news" class="know-more-btn">View Full Gallery &rarr;</a>
@@ -683,17 +1163,17 @@ footer::after {
 </section>
 
 
-<!-- ══ NEWS ══ -->
-<section class="news-section">
+<!-- NEWS -->
+<section class="news-section" aria-labelledby="news-heading">
   <div class="news-header">
-    <h2>News &amp; Recent Activities</h2>
+    <h2 id="news-heading">News &amp; Recent Activities</h2>
     <p>Latest updates, programs, and enforcement activities across Ondo State</p>
   </div>
 
   <div class="news-grid">
 
-    <!-- ── CARD 1 — NERC (external article) ── -->
-    <div class="news-card">
+    <!-- CARD 1 - NERC (external article) -->
+    <article class="news-card">
       <div class="news-image">
         <div class="news-ext-banner">
           <span class="ext-label">External Article</span>
@@ -701,7 +1181,7 @@ footer::after {
           <a class="ext-read-link"
              href="https://www.vanguardngr.com/2026/02/nerc-outlines-steps-for-resolving-electricity-complaints-nationwide/"
              target="_blank" rel="noopener noreferrer">
-            Read on Vanguard ↗
+            Read on Vanguard <i class="fas fa-external-link-alt" style="font-size:.65rem;"></i>
           </a>
         </div>
         <span class="news-date">Mar 2026</span>
@@ -711,87 +1191,115 @@ footer::after {
         <p class="preview">
           The Nigerian Electricity Regulatory Commission (NERC) has issued a step-by-step guide for consumers facing power supply and billing issues, urging them to follow established complaint channels.
         </p>
-        <p class="more-text">
-          According to NERC, consumers should first contact their Distribution Company (DisCo) customer care unit for faults, outages, metering concerns, or billing disputes. Where a complaint remains unresolved, customers in states with a State Electricity Regulator (SER) should escalate to that authority.<br><br>
-          &#128222; <strong>0201 344 4331</strong> &nbsp;|&nbsp; <strong>0908 899 9244</strong><br>
-          &#128231; consumeraffairs@nerc.gov.ng<br><br>
-          OCCPA encourages all Ondo State residents to use these channels to assert their consumer rights.
-        </p>
-        <button class="read-more-btn">View More</button>
+        <div class="more-text">
+          <p>According to NERC, consumers should first contact their Distribution Company (DisCo) customer care unit for faults, outages, metering concerns, or billing disputes. Where a complaint remains unresolved, customers in states with a State Electricity Regulator (SER) should escalate to that authority.</p>
+          <p style="margin-top: .8rem;"><i class="fas fa-phone" style="color: var(--lilac-primary);"></i> <strong>0201 344 4331</strong> &nbsp;|&nbsp; <strong>0908 899 9244</strong></p>
+          <p><i class="fas fa-envelope" style="color: var(--lilac-primary);"></i> consumeraffairs@nerc.gov.ng</p>
+          <p style="margin-top: .8rem;"><strong>OCCPA encourages all Ondo State residents to use these channels to assert their consumer rights.</strong></p>
+        </div>
+        <button class="read-more-btn" aria-expanded="false">View More</button>
       </div>
-    </div>
+    </article>
 
-    <!-- ── CARD 2 — Facebook Video 1 ── -->
-    <div class="news-card">
+    <!-- CARD 2 - Facebook Video 1 -->
+    <article class="news-card">
       <div class="news-image fb-card">
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&show_text=false&width=267&t=0"
           scrolling="no" frameborder="0"
           allowfullscreen="true"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          title="OCCPA Clamps Down on Unfair Trade Practices in Ondo State"
+          loading="lazy">
         </iframe>
+        <div class="fb-fallback" style="display:none;">
+          <i class="fab fa-facebook"></i>
+          <p>Video unavailable. View on Facebook.</p>
+          <a href="https://web.facebook.com/reel/933525072786066/" target="_blank" class="fb-watch-link" style="background:#fff;color:#1877F2;">Open Video</a>
+        </div>
       </div>
       <div class="news-content">
         <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
         <a href="https://web.facebook.com/reel/933525072786066/"
            target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link">&#9654; Watch on Facebook</a>
+           class="fb-watch-link"><i class="fas fa-play"></i> Watch on Facebook</a>
       </div>
-    </div>
+    </article>
 
-    <!-- ── CARD 3 — Facebook Video 2 ── -->
-    <div class="news-card">
+    <!-- CARD 3 - Facebook Video 2 -->
+    <article class="news-card">
       <div class="news-image fb-card">
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1853786275175803%2F&show_text=false&width=267&t=0"
           scrolling="no" frameborder="0"
           allowfullscreen="true"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          title="OCCPA Consumer Sensitization Drive Across Ondo State"
+          loading="lazy">
         </iframe>
+        <div class="fb-fallback" style="display:none;">
+          <i class="fab fa-facebook"></i>
+          <p>Video unavailable. View on Facebook.</p>
+          <a href="https://web.facebook.com/reel/1853786275175803/" target="_blank" class="fb-watch-link" style="background:#fff;color:#1877F2;">Open Video</a>
+        </div>
       </div>
       <div class="news-content">
         <h3>OCCPA Consumer Sensitization Drive Across Ondo State</h3>
         <a href="https://web.facebook.com/reel/1853786275175803/"
            target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link">&#9654; Watch on Facebook</a>
+           class="fb-watch-link"><i class="fas fa-play"></i> Watch on Facebook</a>
       </div>
-    </div>
+    </article>
 
-    <!-- ── CARD 4 — Facebook Video 3 ── -->
-    <div class="news-card">
+    <!-- CARD 4 - Facebook Video 3 -->
+    <article class="news-card">
       <div class="news-image fb-card">
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1840859706594273%2F&show_text=false&width=267&t=0"
           scrolling="no" frameborder="0"
           allowfullscreen="true"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          title="Market Surveillance &amp; Enforcement Operations by OCCPA"
+          loading="lazy">
         </iframe>
+        <div class="fb-fallback" style="display:none;">
+          <i class="fab fa-facebook"></i>
+          <p>Video unavailable. View on Facebook.</p>
+          <a href="https://web.facebook.com/reel/1840859706594273/" target="_blank" class="fb-watch-link" style="background:#fff;color:#1877F2;">Open Video</a>
+        </div>
       </div>
       <div class="news-content">
         <h3>Market Surveillance &amp; Enforcement Operations by OCCPA</h3>
         <a href="https://web.facebook.com/reel/1840859706594273/"
            target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link">&#9654; Watch on Facebook</a>
+           class="fb-watch-link"><i class="fas fa-play"></i> Watch on Facebook</a>
       </div>
-    </div>
+    </article>
 
-    <!-- ── CARD 5 — Facebook Video 4 ── -->
-    <div class="news-card">
+    <!-- CARD 5 - Facebook Video 4 -->
+    <article class="news-card">
       <div class="news-image fb-card">
         <iframe
           src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F26279987428370429%2F&show_text=false&width=267&t=0"
           scrolling="no" frameborder="0"
           allowfullscreen="true"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          title="OCCPA Public Awareness Campaign: Know Your Consumer Rights"
+          loading="lazy">
         </iframe>
+        <div class="fb-fallback" style="display:none;">
+          <i class="fab fa-facebook"></i>
+          <p>Video unavailable. View on Facebook.</p>
+          <a href="https://web.facebook.com/reel/26279987428370429/" target="_blank" class="fb-watch-link" style="background:#fff;color:#1877F2;">Open Video</a>
+        </div>
       </div>
       <div class="news-content">
         <h3>OCCPA Public Awareness Campaign: Know Your Consumer Rights</h3>
         <a href="https://web.facebook.com/reel/26279987428370429/"
            target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link">&#9654; Watch on Facebook</a>
+           class="fb-watch-link"><i class="fas fa-play"></i> Watch on Facebook</a>
       </div>
-    </div>
+    </article>
 
   </div><!-- /.news-grid -->
 
@@ -801,14 +1309,14 @@ footer::after {
 </section>
 
 
-<!-- ══ FOOTER ══ -->
+<!-- FOOTER -->
 <footer>
   <div class="footer-main">
     <div class="footer-top">
 
       <div class="footer-brand">
         <div class="footer-logo-container">
-          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="lazy">
           <div class="footer-brand-text">
             <h3>Ondo State Competition &amp; Consumer Protection Agency</h3>
             <span class="tagline">consumer rights first</span>
@@ -821,10 +1329,10 @@ footer::after {
           <p><strong>Our Mission:</strong> To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
         </div>
         <div class="social-links">
-          <a href="#" class="social-link" aria-label="Facebook"><span>f</span></a>
-          <a href="#" class="social-link" aria-label="Twitter"><span>&#120143;</span></a>
-          <a href="#" class="social-link" aria-label="Instagram"><span>&#128247;</span></a>
-          <a href="#" class="social-link" aria-label="LinkedIn"><span>in</span></a>
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
 
@@ -853,19 +1361,19 @@ footer::after {
       <div class="footer-column">
         <h4>Contact Us</h4>
         <div class="contact-item">
-          <span class="icon">&#128205;</span>
+          <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
           <span>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</span>
         </div>
         <div class="contact-item">
-          <span class="icon">&#128231;</span>
+          <span class="icon"><i class="fas fa-envelope"></i></span>
           <span>info@occpa.on.gov.ng</span>
         </div>
         <div class="contact-item">
-          <span class="icon">&#128222;</span>
+          <span class="icon"><i class="fas fa-phone"></i></span>
           <span>+234 904 335 3001</span>
         </div>
         <div class="contact-item">
-          <span class="icon">&#9200;</span>
+          <span class="icon"><i class="fas fa-clock"></i></span>
           <span>Mon – Fri: 8AM – 5PM</span>
         </div>
       </div>
@@ -888,7 +1396,7 @@ footer::after {
 </footer>
 
 
-<!-- ══ CHAT FLOAT ══ -->
+<!-- CHAT FLOAT -->
 <div class="chat-float">
   <a href="https://wa.me/2349043353001" target="_blank" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
@@ -899,53 +1407,147 @@ footer::after {
   <span class="chat-tooltip">Chat with us</span>
 </div>
 
-<!-- ══ BACK TO TOP ══ -->
-<button class="back-to-top" id="backToTop" aria-label="Back to top">&#8593;</button>
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-  /* ── Back to top ── */
+  /* Back to top */
   const backToTopBtn = document.getElementById("backToTop");
+  let scrollTicking = false;
+
   window.addEventListener("scroll", function () {
-    backToTopBtn.classList.toggle("show", window.pageYOffset > 300);
+    if (!scrollTicking) {
+      window.requestAnimationFrame(function () {
+        backToTopBtn.classList.toggle("show", window.pageYOffset > 300);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
   });
+
   backToTopBtn.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  /* ── Mobile menu ── */
+  /* Mobile menu */
   const menuToggle = document.querySelector(".mobile-menu-toggle");
   const mobileMenu = document.getElementById("mobileMenu");
+
   window.toggleMobileMenu = function () {
-    mobileMenu.classList.toggle("open");
+    const isOpen = mobileMenu.classList.toggle("open");
     menuToggle.classList.toggle("active");
+    menuToggle.setAttribute("aria-expanded", isOpen);
+
+    if (isOpen) {
+      document.addEventListener("click", closeMenuOutside);
+    } else {
+      document.removeEventListener("click", closeMenuOutside);
+    }
   };
 
-  /* ── Slider ── */
+  function closeMenuOutside(e) {
+    if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", closeMenuOutside);
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768 && mobileMenu.classList.contains("open")) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  /* Slider */
   let index = 0;
   const slides = document.querySelectorAll(".slide");
   const slider = document.getElementById("slider");
+  const dotsContainer = document.getElementById("sliderDots");
+  let slideInterval;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement("button");
+    dot.className = "slider-dot" + (i === 0 ? " active" : "");
+    dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+    dot.addEventListener("click", () => {
+      showSlide(i);
+      resetInterval();
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  const dots = document.querySelectorAll(".slider-dot");
+
+  function updateDots() {
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+  }
 
   function showSlide(i) {
     index = (i + slides.length) % slides.length;
     slider.style.transform = "translateX(" + (-index * 100) + "%)";
+    updateDots();
   }
+
   window.nextSlide = function () { showSlide(index + 1); };
   window.prevSlide = function () { showSlide(index - 1); };
-  setInterval(window.nextSlide, 6000);
 
-  /* ── Read more / less (NERC card only) ── */
+  function startInterval() {
+    if (!prefersReducedMotion) {
+      slideInterval = setInterval(window.nextSlide, 6000);
+    }
+  }
+
+  function resetInterval() {
+    clearInterval(slideInterval);
+    startInterval();
+  }
+
+  startInterval();
+
+  const sliderContainer = document.querySelector(".slider-container");
+  sliderContainer.addEventListener("mouseenter", () => clearInterval(slideInterval));
+  sliderContainer.addEventListener("mouseleave", startInterval);
+
+  /* Read more / less */
   document.querySelectorAll(".read-more-btn").forEach(function (btn) {
-    if (btn.tagName === "A") return;
     btn.addEventListener("click", function () {
-      const moreText = this.previousElementSibling;
+      const card = this.closest(".news-content");
+      const moreText = card.querySelector(".more-text");
       if (!moreText) return;
+
       const expanded = moreText.style.display === "block";
       moreText.style.display = expanded ? "none" : "block";
       this.textContent = expanded ? "View More" : "View Less";
+      this.setAttribute("aria-expanded", !expanded);
+      this.classList.toggle("expanded", !expanded);
     });
+  });
+
+  /* Facebook iframe fallback detection */
+  document.querySelectorAll(".news-image.fb-card").forEach(function (card) {
+    const iframe = card.querySelector("iframe");
+    const fallback = card.querySelector(".fb-fallback");
+    if (!iframe || !fallback) return;
+
+    setTimeout(function () {
+      try {
+        if (!iframe.contentDocument || iframe.contentDocument.body.innerHTML === "") {
+          fallback.style.display = "flex";
+        }
+      } catch (e) {
+        if (iframe.clientHeight < 50) {
+          fallback.style.display = "flex";
+        }
+      }
+    }, 5000);
   });
 
 });
