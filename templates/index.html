@@ -498,13 +498,109 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .lightbox-nav:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .lightbox-prev { left: 24px; }
 .lightbox-next { right: 24px; }
-body.lightbox-open { overflow: hidden; }
+body.lightbox-open,
+body.news-modal-open { overflow: hidden; }
 
-/* NEWS */
+/* NEWS — same "compact box that expands" pattern as the gallery.
+   The homepage only spends space on one preview card; the full feed
+   of articles and videos lives inside a modal opened on demand. */
 .news-section { padding: 80px 7%; background: var(--paper); border-top: 1px solid var(--line); }
-.news-header { text-align: center; margin-bottom: 2.6rem; }
-.news-header h2 { font-size: 2.1rem; color: var(--navy); margin-bottom: .5rem; font-weight: 600; }
-.news-header p  { color: var(--text-muted); font-size: 1rem; }
+.news-layout {
+  max-width: 1200px; margin: 0 auto 3rem;
+  display: grid; grid-template-columns: 320px 1fr;
+  gap: 56px; align-items: center;
+}
+
+.news-preview-trigger {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: none; border: none; padding: 0; cursor: pointer;
+  width: 100%; max-width: 300px; margin: 0 auto;
+  font-family: var(--font-body); text-align: left;
+}
+.news-preview-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: var(--radius-md); }
+.news-preview-card {
+  position: relative; width: 100%;
+  background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-md);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+.news-preview-trigger:hover .news-preview-card,
+.news-preview-trigger:focus-visible .news-preview-card { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.news-preview-banner {
+  height: 110px;
+  background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.news-preview-banner i { font-size: 2rem; color: var(--gold); }
+.news-preview-banner .mini-avatars { position: absolute; bottom: 10px; right: 12px; display: flex; }
+.news-preview-banner .mini-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--navy-mid); border: 2px solid var(--navy-deep);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: .7rem; margin-left: -8px;
+}
+.news-preview-body { padding: 16px 18px 18px; }
+.news-preview-tag {
+  display: inline-block; font-size: .68rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--gold-dark); background: var(--gold-soft);
+  padding: 3px 10px; border-radius: 50px; margin-bottom: 8px;
+}
+.news-preview-body h3 {
+  font-size: .92rem; font-weight: 700; color: var(--text-dark); line-height: 1.4;
+  font-family: var(--font-body);
+}
+.news-preview-count {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  background: rgba(15,10,26,.55); color: #fff;
+  padding: 5px 12px; border-radius: 50px;
+  font-size: .72rem; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 6px;
+  backdrop-filter: blur(2px);
+}
+.news-preview-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--navy); color: #fff;
+  padding: 12px 24px; border-radius: 4px;
+  font-weight: 700; font-size: .88rem;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.news-preview-trigger:hover .news-preview-cta,
+.news-preview-trigger:focus-visible .news-preview-cta { background: var(--navy-mid); transform: translateY(-2px); }
+
+.news-copy h2 { font-size: 2.1rem; color: var(--text-dark); margin-bottom: 16px; font-weight: 600; }
+.news-copy p { color: var(--text-muted); font-size: 1.02rem; line-height: 1.75; max-width: 52ch; }
+
+/* News modal — holds the real feed (article + videos) */
+.news-modal {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(15,10,26,.82);
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 5%;
+}
+.news-modal[hidden] { display: none; }
+.news-modal-inner {
+  background: var(--cream); border-radius: var(--radius-lg);
+  width: 100%; max-width: 1160px; max-height: 88vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 30px 70px rgba(0,0,0,.4);
+  overflow: hidden;
+}
+.news-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 26px; background: var(--navy); flex-shrink: 0;
+}
+.news-modal-header h3 { color: #fff; font-size: 1.2rem; font-weight: 600; }
+.news-modal-close {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: none; color: #fff;
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
+}
+.news-modal-close:hover, .news-modal-close:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
+.news-modal-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.news-modal-body { padding: 26px; overflow-y: auto; }
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -745,6 +841,7 @@ footer::before {
   .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
   .footer-brand { grid-column: 1 / -1; }
   .gallery-layout { grid-template-columns: 260px 1fr; gap: 40px; }
+  .news-layout { grid-template-columns: 260px 1fr; gap: 40px; }
   .news-grid { grid-template-columns: repeat(2, 1fr); }
   .slide img { height: 480px; }
   .slide-text h2 { font-size: 2.5rem; }
@@ -796,13 +893,16 @@ footer::before {
   .lightbox-next { right: 8px; }
   .lightbox-close { top: 14px; right: 14px; width: 40px; height: 40px; }
 
-  .news-section { padding: 46px 5%; }
-  .news-grid {
-    display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch; gap: 14px; padding-bottom: 10px;
-  }
-  .news-grid::-webkit-scrollbar { display: none; }
-  .news-card { min-width: 80%; max-width: 80%; scroll-snap-align: start; }
+  .news-section { padding: 50px 5%; }
+  .news-layout { grid-template-columns: 1fr; gap: 30px; text-align: center; justify-items: center; }
+  .news-preview-trigger { max-width: 220px; }
+  .news-copy p { margin: 0 auto; }
+
+  .news-modal { padding: 0; }
+  .news-modal-inner { max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; }
+  .news-modal-body { padding: 18px; }
+  .news-grid { grid-template-columns: 1fr; gap: 16px; }
+  .news-card { width: 100%; }
 
   .footer-main { padding: 46px 5% 22px; }
   .footer-top { grid-template-columns: 1fr; gap: 32px; }
@@ -836,8 +936,8 @@ footer::before {
   .gallery-preview-trigger { max-width: 190px; }
   .gallery-copy h2 { font-size: 1.55rem; }
 
-  .news-card { min-width: 86%; max-width: 86%; }
-  .news-header h2 { font-size: 1.55rem; }
+  .news-preview-trigger { max-width: 190px; }
+  .news-copy h2 { font-size: 1.55rem; }
   .header-text h2 { font-size: 11px; }
 
   .footer-brand-text h3 { font-size: 1.08rem; }
@@ -1081,13 +1181,47 @@ footer::before {
 
 <!-- NEWS -->
 <section class="news-section" aria-labelledby="news-heading">
-  <div class="news-header">
-    <div class="section-eyebrow" style="margin-bottom:14px;"><i class="fas fa-newspaper"></i> Updates</div>
-    <h2 id="news-heading">News &amp; Recent Activities</h2>
-    <p>Latest updates, programs, and enforcement activities across Ondo State</p>
-  </div>
+  <div class="news-layout">
 
-  <div class="news-grid">
+    <div class="news-preview">
+      <button type="button" class="news-preview-trigger" id="openNewsBtn" aria-haspopup="dialog" aria-controls="newsModal">
+        <div class="news-preview-card">
+          <span class="news-preview-count"><i class="fas fa-layer-group"></i> 5 Updates</span>
+          <div class="news-preview-banner">
+            <i class="fas fa-newspaper"></i>
+            <div class="mini-avatars">
+              <span class="mini-avatar"><i class="fab fa-facebook-f"></i></span>
+              <span class="mini-avatar"><i class="fab fa-facebook-f"></i></span>
+              <span class="mini-avatar"><i class="fas fa-plus"></i></span>
+            </div>
+          </div>
+          <div class="news-preview-body">
+            <span class="news-preview-tag">Latest</span>
+            <h3>NERC Outlines Steps for Resolving Electricity Complaints Nationwide</h3>
+          </div>
+        </div>
+        <span class="news-preview-cta"><i class="fas fa-expand"></i> View All News &amp; Activities</span>
+      </button>
+    </div>
+
+    <div class="news-copy">
+      <div class="section-eyebrow"><i class="fas fa-newspaper"></i> Updates</div>
+      <h2 id="news-heading">News &amp; Recent Activities</h2>
+      <p>Latest updates, programs, and enforcement activities across Ondo State. Open the feed to read articles and watch our field videos.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- NEWS MODAL -->
+<div class="news-modal" id="newsModal" role="dialog" aria-modal="true" aria-label="News and recent activities" hidden>
+  <div class="news-modal-inner">
+    <div class="news-modal-header">
+      <h3>News &amp; Recent Activities</h3>
+      <button type="button" class="news-modal-close" id="newsModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="news-modal-body">
+      <div class="news-grid">
 
     <!-- CARD 1 - NERC (external article) -->
     <article class="news-card">
@@ -1193,10 +1327,9 @@ footer::before {
 
   </div><!-- /.news-grid -->
 
-  <div class="news-footer">
-    <a href="/news" class="know-more-btn">View All News &rarr;</a>
-  </div>
-</section>
+    </div><!-- /.news-modal-body -->
+  </div><!-- /.news-modal-inner -->
+</div><!-- /.news-modal -->
 
 </main>
 
@@ -1546,6 +1679,40 @@ document.addEventListener("DOMContentLoaded", function () {
       delta < 0 ? showNext() : showPrev();
     }
   }, { passive: true });
+
+  /* News modal — the "News & Recent Activities" section shows one
+     compact preview card; the full article + video feed lives here
+     and opens on demand instead of taking up the whole homepage. */
+  const openNewsBtn = document.getElementById("openNewsBtn");
+  const newsModal = document.getElementById("newsModal");
+  const newsModalClose = document.getElementById("newsModalClose");
+  let lastNewsFocusedEl = null;
+
+  function openNewsModal() {
+    lastNewsFocusedEl = document.activeElement;
+    newsModal.hidden = false;
+    document.body.classList.add("news-modal-open");
+    newsModalClose.focus();
+  }
+
+  function closeNewsModal() {
+    newsModal.hidden = true;
+    document.body.classList.remove("news-modal-open");
+    if (lastNewsFocusedEl) lastNewsFocusedEl.focus();
+  }
+
+  if (openNewsBtn) {
+    openNewsBtn.addEventListener("click", openNewsModal);
+  }
+  newsModalClose.addEventListener("click", closeNewsModal);
+
+  newsModal.addEventListener("click", function (e) {
+    if (e.target === newsModal) closeNewsModal();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (!newsModal.hidden && e.key === "Escape") closeNewsModal();
+  });
 
 });
 </script>
