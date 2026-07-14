@@ -402,36 +402,103 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 }
 .about-contact-link:hover i { background: var(--gold); color: #fff; }
 
-/* GALLERY */
+/* GALLERY — compact expandable preview + lightbox, instead of a
+   space-hungry full grid. The section only ever costs one small
+   box; everything else lives behind the "View Full Gallery" action. */
 .gallery-section { padding: 80px 7%; background: var(--cream); }
-.gallery-header { text-align: center; margin-bottom: 2.6rem; }
-.gallery-header h2 { font-size: 2.3rem; color: var(--navy); margin-bottom: .6rem; font-weight: 600; }
-.gallery-header p  { color: var(--text-muted); font-size: 1.05rem; }
-.gallery-grid { columns: 3; column-gap: 16px; margin-bottom: 2rem; }
-.gallery-card {
-  break-inside: avoid;
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  margin-bottom: 16px;
-  display: block;
+.gallery-layout {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 320px 1fr;
+  gap: 56px; align-items: center;
+}
+
+/* Left: the compact stacked-photo box that acts as the trigger */
+.gallery-preview-trigger {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: none; border: none; padding: 0; cursor: pointer;
+  width: 100%; max-width: 300px; margin: 0 auto;
+  font-family: var(--font-body);
+}
+.gallery-preview-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: var(--radius-md); }
+.gallery-stack {
   position: relative;
+  width: 100%; aspect-ratio: 4 / 5;
 }
-.gallery-card img { width: 100%; height: auto; object-fit: cover; display: block; transition: transform .4s ease; }
-.gallery-card:hover img { transform: scale(1.04); }
-.gallery-card::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(11,42,74,.35), transparent 55%);
-  opacity: 0; transition: opacity var(--transition-medium);
-  pointer-events: none;
+.stack-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 4px solid var(--paper);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
 }
-.gallery-card:hover::after { opacity: 1; }
-.gallery-footer { text-align: center; margin-top: 2.2rem; }
-.gallery-scroll-hint {
-  display: none; text-align: center; color: var(--text-muted); font-size: .85rem;
-  margin-bottom: 1rem; font-weight: 600;
+.stack-img-3 { transform: rotate(7deg) translate(10px, 6px); z-index: 1; filter: brightness(.94); }
+.stack-img-2 { transform: rotate(-5deg) translate(-8px, 4px); z-index: 2; filter: brightness(.97); }
+.stack-img-1 { transform: rotate(0deg); z-index: 3; }
+.gallery-preview-trigger:hover .stack-img-1,
+.gallery-preview-trigger:focus-visible .stack-img-1 { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.gallery-preview-trigger:hover .stack-img-2 { transform: rotate(-8deg) translate(-12px, 2px); }
+.gallery-preview-trigger:hover .stack-img-3 { transform: rotate(10deg) translate(14px, 4px); }
+.stack-count {
+  position: absolute; bottom: 12px; right: 12px; z-index: 4;
+  background: var(--navy-deep); color: #fff;
+  padding: 6px 14px; border-radius: 50px;
+  font-size: .78rem; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: var(--shadow-sm);
 }
+.gallery-preview-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--navy); color: #fff;
+  padding: 12px 24px; border-radius: 4px;
+  font-weight: 700; font-size: .88rem;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.gallery-preview-trigger:hover .gallery-preview-cta,
+.gallery-preview-trigger:focus-visible .gallery-preview-cta { background: var(--navy-mid); transform: translateY(-2px); }
+
+/* Right: supporting copy */
+.gallery-copy h2 { font-size: 2.2rem; color: var(--text-dark); margin-bottom: 16px; font-weight: 600; }
+.gallery-copy p { color: var(--text-muted); font-size: 1.02rem; line-height: 1.75; max-width: 52ch; }
+
+/* Lightbox modal */
+.lightbox {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(15,10,26,.94);
+  display: flex; align-items: center; justify-content: center;
+  padding: 70px 90px;
+}
+.lightbox[hidden] { display: none; }
+.lightbox-stage { position: relative; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.lightbox-stage img {
+  max-width: 100%; max-height: 78vh; object-fit: contain;
+  border-radius: var(--radius-md); box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  background: #1a1224;
+}
+.lightbox-counter { color: rgba(255,255,255,.75); font-size: .85rem; font-weight: 600; letter-spacing: .04em; }
+.lightbox-close {
+  position: absolute; top: 22px; right: 26px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); color: #fff;
+  font-size: 1.6rem; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.lightbox-close:hover, .lightbox-close:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
+.lightbox-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); color: #fff;
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.lightbox-nav:hover, .lightbox-nav:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
+.lightbox-nav:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lightbox-prev { left: 24px; }
+.lightbox-next { right: 24px; }
+body.lightbox-open { overflow: hidden; }
 
 /* NEWS */
 .news-section { padding: 80px 7%; background: var(--paper); border-top: 1px solid var(--line); }
@@ -677,7 +744,7 @@ footer::before {
   nav a { font-size: .87rem; padding: 9px 11px; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
   .footer-brand { grid-column: 1 / -1; }
-  .gallery-grid { columns: 3; }
+  .gallery-layout { grid-template-columns: 260px 1fr; gap: 40px; }
   .news-grid { grid-template-columns: repeat(2, 1fr); }
   .slide img { height: 480px; }
   .slide-text h2 { font-size: 2.5rem; }
@@ -717,18 +784,17 @@ footer::before {
   .about-features { grid-template-columns: 1fr; text-align: left; }
   .about-cta-row { justify-content: center; flex-direction: column; gap: 18px; }
 
-  .gallery-section { padding: 56px 0 56px 5%; }
-  .gallery-header { padding-right: 5%; }
-  .gallery-scroll-hint { display: block; padding-right: 5%; }
-  .gallery-grid {
-    columns: unset; display: flex; flex-wrap: nowrap; overflow-x: auto;
-    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
-    gap: 12px; padding-right: 5%; padding-bottom: 12px; margin-bottom: 0;
-  }
-  .gallery-grid::-webkit-scrollbar { display: none; }
-  .gallery-card { flex: 0 0 72%; scroll-snap-align: start; margin-bottom: 0; aspect-ratio: 3/4; border-radius: 12px; }
-  .gallery-card img { width: 100%; height: 100%; object-fit: cover; }
-  .gallery-footer { padding-right: 5%; }
+  .gallery-section { padding: 50px 5%; }
+  .gallery-layout { grid-template-columns: 1fr; gap: 30px; text-align: center; justify-items: center; }
+  .gallery-preview-trigger { max-width: 220px; }
+  .gallery-copy p { margin: 0 auto; }
+
+  .lightbox { padding: 60px 16px; }
+  .lightbox-stage img { max-height: 62vh; }
+  .lightbox-nav { width: 44px; height: 44px; font-size: 1rem; }
+  .lightbox-prev { left: 8px; }
+  .lightbox-next { right: 8px; }
+  .lightbox-close { top: 14px; right: 14px; width: 40px; height: 40px; }
 
   .news-section { padding: 46px 5%; }
   .news-grid {
@@ -767,8 +833,8 @@ footer::before {
   .stat-number { font-size: 1.5rem; }
   .stat-label { font-size: .68rem; }
 
-  .gallery-card { flex: 0 0 78%; }
-  .gallery-header h2 { font-size: 1.55rem; }
+  .gallery-preview-trigger { max-width: 190px; }
+  .gallery-copy h2 { font-size: 1.55rem; }
 
   .news-card { min-width: 86%; max-width: 86%; }
   .news-header h2 { font-size: 1.55rem; }
@@ -978,27 +1044,39 @@ footer::before {
 
 <!-- GALLERY -->
 <section class="gallery-section" aria-labelledby="gallery-heading">
-  <div class="gallery-header">
-    <div class="section-eyebrow" style="margin-bottom:14px;"><i class="fas fa-images"></i> Gallery</div>
-    <h2 id="gallery-heading">Our Work in the Field</h2>
-    <p>A glimpse of our activities across Ondo State</p>
-  </div>
-  <div class="gallery-scroll-hint"><i class="fas fa-hand-point-right"></i> Swipe to see more</div>
-  <div class="gallery-grid">
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal14.jpg') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal15.png') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal16.png') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal17.png') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal18.png') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal19.jpg') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal20.jpg') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal21.jpg') }}" alt="Agency Activity" loading="lazy"></div>
-    <div class="gallery-card"><img src="{{ url_for('static', filename='gallery/gal22.jpg') }}" alt="Agency Activity" loading="lazy"></div>
-  </div>
-  <div class="gallery-footer">
-    <a href="/news" class="know-more-btn">View Full Gallery &rarr;</a>
+  <div class="gallery-layout">
+
+    <div class="gallery-preview">
+      <button type="button" class="gallery-preview-trigger" id="openGalleryBtn" aria-haspopup="dialog" aria-controls="galleryLightbox">
+        <div class="gallery-stack">
+          <img class="stack-img stack-img-3" src="{{ url_for('static', filename='gallery/gal16.png') }}" alt="" loading="lazy" aria-hidden="true">
+          <img class="stack-img stack-img-2" src="{{ url_for('static', filename='gallery/gal15.png') }}" alt="" loading="lazy" aria-hidden="true">
+          <img class="stack-img stack-img-1" src="{{ url_for('static', filename='gallery/gal14.jpg') }}" alt="Preview of OCCPA field activities" loading="lazy">
+          <span class="stack-count"><i class="fas fa-images"></i> 9 Photos</span>
+        </div>
+        <span class="gallery-preview-cta"><i class="fas fa-expand"></i> View Full Gallery</span>
+      </button>
+    </div>
+
+    <div class="gallery-copy">
+      <div class="section-eyebrow"><i class="fas fa-images"></i> Gallery</div>
+      <h2 id="gallery-heading">Our Work in the Field</h2>
+      <p>A glimpse of our market inspections, sensitization drives, and enforcement operations across Ondo State. Tap the photos to open the full gallery.</p>
+    </div>
+
   </div>
 </section>
+
+<!-- GALLERY LIGHTBOX -->
+<div class="lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="Photo gallery" hidden>
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close gallery">&times;</button>
+  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+  <div class="lightbox-stage">
+    <img id="lightboxImg" src="" alt="">
+    <span class="lightbox-counter" id="lightboxCounter"></span>
+  </div>
+  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+</div>
 
 
 <!-- NEWS -->
@@ -1380,6 +1458,94 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  /* Gallery lightbox — the "Our Work in the Field" section shows one
+     small stacked-photo box; all 9 photos live behind it and open
+     here so the homepage never has to spend a huge grid on them. */
+  const galleryImages = [
+    { src: "{{ url_for('static', filename='gallery/gal14.jpg') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal15.png') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal16.png') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal17.png') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal18.png') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal19.jpg') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal20.jpg') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal21.jpg') }}", alt: "OCCPA field activity" },
+    { src: "{{ url_for('static', filename='gallery/gal22.jpg') }}", alt: "OCCPA field activity" }
+  ];
+
+  const openGalleryBtn = document.getElementById("openGalleryBtn");
+  const lightbox = document.getElementById("galleryLightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const lightboxCounter = document.getElementById("lightboxCounter");
+  const lightboxClose = document.getElementById("lightboxClose");
+  const lightboxPrev = document.getElementById("lightboxPrev");
+  const lightboxNext = document.getElementById("lightboxNext");
+  let galleryIndex = 0;
+  let lastFocusedEl = null;
+
+  function renderGalleryImage() {
+    const item = galleryImages[galleryIndex];
+    lightboxImg.src = item.src;
+    lightboxImg.alt = item.alt;
+    lightboxCounter.textContent = (galleryIndex + 1) + " / " + galleryImages.length;
+  }
+
+  function openLightbox(startIndex) {
+    galleryIndex = startIndex || 0;
+    renderGalleryImage();
+    lastFocusedEl = document.activeElement;
+    lightbox.hidden = false;
+    document.body.classList.add("lightbox-open");
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    lightboxImg.src = "";
+    if (lastFocusedEl) lastFocusedEl.focus();
+  }
+
+  function showNext() {
+    galleryIndex = (galleryIndex + 1) % galleryImages.length;
+    renderGalleryImage();
+  }
+
+  function showPrev() {
+    galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+    renderGalleryImage();
+  }
+
+  if (openGalleryBtn) {
+    openGalleryBtn.addEventListener("click", function () { openLightbox(0); });
+  }
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightboxNext.addEventListener("click", showNext);
+  lightboxPrev.addEventListener("click", showPrev);
+
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (lightbox.hidden) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") showNext();
+    if (e.key === "ArrowLeft") showPrev();
+  });
+
+  /* Basic swipe support for mobile */
+  let touchStartX = 0;
+  lightbox.addEventListener("touchstart", function (e) {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  lightbox.addEventListener("touchend", function (e) {
+    const delta = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(delta) > 40) {
+      delta < 0 ? showNext() : showPrev();
+    }
+  }, { passive: true });
 
 });
 </script>
