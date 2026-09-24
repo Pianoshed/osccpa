@@ -4,449 +4,699 @@
 <meta charset="UTF-8">
 <title>Admin Dashboard | OSCCPA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Standard Favicon -->
+<meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 :root{
-  --primary:#5f4b8b;
-  --primary-dark:#4a3a70;
-  --bg:#f6f5fb;
-  --white:#ffffff;
-  --border:#e5e1f2;
-  --danger:#dc3545;
-  --success:#198754;
-  --info:#0d6efd;
+  --navy:#6D28D9; --navy-deep:#4C1D95; --navy-mid:#7C3AED; --navy-soft:#F1EBFC;
+  --gold:#A855F7; --cream:#F6F1FC; --paper:#FFFFFF;
+  --text:#241B33; --muted:#665D77; --line:#E9E1F7;
+  --danger:#B42318; --danger-soft:#FEF3F2;
+  --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',sans-serif;
+  --shadow-sm:0 2px 8px rgba(11,42,74,.08); --shadow-md:0 6px 20px rgba(11,42,74,.10); --shadow-lg:0 16px 40px rgba(11,42,74,.18);
 }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.5;min-height:100vh}
+body.modal-open{overflow:hidden}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600}
+a{color:inherit}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-*{box-sizing:border-box}
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:3px solid var(--gold);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:10px 5%}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand img{height:46px;width:auto}
+.brand h1{font-size:1.2rem;color:var(--navy);line-height:1.2}
+.brand p{font-size:.74rem;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.who{font-size:.84rem;color:var(--muted);margin-right:4px}
+.who strong{color:var(--text)}
 
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:var(--bg);
-  color:#333;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border-radius:6px;border:1px solid var(--line);
+  background:var(--paper);color:var(--text);font-weight:600;font-size:.84rem;text-decoration:none;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .2s,box-shadow .2s}
+.btn:hover{background:var(--navy-soft);border-color:#D3C5EE}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-mid);box-shadow:0 8px 18px rgba(76,29,149,.25)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.danger:hover{background:#912018}
+
+/* PAGE */
+.wrap{max-width:1300px;margin:0 auto;padding:26px 5% 60px}
+.page-head{margin-bottom:20px}
+.page-head h2{font-size:1.7rem}
+.page-head p{color:var(--muted);font-size:.92rem}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:26px}
+.stat{text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;
+  box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:#D3C5EE}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--dot,var(--navy))}
+.stat-num{display:block;font-family:var(--font-display);font-size:2rem;font-weight:600;line-height:1.1;color:var(--text)}
+.stat-label{display:block;margin-top:4px;font-size:.8rem;font-weight:600;color:var(--muted)}
+.stat.pending{--dot:#D99A00}.stat.progress{--dot:#2563EB}.stat.resolved{--dot:#2F7A4D}.stat.contacts{--dot:var(--gold)}
+
+/* TABS + TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.tabs{display:flex;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:4px}
+.tab-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:0;background:transparent;border-radius:7px;
+  font-weight:600;font-size:.88rem;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.tab-btn:hover{color:var(--navy)}
+.tab-btn.active{background:var(--navy);color:#fff}
+.count-pill{background:var(--navy-soft);color:var(--navy);border-radius:20px;padding:1px 9px;font-size:.74rem}
+.tab-btn.active .count-pill{background:rgba(255,255,255,.22);color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* FILTERS */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.search{position:relative;flex:1 1 260px;max-width:420px}
+.search i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem}
+.filters input,.filters select{padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);
+  font-family:var(--font-body);font-size:.86rem;color:var(--text)}
+.search input{width:100%;padding-left:36px}
+.filters input:focus,.filters select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 4px rgba(109,40,217,.12)}
+.result-count{margin-left:auto;font-size:.82rem;color:var(--muted)}
+
+/* TABLE */
+.table-box{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow-x:auto;box-shadow:var(--shadow-sm)}
+table.data{width:100%;border-collapse:collapse;min-width:920px}
+table.data th{background:var(--navy-soft);color:var(--navy-deep);text-align:left;font-size:.78rem;font-weight:700;padding:12px 14px;white-space:nowrap}
+table.data td{padding:13px 14px;border-top:1px solid var(--line);font-size:.86rem;vertical-align:middle}
+table.data tbody tr:hover{background:#FBF9FE}
+.ref{font-weight:700;color:var(--navy)}
+.sub{display:block;font-size:.76rem;color:var(--muted)}
+.trunc{max-width:280px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.chip{display:inline-block;background:var(--navy-soft);color:var(--navy-deep);border-radius:20px;padding:3px 10px;font-size:.76rem;font-weight:600}
+.muted{color:var(--muted)}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.actions form{display:inline}
+.btn-sm{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:var(--paper);
+  font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;text-decoration:none;transition:background .2s,border-color .2s}
+.btn-sm:hover{background:var(--navy-soft);border-color:#D3C5EE}
+.btn-sm.danger{color:var(--danger)}
+.btn-sm.danger:hover{background:var(--danger-soft);border-color:#FDA29B}
+
+.ev-thumb{width:44px;height:44px;border-radius:8px;overflow:hidden;border:1px solid var(--line);padding:0;background:var(--navy-soft);cursor:pointer}
+.ev-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ev-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:var(--navy-soft);
+  color:var(--navy-deep);font-size:.76rem;font-weight:700;cursor:pointer}
+.ev-chip:hover{border-color:#D3C5EE}
+
+/* STATUS */
+.status-select{appearance:none;border:1.5px solid transparent;border-radius:20px;padding:6px 30px 6px 12px;font-size:.78rem;font-weight:700;cursor:pointer;
+  background-repeat:no-repeat;background-position:right 11px center;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23444' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")}
+.status-select:disabled{opacity:.6;cursor:progress}
+.s-pending{background-color:#FFF3CD;color:#7A5A00}
+.s-in-progress{background-color:#DBEAFE;color:#1D4ED8}
+.s-resolved{background-color:#D8F0E1;color:#1E6B3F}
+.badge{display:inline-block;border-radius:20px;padding:4px 12px;font-size:.76rem;font-weight:700}
+
+.empty{padding:46px 20px;text-align:center;color:var(--muted)}
+.empty i{font-size:1.8rem;color:#CDBBEE;margin-bottom:10px;display:block}
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:12px;font-size:.84rem;color:var(--muted)}
+.pager button{padding:7px 13px}
+.pager button:disabled{opacity:.45;cursor:default}
+
+/* MODAL */
+.modal{position:fixed;inset:0;z-index:2000;background:rgba(36,27,51,.55);display:none;align-items:center;justify-content:center;padding:18px}
+.modal:not([hidden]){display:flex}
+.modal-card{background:var(--paper);width:100%;max-width:640px;max-height:92vh;border-radius:16px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;overflow:hidden}
+.modal-card.small{max-width:440px}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+.modal-head .eyebrow{font-size:.76rem;font-weight:700;color:var(--navy);margin-bottom:2px}
+.modal-head h3{font-size:1.35rem;line-height:1.25;word-break:break-word}
+.x{border:0;background:var(--navy-soft);color:var(--navy);width:36px;height:36px;border-radius:50%;font-size:1.3rem;line-height:1;cursor:pointer;flex-shrink:0}
+.x:hover{background:var(--gold);color:#fff}
+.modal-body{padding:18px 22px;overflow-y:auto}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 22px;border-top:1px solid var(--line);background:#FBF9FE}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-bottom:18px}
+.fields div{min-width:0}
+.fields dt{font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:1px}
+.fields dd{font-size:.92rem;word-break:break-word}
+.fields dd a{color:var(--navy);font-weight:600}
+.modal-body h4{font-size:1rem;margin:16px 0 8px;color:var(--navy-deep)}
+.prose{white-space:pre-wrap;word-break:break-word;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:.92rem;line-height:1.65}
+.ev-img{display:block;max-width:100%;max-height:340px;border-radius:10px;border:1px solid var(--line);margin-bottom:10px;background:var(--cream)}
+.ev-video{width:100%;max-height:340px;border-radius:10px;background:#000;margin-bottom:10px}
+.ev-file{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--cream);margin-bottom:10px}
+.ev-file i{font-size:1.8rem;color:var(--navy)}
+.ev-file b{display:block;word-break:break-all;font-size:.9rem}
+.ev-file span{font-size:.78rem;color:var(--muted)}
+.ev-actions{display:flex;gap:8px;flex-wrap:wrap}
+.notice{padding:12px 14px;border-radius:10px;background:var(--danger-soft);color:var(--danger);font-size:.86rem;font-weight:500}
+
+/* TOASTS */
+.toasts{position:fixed;right:18px;bottom:18px;z-index:3000;display:flex;flex-direction:column;gap:10px;max-width:min(380px,calc(100vw - 36px))}
+.toast{padding:13px 16px;border-radius:10px;background:var(--navy-deep);color:#fff;font-size:.88rem;font-weight:500;box-shadow:var(--shadow-lg);
+  border-left:4px solid var(--gold);animation:tin .3s ease}
+.toast.success{border-left-color:#4ADE80}.toast.error{background:#912018;border-left-color:#FDA29B}
+.toast.out{opacity:0;transform:translateY(8px);transition:.4s}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* MOBILE: rows become cards */
+@media(max-width:860px){
+  .topbar{padding:10px 4%}
+  .who{display:none}
+  .wrap{padding:20px 4% 50px}
+  .result-count{margin-left:0;width:100%}
+  table.data{min-width:0}
+  table.data thead{display:none}
+  table.data,table.data tbody,table.data tr,table.data td{display:block;width:100%}
+  table.data tr{border:1px solid var(--line);border-radius:12px;margin:0 0 12px;padding:6px 0;background:var(--paper)}
+  .table-box{background:transparent;border:0;box-shadow:none;overflow:visible}
+  table.data td{display:flex;justify-content:space-between;align-items:center;gap:14px;text-align:right;border:0;padding:8px 14px}
+  table.data td::before{content:attr(data-label);font-size:.72rem;font-weight:700;color:var(--muted);text-align:left;flex-shrink:0}
+  .trunc{max-width:none;text-align:right}
+  .fields{grid-template-columns:1fr}
 }
-
-header{
-  background:var(--white);
-  padding:16px 6%;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
-}
-
-header h2{
-  margin:0;
-  color:var(--primary);
-}
-
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
-}
-
-.actions a{
-  text-decoration:none;
-  padding:7px 14px;
-  border-radius:8px;
-  font-size:13px;
-  border:1px solid var(--border);
-  color:#333;
-}
-
-.logout{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-}
-
-/* CONTAINER */
-.container{
-  max-width:1300px;
-  margin:30px auto;
-  padding:0 16px;
-}
-
-.tabs{
-  display:flex;
-  gap:10px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-}
-
-.tab-btn{
-  padding:8px 16px;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:600;
-  transition:0.3s;
-}
-
-.tab-btn.active{
-  background:var(--primary);
-  color:#fff;
-  border-color:var(--primary);
-}
-
-/* FILTER BAR */
-.filters{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:16px;
-}
-
-.filters input,
-.filters select,
-.filters button{
-  padding:8px 10px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-size:13px;
-}
-
-.filters button{
-  background:#fff;
-  cursor:pointer;
-}
-
-.table-box{
-  background:var(--white);
-  border-radius:14px;
-  overflow-x:auto;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:800px;
-}
-
-th,td{
-  padding:14px;
-  border-bottom:1px solid var(--border);
-  text-align:left;
-  font-size:13px;
-}
-
-th{
-  background:var(--primary);
-  color:#fff;
-  text-transform:uppercase;
-  font-size:11px;
-}
-
-tbody tr:hover{
-  background:#faf9fd;
-}
-
-.status-select{
-  padding:6px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  font-size:12px;
-}
-
-.badge{
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:600;
-}
-
-.pending{background:#fff3cd;color:#856404}
-.progress{background:#cfe2ff;color:#084298}
-.resolved{background:#d1e7dd;color:#0f5132}
-
-.btn{
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-  font-size:12px;
-}
-
-.view-btn{color:var(--primary)}
-.delete-btn{color:var(--danger)}
-.file-btn{color:var(--info)}
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-}
-
-.modal-content{
-  background:#fff;
-  width:90%;
-  max-width:520px;
-  border-radius:16px;
-  padding:22px;
-}
-
-.modal h3{
-  margin-top:0;
-  color:var(--primary);
-}
-
-.close{
-  float:right;
-  font-size:18px;
-  cursor:pointer;
-}
-
-.tab-content{
-  display:none;
-}
-
-.tab-content.active{
-  display:block;
-}
-
-@media(max-width:768px){
-  header{
-    padding:14px;
-  }
-  th,td{
-    padding:10px;
-  }
-}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 
 <body>
 
-<header>
-  <h2>Admin Dashboard</h2>
-  <div class="actions">
-    <span>Welcome, {{ session.admin_user }}</span>
-    <a href="/admin/change-password">Change Password</a>
-    <a href="/admin/logout" class="logout">Logout</a>
+<header class="topbar">
+  <div class="brand">
+    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p>Ondo State Competition &amp; Consumer Protection Agency</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <span class="who">Signed in as <strong>{{ session.admin_user }}</strong></span>
+    <a class="btn" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View site</a>
+    <a class="btn" href="/admin/change-password"><i class="fa-solid fa-key"></i> Change password</a>
+    <a class="btn primary" href="/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
   </div>
 </header>
 
-<div class="container">
+<main class="wrap">
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="complaintsTab">Complaints</button>
-    <button class="tab-btn" data-tab="contactsTab">Contacts</button>
+  <div class="page-head">
+    <h2>Overview</h2>
+    <p>Review complaints, update their status, and read messages from the contact form.</p>
   </div>
 
-  <div class="tab-content active" id="complaintsTab">
+  <section class="stats" aria-label="Summary">
+    <button type="button" class="stat" data-filter="">
+      <span class="stat-num" id="statTotal">{{ complaints|length }}</span><span class="stat-label">All complaints</span>
+    </button>
+    <button type="button" class="stat pending" data-filter="Pending">
+      <span class="stat-num" id="statPending">0</span><span class="stat-label">Pending</span>
+    </button>
+    <button type="button" class="stat progress" data-filter="In Progress">
+      <span class="stat-num" id="statProgress">0</span><span class="stat-label">In progress</span>
+    </button>
+    <button type="button" class="stat resolved" data-filter="Resolved">
+      <span class="stat-num" id="statResolved">0</span><span class="stat-label">Resolved</span>
+    </button>
+    <button type="button" class="stat contacts" data-go="contactsTab">
+      <span class="stat-num">{{ contacts|length }}</span><span class="stat-label">Contact messages</span>
+    </button>
+  </section>
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-tab="complaintsTab" role="tab" aria-selected="true">
+        <i class="fa-solid fa-triangle-exclamation"></i> Complaints <span class="count-pill">{{ complaints|length }}</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="contactsTab" role="tab" aria-selected="false">
+        <i class="fa-solid fa-envelope"></i> Contacts <span class="count-pill">{{ contacts|length }}</span>
+      </button>
+    </div>
+    <a class="btn" href="{{ url_for('export_excel') }}"><i class="fa-solid fa-file-excel"></i> Download all data (Excel)</a>
+  </div>
+
+  <!-- ========== COMPLAINTS ========== -->
+  <section class="tab-content active" id="complaintsTab" role="tabpanel">
 
     <div class="filters">
-      <input type="text" id="complaintsSearch" placeholder="Search complaints...">
-      <select id="complaintsStatus">
-        <option value="">All Status</option>
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="cSearch" placeholder="Search name, business, phone, details..." aria-label="Search complaints"></div>
+      <select id="cStatus" aria-label="Filter by status">
+        <option value="">All statuses</option>
         <option>Pending</option>
         <option>In Progress</option>
         <option>Resolved</option>
       </select>
-      <input type="date" id="complaintsDate">
+      <input type="date" id="cDate" aria-label="Filter by date submitted">
+      <button type="button" class="btn" id="cClear">Clear filters</button>
+      <span class="result-count" id="cCount"></span>
     </div>
 
     <div class="table-box">
-      <table id="complaintsTable">
+      <table class="data" id="complaintsTable">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Business</th>
-            <th>Evidence</th>
-            <th>Date</th>
-            <th>Actions</th>
+            <th>Ref</th><th>Submitted</th><th>Complainant</th><th>Business</th>
+            <th>Type</th><th>Evidence</th><th>Status</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for c in complaints %}
-          <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.full_name }}</td>
-            <td>{{ c.business_name }}</td>
-
-            <td>
+          {% set st = c.status or 'Pending' %}
+          {% set ext = (c.evidence.rsplit('.', 1)[-1] | lower) if (c.evidence and '.' in c.evidence) else '' %}
+          {% set ts = c.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if c.created_at else '' %}
+          <tr data-id="{{ c.id }}">
+            <td data-label="Ref"><span class="ref">#{{ c.id }}</span></td>
+            <td data-label="Submitted"><time class="js-time" datetime="{{ ts }}">{{ c.created_at.strftime('%d %b %Y, %H:%M') ~ ' UTC' if c.created_at else '—' }}</time></td>
+            <td data-label="Complainant"><span><strong>{{ c.full_name }}</strong><span class="sub">{{ c.phone }}</span></span></td>
+            <td data-label="Business">{{ c.business_name }}</td>
+            <td data-label="Type"><span class="chip">{{ c.complaint_type }}</span></td>
+            <td data-label="Evidence">
               {% if c.evidence %}
-                <a class="btn file-btn"
-                   href="{{ url_for('static', filename='uploads/' + c.evidence) }}"
-                   target="_blank">View</a>
-              {% else %}—{% endif %}
+                {% if ext in ['png','jpg','jpeg','gif','webp'] %}
+                  <button type="button" class="ev-thumb" data-view="{{ c.id }}" title="Preview evidence">
+                    <img loading="lazy" src="{{ url_for('admin_evidence', filename=c.evidence) }}" alt="Evidence thumbnail">
+                  </button>
+                {% else %}
+                  <button type="button" class="ev-chip" data-view="{{ c.id }}" title="Preview evidence">
+                    <i class="fa-solid {{ 'fa-file-pdf' if ext == 'pdf' else 'fa-file-video' if ext == 'mp4' else 'fa-file-lines' }}"></i> {{ (ext or 'file') | upper }}
+                  </button>
+                {% endif %}
+              {% else %}<span class="muted">None</span>{% endif %}
             </td>
-
-            <td>{{ c.created_at }}</td>
-
-            <td>
-              <button class="btn view-btn"
-                onclick="openComplaintModal(
-                  '{{ c.full_name }}',
-                  '{{ c.business_name }}',
-                  '{{ c.complaint_type }}',
-                  '{{ c.complaint_details }}',
-                     '{{ c.created_at }}'
-                )">View</button>
-
-              <form method="POST"
-                    action="/admin/complaints/delete/{{ c.id }}"
-                    style="display:inline"
-                    onsubmit="return confirm('Delete this complaint permanently?');">
-                <button type="submit" class="btn delete-btn">Delete</button>
+            <td data-label="Status">
+              <form class="status-form" method="POST" action="{{ url_for('update_complaint_status', id=c.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" class="status-select s-{{ st | lower | replace(' ', '-') }}" data-current="{{ st }}" aria-label="Status for complaint #{{ c.id }}">
+                  {% for opt in ['Pending', 'In Progress', 'Resolved'] %}
+                  <option value="{{ opt }}" {{ 'selected' if opt == st }}>{{ opt }}</option>
+                  {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn-sm">Save</button></noscript>
               </form>
+            </td>
+            <td data-label="Actions">
+              <div class="actions">
+                <button type="button" class="btn-sm" data-view="{{ c.id }}"><i class="fa-solid fa-eye"></i> View</button>
+                <form method="POST" action="{{ url_for('delete_complaint', complaint_id=c.id) }}" class="js-confirm"
+                      data-title="Delete complaint #{{ c.id }}?"
+                      data-confirm="This permanently deletes the complaint from {{ c.full_name }}{{ ' and its uploaded evidence' if c.evidence }}. This cannot be undone.">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      <div class="empty" id="cEmpty" hidden><i class="fa-regular fa-folder-open"></i><span id="cEmptyText"></span></div>
     </div>
-  </div>
+    <div class="pager" id="cPager"><button type="button" class="btn-sm" id="cPrev">Previous</button><span id="cPage"></span><button type="button" class="btn-sm" id="cNext">Next</button></div>
+  </section>
 
-  <div class="tab-content" id="contactsTab">
+  <!-- ========== CONTACTS ========== -->
+  <section class="tab-content" id="contactsTab" role="tabpanel">
 
     <div class="filters">
-      <input type="text" id="contactsSearch" placeholder="Search messages...">
-      <input type="date" id="contactsDate">
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="mSearch" placeholder="Search name, email, subject, message..." aria-label="Search messages"></div>
+      <input type="date" id="mDate" aria-label="Filter by date received">
+      <button type="button" class="btn" id="mClear">Clear filters</button>
+      <span class="result-count" id="mCount"></span>
     </div>
 
     <div class="table-box">
-      <table id="contactsTable">
+      <table class="data" id="contactsTable">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Subject</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
+          <tr><th>Ref</th><th>Received</th><th>From</th><th>Subject</th><th>Message</th><th>Actions</th></tr>
         </thead>
         <tbody>
-          {% for c in contacts %}
-          <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.name }}</td>
-            <td>{{ c.email }}</td>
-            <td>{{ c.subject }}</td>
-            <td>{{ c.created_at }}</td>
-            <td>
-              <button class="btn view-btn"
-                onclick="openContactModal(
-                  '{{ c.name }}',
-                  '{{ c.email }}',
-                  '{{ c.subject }}',
-                  '{{ c.message }}',
-                       '{{ c.created_at }}'
-                )">View</button>
-
-              <form method="POST"
-                    action="/admin/contacts/delete/{{ c.id }}"
-                    style="display:inline"
-                    onsubmit="return confirm('Delete this message permanently?');">
-                <button type="submit" class="btn delete-btn">Delete</button>
-              </form>
+          {% for m in contacts %}
+          {% set mts = m.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if m.created_at else '' %}
+          <tr data-id="{{ m.id }}">
+            <td data-label="Ref"><span class="ref">#{{ m.id }}</span></td>
+            <td data-label="Received"><time class="js-time" datetime="{{ mts }}">{{ m.created_at.strftime('%d %b %Y, %H:%M') ~ ' UTC' if m.created_at else '—' }}</time></td>
+            <td data-label="From"><span><strong>{{ m.name }}</strong><span class="sub">{{ m.email }}</span></span></td>
+            <td data-label="Subject">{{ m.subject or '—' }}</td>
+            <td data-label="Message"><span class="trunc">{{ m.message }}</span></td>
+            <td data-label="Actions">
+              <div class="actions">
+                <button type="button" class="btn-sm" data-view="{{ m.id }}"><i class="fa-solid fa-eye"></i> Read</button>
+                <form method="POST" action="{{ url_for('delete_contact', contact_id=m.id) }}" class="js-confirm"
+                      data-title="Delete message #{{ m.id }}?"
+                      data-confirm="This permanently deletes the message from {{ m.name }}. This cannot be undone.">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      <div class="empty" id="mEmpty" hidden><i class="fa-regular fa-envelope-open"></i><span id="mEmptyText"></span></div>
+    </div>
+    <div class="pager" id="mPager"><button type="button" class="btn-sm" id="mPrev">Previous</button><span id="mPage"></span><button type="button" class="btn-sm" id="mNext">Next</button></div>
+  </section>
+
+</main>
+
+<!-- COMPLAINT MODAL -->
+<div class="modal" id="complaintModal" role="dialog" aria-modal="true" aria-labelledby="cmTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><p class="eyebrow" id="cmRef"></p><h3 id="cmTitle"></h3></div>
+      <button type="button" class="x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <dl class="fields" id="cmFields"></dl>
+      <h4>Complaint details</h4>
+      <div class="prose" id="cmDetails"></div>
+      <h4>Evidence</h4>
+      <div id="cmEvidence"></div>
+    </div>
+    <div class="modal-foot">
+      <a class="btn primary" id="cmReply" href="#"><i class="fa-solid fa-reply"></i> Reply by email</a>
+      <button type="button" class="btn" data-close>Close</button>
     </div>
   </div>
-
 </div>
 
-<div class="modal" id="complaintModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeComplaintModal()">×</span>
-    <h3>Complaint Details</h3>
-    <p><strong>Name:</strong> <span id="cName"></span></p>
-    <p><strong>Business:</strong> <span id="cBusiness"></span></p>
-    <p><strong>Type:</strong> <span id="cType"></span></p>
-    <p><strong>Details:</strong> <span id="cDetails"></span></p>
-    <p><strong>Date:</strong> <span id="cDate"></span></p>
+<!-- CONTACT MODAL -->
+<div class="modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="mmTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><p class="eyebrow" id="mmRef"></p><h3 id="mmTitle"></h3></div>
+      <button type="button" class="x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <dl class="fields" id="mmFields"></dl>
+      <h4>Message</h4>
+      <div class="prose" id="mmMessage"></div>
+    </div>
+    <div class="modal-foot">
+      <a class="btn primary" id="mmReply" href="#"><i class="fa-solid fa-reply"></i> Reply by email</a>
+      <button type="button" class="btn" data-close>Close</button>
+    </div>
   </div>
 </div>
 
-<div class="modal" id="contactModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeContactModal()">×</span>
-    <h3>Message Details</h3>
-    <p><strong>Name:</strong> <span id="mName"></span></p>
-    <p><strong>Email:</strong> <span id="mEmail"></span></p>
-    <p><strong>Subject:</strong> <span id="mSubject"></span></p>
-    <p><strong>Message:</strong> <span id="mMessage"></span></p>
-    <p><strong>Date:</strong> <span id="mDate"></span></p>
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfText" hidden>
+  <div class="modal-card small">
+    <div class="modal-head"><h3 id="cfTitle">Are you sure?</h3><button type="button" class="x" data-close aria-label="Cancel">&times;</button></div>
+    <div class="modal-body"><p id="cfText"></p></div>
+    <div class="modal-foot">
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button type="button" class="btn danger" id="cfOk"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
   </div>
 </div>
 
-<a href="{{ url_for('export_excel') }}" class="btn btn-success">
-   Download Data as Excel
-</a>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- Data for the viewers. tojson escapes everything, so record text can never break out of the script. -->
+<script>
+const COMPLAINTS = [
+{%- for c in complaints %}
+{{ {
+  'id': c.id, 'name': c.full_name, 'email': c.email, 'phone': c.phone, 'lga': c.lga,
+  'business': c.business_name, 'type': c.complaint_type, 'details': c.complaint_details,
+  'status': c.status or 'Pending',
+  'ts': c.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if c.created_at else '',
+  'evidence': url_for('admin_evidence', filename=c.evidence) if c.evidence else '',
+  'evName': c.evidence or '',
+  'evExt': (c.evidence.rsplit('.', 1)[-1] | lower) if (c.evidence and '.' in c.evidence) else ''
+} | tojson }}{{ ',' if not loop.last }}
+{%- endfor %}
+];
+const CONTACTS = [
+{%- for m in contacts %}
+{{ {
+  'id': m.id, 'name': m.name, 'email': m.email, 'phone': m.phone, 'subject': m.subject,
+  'message': m.message, 'ts': m.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if m.created_at else ''
+} | tojson }}{{ ',' if not loop.last }}
+{%- endfor %}
+];
+{% with msgs = get_flashed_messages(with_categories=true) %}
+const FLASHES = {{ msgs | tojson }};
+{% endwith %}
+</script>
 
 <script>
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".tab-content").forEach(tc=>tc.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
+(function () {
+  'use strict';
+  const $  = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const TZ = 'Africa/Lagos';
+  const IMG_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+  const fmtDateTime = ts => ts ? new Date(ts).toLocaleString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: TZ }) : '—';
+  const dayKey = ts => ts ? new Date(ts).toLocaleDateString('en-CA', { timeZone: TZ }) : '';
+
+  // Show times in Nigerian time (the server stores UTC)
+  $$('time.js-time').forEach(t => { const v = t.getAttribute('datetime'); if (v) t.textContent = fmtDateTime(v); });
+
+  const cMap = new Map(COMPLAINTS.map(c => [String(c.id), c]));
+  const mMap = new Map(CONTACTS.map(m => [String(m.id), m]));
+
+  /* ---------- toasts ---------- */
+  function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (type || '');
+    el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    el.textContent = msg;
+    $('#toasts').appendChild(el);
+    setTimeout(() => el.classList.add('out'), 4200);
+    setTimeout(() => el.remove(), 4800);
+  }
+  const guess = m => /incorrect|invalid|not match|failed|expired|error|denied|too many|not allowed/i.test(m) ? 'error'
+                   : /success|deleted|updated|changed|submitted/i.test(m) ? 'success' : '';
+  FLASHES.forEach(([cat, msg]) => toast(msg, cat === 'message' ? guess(msg) : cat));
+
+  /* ---------- tabs (remembered across reloads) ---------- */
+  const tabBtns = $$('.tab-btn');
+  function showTab(id) {
+    tabBtns.forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
+    $$('.tab-content').forEach(p => p.classList.toggle('active', p.id === id));
+    try { sessionStorage.setItem('adminTab', id); } catch (e) {}
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  try { const t = sessionStorage.getItem('adminTab'); if (t && document.getElementById(t)) showTab(t); } catch (e) {}
+
+  /* ---------- filter + paginate a table ---------- */
+  function initList(cfg) {
+    const rows = $$('#' + cfg.table + ' tbody tr');
+    const search = $(cfg.search), status = cfg.status ? $(cfg.status) : null, date = $(cfg.date);
+    const count = $(cfg.count), empty = $(cfg.empty), emptyText = $(cfg.emptyText);
+    const prev = $(cfg.prev), next = $(cfg.next), pageLbl = $(cfg.pageLbl);
+    const size = 20; let page = 1;
+
+    function blob(rec) {
+      if (!rec._blob) rec._blob = cfg.fields.map(k => rec[k] || '').join(' ').toLowerCase() + ' #' + rec.id;
+      return rec._blob;
+    }
+    function render() {
+      const q = search.value.trim().toLowerCase(), st = status ? status.value : '', d = date.value;
+      const hits = rows.filter(r => {
+        const rec = cfg.map.get(r.dataset.id);
+        return rec && (!q || blob(rec).includes(q)) && (!st || rec.status === st) && (!d || dayKey(rec.ts) === d);
+      });
+      const pages = Math.max(1, Math.ceil(hits.length / size));
+      page = Math.min(page, pages);
+      const shown = new Set(hits.slice((page - 1) * size, page * size));
+      rows.forEach(r => { r.hidden = !shown.has(r); });
+      count.textContent = rows.length ? 'Showing ' + hits.length + ' of ' + rows.length : '';
+      empty.hidden = hits.length > 0;
+      emptyText.textContent = rows.length ? 'Nothing matches your filters.' : cfg.emptyMsg;
+      pageLbl.textContent = 'Page ' + page + ' of ' + pages;
+      prev.disabled = page <= 1; next.disabled = page >= pages;
+      $(cfg.pager).hidden = pages <= 1;
+    }
+    [search, status, date].forEach(el => { if (el) { el.addEventListener('input', () => { page = 1; render(); }); el.addEventListener('change', () => { page = 1; render(); }); } });
+    $(cfg.clear).addEventListener('click', () => { search.value = ''; if (status) status.value = ''; date.value = ''; page = 1; render(); });
+    prev.addEventListener('click', () => { page--; render(); });
+    next.addEventListener('click', () => { page++; render(); });
+    render();
+    return { render, setStatus: v => { status.value = v; page = 1; render(); } };
+  }
+
+  const cList = initList({
+    table: 'complaintsTable', map: cMap, search: '#cSearch', status: '#cStatus', date: '#cDate', clear: '#cClear',
+    count: '#cCount', empty: '#cEmpty', emptyText: '#cEmptyText', prev: '#cPrev', next: '#cNext', pageLbl: '#cPage',
+    pager: '#cPager', emptyMsg: 'No complaints have been submitted yet.',
+    fields: ['name', 'email', 'phone', 'lga', 'business', 'type', 'details', 'status']
   });
-});
-
-function openComplaintModal(name,business,type,details,status,date){
-  cName.textContent=name;
-  cBusiness.textContent=business;
-  cType.textContent=type;
-  cDetails.textContent=details;
-  cDate.textContent=date;
-  complaintModal.style.display="flex";
-}
-function closeComplaintModal(){ complaintModal.style.display="none"; }
-
-function openContactModal(name,email,subject,message,status,date){
-  mName.textContent=name;
-  mEmail.textContent=email;
-  mSubject.textContent=subject;
-  mMessage.textContent=message;
-  mDate.textContent=date;
-  contactModal.style.display="flex";
-}
-function closeContactModal(){ contactModal.style.display="none"; }
-
-complaintsDate.onchange = complaintsFilter;
-function complaintsFilter(){
-  const s=complaintsSearch.value.toLowerCase();
-  const st=complaintsStatus.value;
-  const d=complaintsDate.value;
-  document.querySelectorAll("#complaintsTable tbody tr").forEach(row=>{
-    const text=row.innerText.toLowerCase();
-    const rowStatus=row.children[3].innerText;
-    const rowDate=row.children[5].innerText;
-    row.style.display = (!s||text.includes(s))&&(!st||rowStatus===st)&&(!d||rowDate.includes(d))?"":"none";
+  initList({
+    table: 'contactsTable', map: mMap, search: '#mSearch', date: '#mDate', clear: '#mClear',
+    count: '#mCount', empty: '#mEmpty', emptyText: '#mEmptyText', prev: '#mPrev', next: '#mNext', pageLbl: '#mPage',
+    pager: '#mPager', emptyMsg: 'No messages have been received yet.',
+    fields: ['name', 'email', 'phone', 'subject', 'message']
   });
-}
 
-contactsSearch.onkeyup = contactsFilter;
-contactsDate.onchange = contactsFilter;
-function contactsFilter(){
-  const s=contactsSearch.value.toLowerCase();
-  const d=contactsDate.value;
-  document.querySelectorAll("#contactsTable tbody tr").forEach(row=>{
-    const text=row.innerText.toLowerCase();
-    const rowDate=row.children[4].innerText;
-    row.style.display = (!s||text.includes(s))&&(!d||rowDate.includes(d))?"":"none";
+  /* ---------- summary cards ---------- */
+  function updateStats() {
+    const n = { 'Pending': 0, 'In Progress': 0, 'Resolved': 0 };
+    cMap.forEach(c => { n[c.status] = (n[c.status] || 0) + 1; });
+    $('#statPending').textContent = n['Pending'];
+    $('#statProgress').textContent = n['In Progress'];
+    $('#statResolved').textContent = n['Resolved'];
+  }
+  updateStats();
+  $$('.stat').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.go) { showTab(b.dataset.go); return; }
+    showTab('complaintsTab'); cList.setStatus(b.dataset.filter);
+  }));
+
+  /* ---------- change status without reloading ---------- */
+  $$('.status-select').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      const form = sel.closest('form'), row = sel.closest('tr'), rec = cMap.get(row.dataset.id);
+      const previous = sel.dataset.current;
+      const body = new FormData(form);      // read the value BEFORE disabling (disabled fields are not sent)
+      sel.disabled = true;
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST', body: body, credentials: 'same-origin',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!(res.headers.get('content-type') || '').includes('json')) { window.location.href = '/admin/login'; return; }
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Update failed');
+        rec.status = data.status; rec._blob = null;
+        sel.dataset.current = data.status;
+        sel.className = 'status-select s-' + data.status.toLowerCase().replace(/ /g, '-');
+        updateStats();
+        toast('Complaint #' + rec.id + ' marked ' + data.status, 'success');
+        cList.render();
+      } catch (err) {
+        sel.value = previous;
+        toast(err.message || 'Could not update the status', 'error');
+      } finally { sel.disabled = false; }
+    });
   });
-}
+
+  /* ---------- modals ---------- */
+  let lastFocus = null;
+  function openModal(m) {
+    lastFocus = document.activeElement;
+    m.hidden = false; document.body.classList.add('modal-open');
+    const f = $('[data-close]', m); if (f) f.focus();
+  }
+  function closeModal(m) {
+    m.hidden = true;
+    $$('video', m).forEach(v => v.pause());
+    if (!$$('.modal:not([hidden])').length) document.body.classList.remove('modal-open');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $$('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) closeModal(m); });
+    m.addEventListener('keydown', e => {           // keep Tab inside the open dialog
+      if (e.key !== 'Tab') return;
+      const f = $$('button, a[href], select, input', m).filter(x => !x.disabled && x.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const open = $$('.modal:not([hidden])'); if (open.length) closeModal(open[open.length - 1]);
+  });
+
+  function fillFields(dl, list) {
+    dl.replaceChildren();
+    list.forEach(([label, value, kind]) => {
+      const box = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+      dt.textContent = label;
+      if (value && kind === 'mail') { const a = document.createElement('a'); a.href = 'mailto:' + value; a.textContent = value; dd.appendChild(a); }
+      else if (value && kind === 'tel' && /\d/.test(value)) { const a = document.createElement('a'); a.href = 'tel:' + value.replace(/[^\d+]/g, ''); a.textContent = value; dd.appendChild(a); }
+      else dd.textContent = value || '—';
+      box.append(dt, dd); dl.appendChild(box);
+    });
+  }
+  function replyLink(a, email, subject) {
+    if (email) { a.href = 'mailto:' + email + '?subject=' + encodeURIComponent(subject); a.hidden = false; }
+    else a.hidden = true;
+  }
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+
+  function renderEvidence(host, c) {
+    host.replaceChildren();
+    if (!c.evidence) { host.appendChild(el('p', 'muted', 'No evidence was uploaded with this complaint.')); return; }
+    const url = c.evidence, ext = c.evExt, name = c.evName.replace(/^[0-9a-f]{12}_/, '');
+    const missing = () => { host.replaceChildren(el('div', 'notice', 'This file could not be found on the server. It may have been moved or deleted.')); };
+
+    if (IMG_EXT.includes(ext)) {
+      const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      const img = document.createElement('img'); img.className = 'ev-img'; img.alt = 'Uploaded evidence: ' + name;
+      img.onerror = missing; img.src = url; a.appendChild(img); host.appendChild(a);
+    } else if (ext === 'mp4') {
+      const v = document.createElement('video'); v.className = 'ev-video'; v.controls = true; v.preload = 'metadata';
+      v.onerror = missing; v.src = url; host.appendChild(v);
+    } else {
+      const icon = ext === 'pdf' ? 'fa-file-pdf' : (ext === 'doc' || ext === 'docx') ? 'fa-file-word'
+                 : (ext === 'xls' || ext === 'xlsx') ? 'fa-file-excel' : 'fa-file-lines';
+      const card = el('div', 'ev-file'); const i = el('i', 'fa-solid ' + icon); const t = el('div');
+      t.append(el('b', '', name), el('span', '', ext ? ext.toUpperCase() + ' file' : 'File'));
+      card.append(i, t); host.appendChild(card);
+    }
+    const bar = el('div', 'ev-actions');
+    if (ext === 'pdf' || IMG_EXT.includes(ext) || ext === 'mp4') {
+      const open = el('a', 'btn-sm'); open.href = url; open.target = '_blank'; open.rel = 'noopener';
+      open.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Open in new tab'; bar.appendChild(open);
+    }
+    const dl = el('a', 'btn-sm'); dl.href = url + '?download=1'; dl.innerHTML = '<i class="fa-solid fa-download"></i> Download'; bar.appendChild(dl);
+    host.appendChild(bar);
+  }
+
+  function openComplaint(id) {
+    const c = cMap.get(String(id)); if (!c) return;
+    $('#cmRef').textContent = 'Complaint #' + c.id;
+    $('#cmTitle').textContent = c.type + ' \u2013 ' + c.business;
+    fillFields($('#cmFields'), [
+      ['Complainant', c.name], ['Status', c.status], ['Email', c.email, 'mail'], ['Phone', c.phone, 'tel'],
+      ['Local Government Area', c.lga], ['Submitted', fmtDateTime(c.ts)]
+    ]);
+    $('#cmDetails').textContent = c.details || '—';
+    renderEvidence($('#cmEvidence'), c);
+    replyLink($('#cmReply'), c.email, 'Your complaint to OCCPA (#' + c.id + ')');
+    openModal($('#complaintModal'));
+  }
+  function openContact(id) {
+    const m = mMap.get(String(id)); if (!m) return;
+    $('#mmRef').textContent = 'Message #' + m.id;
+    $('#mmTitle').textContent = m.subject || 'No subject';
+    fillFields($('#mmFields'), [
+      ['From', m.name], ['Received', fmtDateTime(m.ts)], ['Email', m.email, 'mail'], ['Phone', m.phone, 'tel']
+    ]);
+    $('#mmMessage').textContent = m.message || '—';
+    replyLink($('#mmReply'), m.email, 'Re: ' + (m.subject || 'Your message to OCCPA'));
+    openModal($('#contactModal'));
+  }
+  $('#complaintsTable').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) openComplaint(b.dataset.view); });
+  $('#contactsTable').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) openContact(b.dataset.view); });
+
+  /* ---------- delete confirmation ---------- */
+  let pendingForm = null;
+  $$('form.js-confirm').forEach(f => f.addEventListener('submit', e => {
+    e.preventDefault(); pendingForm = f;
+    $('#cfTitle').textContent = f.dataset.title || 'Are you sure?';
+    $('#cfText').textContent = f.dataset.confirm || '';
+    openModal($('#confirmModal'));
+  }));
+  $('#cfOk').addEventListener('click', () => {
+    if (!pendingForm) return;
+    const f = pendingForm; pendingForm = null; $('#cfOk').disabled = true; f.submit();
+  });
+})();
 </script>
 
 </body>

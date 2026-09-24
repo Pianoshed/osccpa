@@ -1,572 +1,842 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | OCCPA</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | Ondo State Competition &amp; Consumer Protection Agency</title>
 
-    <style>
-        :root {
-            --lilac-primary: #8b5cf6;
-            --lilac-dark: #6d28d9;
-            --lilac-soft: #f5f3ff;
-            --lilac-medium: #a78bfa;
-            --lilac-light: #c4b5fd;
-            --lilac-accent: #7c3aed;
-            --purple-deep: #5b21b6;
-            --navy-deep: #0f172a;
-            --text-main: #334155;
-            --text-light: #64748b;
-            --white: #ffffff;
-            --gradient-lilac: linear-gradient(135deg, #6d28d9, #8b5cf6, #a78bfa);
-        }
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        body {
-            background-color: #f8fafc;
-            color: var(--text-main);
-            line-height: 1.6;
-        }
+<style>
+/* ===================================================================
+   DESIGN TOKENS  (identical to the homepage)
+=================================================================== */
+:root {
+  --navy:        #6D28D9;
+  --navy-deep:   #4C1D95;
+  --navy-mid:    #7C3AED;
+  --navy-soft:   #F1EBFC;
+  --gold:        #A855F7;
+  --gold-dark:   #7C3AED;
+  --gold-soft:   #F1E7FE;
+  --cream:       #F6F1FC;
+  --paper:       #FFFFFF;
+  --text-dark:   #241B33;
+  --text-muted:  #665D77;
+  --line:        #E9E1F7;
+  --success:     #2F7A4D;
+  --danger:      #B42318;
 
-        .main-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 6%;
-            background: var(--white);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            position: fixed;
-            top: 0; width: 100%; z-index: 1000;
-        }
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', sans-serif;
 
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .logo-box { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
-        .logo-box img { height: 55px; width: auto; }
-        .logo-tagline { font-size: 0.65rem; font-weight: 600; color: var(--text-light); text-transform: lowercase; }
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.35s ease;
+  --shadow-sm: 0 2px 8px rgba(11,42,74,.08);
+  --shadow-md: 0 6px 20px rgba(11,42,74,.10);
+  --shadow-lg: 0 16px 40px rgba(11,42,74,.16);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
 
-        .header-divider { width: 2px; height: 45px; background: var(--lilac-primary); }
-        .header-title h2 { font-size: 1rem; color: var(--lilac-dark); line-height: 1.2; margin: 0; }
-        .header-title p { font-size: 11px; color: var(--text-light); margin: 0; }
+/* RESET */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  padding-top: 96px;
+  line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); }
+img { max-width: 100%; }
+a { color: inherit; }
 
-        nav ul { display: flex; list-style: none; gap: 25px; }
-        nav a { text-decoration: none; font-weight: 500; color: var(--text-main); font-size: 0.9rem; transition: 0.3s; }
-        nav a:hover { color: var(--lilac-primary); }
+.skip-link {
+  position: absolute; left: 8px; top: -60px;
+  background: var(--navy); color: #fff;
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  z-index: 2000; text-decoration: none; font-weight: 600;
+  transition: top var(--transition-fast);
+}
+.skip-link:focus { top: 8px; }
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-            padding: 5px;
-        }
+/* HEADER */
+.main-header {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 6%; background: var(--paper);
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 2px 14px rgba(11,42,74,.08);
+}
+.header-left { display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1; }
+.logo a { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+.logo img { height: 58px; max-width: 100%; object-fit: contain; }
+.logo-tagline {
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: .72rem; letter-spacing: .06em; color: var(--gold-dark); margin-top: 2px;
+}
+.header-divider { width: 1px; height: 46px; background: var(--line); flex-shrink: 0; }
+.header-text { flex: 1; min-width: 0; }
+.header-text h2 {
+  font-size: 1.32rem; color: var(--navy); line-height: 1.25; font-weight: 600;
+  letter-spacing: -.01em;
+}
+.header-text p  { font-size: 12.5px; color: var(--text-muted); font-weight: 500; letter-spacing: .02em; }
+nav ul { display: flex; gap: 6px; list-style: none; }
+nav a  {
+  text-decoration: none; font-weight: 600; color: var(--text-dark); font-size: .93rem;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  white-space: nowrap; padding: 10px 14px; border-radius: var(--radius-sm);
+}
+nav a:hover, nav a:focus { color: var(--navy); background: var(--navy-soft); outline: none; }
+nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+nav a[aria-current="page"] { color: var(--navy); background: var(--navy-soft); }
 
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: var(--lilac-accent);
-            border-radius: 3px;
-            transition: 0.3s;
-        }
+.mobile-menu-toggle {
+  width: 44px; height: 44px; display: none;
+  background: var(--navy-soft); border: none; border-radius: 10px;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
+}
+.mobile-menu-toggle:hover { background: #E4D9F7; }
+.mobile-menu-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mobile-menu-toggle span {
+  position: absolute; left: 50%; width: 22px; height: 2.5px;
+  background: var(--navy); border-radius: 2px;
+  transform: translateX(-50%); transition: var(--transition-medium);
+}
+.mobile-menu-toggle span:nth-child(1) { top: 13px; }
+.mobile-menu-toggle span:nth-child(2) { top: 21px; }
+.mobile-menu-toggle span:nth-child(3) { top: 29px; }
+.mobile-menu-toggle.active span:nth-child(1) { transform: translate(-50%, 8px) rotate(45deg); }
+.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
+.mobile-menu-toggle.active span:nth-child(3) { transform: translate(-50%, -8px) rotate(-45deg); }
 
-        .hamburger.active span {
-            background: var(--purple-deep);
-        }
+.mobile-menu {
+  position: absolute; top: 100%; left: 0; width: 100%;
+  background: var(--paper); display: none; flex-direction: column;
+  box-shadow: 0 14px 30px rgba(11,42,74,.16);
+  max-height: 0; overflow: hidden; transition: max-height var(--transition-medium);
+  border-top: 1px solid var(--line);
+}
+.mobile-menu a {
+  padding: 16px 6%; border-bottom: 1px solid var(--line);
+  text-decoration: none; font-weight: 600; color: var(--text-dark);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.mobile-menu a:hover, .mobile-menu a:focus { background: var(--navy-soft); color: var(--navy); outline: none; }
+.mobile-menu.open { display: flex; max-height: 500px; animation: slideDown .35s ease; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
+/* SHARED EYEBROWS */
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--navy-soft); color: var(--navy);
+  padding: 6px 16px; border-radius: 50px;
+  font-size: .76rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 18px;
+}
+.section-eyebrow i { font-size: .68rem; color: var(--gold-dark); }
 
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
+/* PAGE HERO */
+.page-hero {
+  position: relative; overflow: hidden; background: var(--navy-deep);
+  padding: 84px 7% 130px; color: #fff;
+}
+.page-hero .hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 35%;
+}
+.page-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(100deg, rgba(46,16,101,.92) 10%, rgba(46,16,101,.6) 60%, rgba(46,16,101,.45) 100%);
+}
+.hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 18px;
+}
+.hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--gold); display: inline-block; }
+.hero-inner h1 { font-size: 3rem; font-weight: 600; line-height: 1.15; margin-bottom: 14px; }
+.hero-inner p { font-size: 1.1rem; max-width: 52ch; opacity: .92; }
 
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
+/* FORM CARD */
+.section-form { padding: 0 7% 70px; }
+.form-container {
+  max-width: 900px; margin: -70px auto 0; position: relative; z-index: 5;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  padding: 44px;
+}
+.form-header { margin-bottom: 30px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.form-header h2 { font-size: 1.75rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+.form-header p { color: var(--text-muted); font-size: .96rem; }
 
-        /* Mobile Navigation */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: 80px;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
-            z-index: 999;
-            border-bottom: 2px solid var(--lilac-light);
-        }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; min-width: 0; }
+.form-group > label { font-size: .84rem; font-weight: 700; margin-bottom: 7px; color: var(--text-dark); }
+.form-group > label .req { color: var(--gold-dark); margin-left: 2px; }
 
-        .mobile-nav.active {
-            display: block;
-            animation: slideDown 0.3s ease-out;
-        }
+input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+  width: 100%; padding: 13px 14px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--line); background: var(--cream);
+  font-family: var(--font-body); font-size: .95rem; color: var(--text-dark);
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+input::placeholder, textarea::placeholder { color: #9A90AB; }
+input:hover, select:hover, textarea:hover { border-color: #D3C5EE; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--navy); background: #fff;
+  box-shadow: 0 0 0 4px rgba(109,40,217,.12);
+}
+select {
+  appearance: none; cursor: pointer; padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236D28D9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.form-error {
+  display: none; align-items: flex-start; gap: 10px;
+  margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md);
+  background: #FEF3F2; border: 1px solid #FDA29B; color: var(--danger);
+  font-size: .9rem; font-weight: 500;
+}
+.form-error.show { display: flex; }
 
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.submit-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; margin-top: 18px; padding: 16px 30px;
+  background: var(--navy); color: #fff; border: none; border-radius: 4px;
+  font-family: var(--font-body); font-weight: 700; font-size: 1rem; cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.submit-btn:hover, .submit-btn:focus-visible {
+  background: var(--navy-mid); transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(11,42,74,.28); outline: none;
+}
+.submit-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.submit-btn:disabled { opacity: .7; cursor: progress; transform: none; box-shadow: none; }
 
-        .mobile-nav ul {
-            list-style: none;
-            padding: 20px 6%;
-        }
+/* CONTACT LAYOUT */
+.contact-layout {
+  max-width: 1200px; margin: -70px auto 0; position: relative; z-index: 5;
+  display: grid; grid-template-columns: 1fr 1.5fr; gap: 28px; align-items: start;
+}
+.contact-layout .form-container { max-width: none; margin: 0; }
+.contact-info { display: flex; flex-direction: column; gap: 16px; padding-top: 70px; }
+.info-card {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 20px 22px; box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.info-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--gold); }
+.info-icon {
+  width: 44px; height: 44px; min-width: 44px; border-radius: var(--radius-sm);
+  background: var(--navy); color: var(--gold-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+}
+.info-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.info-card p, .info-card address { font-size: .92rem; color: var(--text-muted); font-style: normal; word-break: break-word; }
+.info-card a { color: var(--navy); font-weight: 600; text-decoration: none; }
+.info-card a:hover { color: var(--gold-dark); text-decoration: underline; }
+.info-card .small { font-size: .8rem; margin-top: 2px; }
+.info-social { display: flex; gap: 10px; margin-top: 10px; }
+.info-social a {
+  width: 38px; height: 38px; border-radius: 50%; background: var(--navy-soft); color: var(--navy);
+  display: flex; align-items: center; justify-content: center; text-decoration: none;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.info-social a:hover { background: var(--gold); color: #fff; transform: translateY(-3px); text-decoration: none; }
 
-        .mobile-nav li {
-            margin-bottom: 12px;
-        }
+.flash {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 24px; padding: 16px 18px; border-radius: var(--radius-md);
+  background: #E7F4EC; border: 1px solid #A9D8BB; color: #1E6B3F; font-weight: 500; font-size: .95rem;
+}
+.flash i { margin-top: 3px; }
+.flash.error { background: #FEF3F2; border-color: #FDA29B; color: var(--danger); }
 
-        .mobile-nav a {
-            display: block;
-            padding: 12px 15px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 500;
-            border-radius: 8px;
-            transition: 0.3s;
-            border-left: 3px solid transparent;
-        }
+.label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+.label-row label { margin: 0; }
+.counter { font-size: .76rem; color: var(--text-muted); }
+.opt { font-weight: 500; color: var(--text-muted); font-size: .78rem; margin-left: 4px; }
+.form-error {
+  display: none; align-items: flex-start; gap: 10px;
+  margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md);
+  background: #FEF3F2; border: 1px solid #FDA29B; color: var(--danger);
+  font-size: .9rem; font-weight: 500;
+}
+.form-error.show { display: flex; }
 
-        .mobile-nav a:hover,
-        .mobile-nav a:active {
-            background: var(--lilac-soft);
-            color: var(--lilac-dark);
-            border-left-color: var(--lilac-primary);
-            transform: translateX(5px);
-        }
+/* FOOTER */
+footer { background: var(--navy-deep); color: #C6CEDA; position: relative; overflow: hidden; }
+footer::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), transparent 60%);
+}
+.footer-main { padding: 70px 7% 34px; position: relative; z-index: 1; }
+.footer-top {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 44px; margin-bottom: 44px; padding-bottom: 44px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.footer-brand { display: flex; flex-direction: column; gap: 22px; }
+.footer-logo-container { display: flex; align-items: center; gap: 16px; }
+.footer-logo-container img { height: 74px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
+.footer-brand-text h3 { font-size: 1.24rem; color: #fff; margin-bottom: 6px; line-height: 1.3; font-weight: 600; }
+.footer-brand-text .tagline { font-family: var(--font-display); font-style: italic; font-size: .88rem; color: var(--gold-soft); letter-spacing: .04em; }
+.footer-description { color: #A9B4C6; line-height: 1.8; font-size: .93rem; }
+.footer-mission {
+  background: rgba(168,85,247,.12); padding: 16px 20px;
+  border-radius: 8px; border-left: 3px solid var(--gold);
+}
+.footer-mission p { font-size: .88rem; color: #D9DEE7; font-style: italic; line-height: 1.6; }
+.footer-column h4 {
+  color: #fff; font-size: 1.02rem; margin-bottom: 20px; font-weight: 600;
+  position: relative; padding-bottom: 12px; font-family: var(--font-body);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.footer-column h4::after {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 32px; height: 2px; background: var(--gold);
+}
+.footer-column ul { list-style: none; }
+.footer-column ul li { margin-bottom: 13px; }
+.footer-column a {
+  color: #A9B4C6; text-decoration: none;
+  transition: all var(--transition-fast); display: inline-flex;
+  align-items: center; gap: 8px; font-size: .92rem;
+}
+.footer-column a::before {
+  content: '\f054'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  font-size: .58rem; color: var(--gold); opacity: 0;
+  transform: translateX(-8px); transition: all var(--transition-fast);
+}
+.footer-column a:hover, .footer-column a:focus { color: #fff; padding-left: 4px; outline: none; }
+.footer-column a:hover::before, .footer-column a:focus::before { opacity: 1; transform: translateX(0); }
+.footer-column a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+.contact-item { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 16px; color: #A9B4C6; font-size: .89rem; }
+.contact-item .icon { color: var(--gold); font-size: 1.05rem; margin-top: 2px; flex-shrink: 0; width: 18px; text-align: center; }
+.social-links { display: flex; gap: 12px; margin-top: 4px; }
+.social-link {
+  width: 42px; height: 42px; background: rgba(255,255,255,.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; font-size: 1.05rem;
+  transition: all var(--transition-fast);
+}
+.social-link:hover, .social-link:focus { background: var(--gold); color: var(--navy-deep); transform: translateY(-3px); outline: none; }
+.social-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.footer-bottom { padding: 22px 7%; background: rgba(0,0,0,.22); position: relative; z-index: 1; }
+.footer-bottom-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.footer-credit { color: #7E8AA0; font-size: .87rem; }
+.footer-credit strong { color: var(--gold); font-weight: 600; }
+.footer-links { display: flex; gap: 26px; }
+.footer-links a { color: #7E8AA0; text-decoration: none; font-size: .87rem; transition: color var(--transition-fast); }
+.footer-links a:hover, .footer-links a:focus { color: #fff; outline: none; }
+.footer-links a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
 
-        .mobile-page-title {
-            display: none;
-            flex-direction: column;
-            text-align: center;
-            flex: 1;
-            padding: 0 10px;
-        }
+/* FLOATING CHAT & BACK-TO-TOP */
+.chat-float { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; gap: 14px; }
+.chat-btn {
+  width: 58px; height: 58px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md); transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+}
+.chat-btn:hover, .chat-btn:focus { transform: scale(1.08); box-shadow: var(--shadow-lg); outline: none; }
+.chat-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.chat-btn.whatsapp { background: #25D366; }
+.chat-btn.facebook { background: #1877F2; }
+.chat-btn img { width: 30px; height: 30px; }
+.chat-tooltip {
+  position: absolute; right: 72px; top: 50%; transform: translateY(-50%);
+  background: var(--navy-deep); color: #fff; padding: 8px 14px;
+  border-radius: 6px; white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--transition-fast); font-size: .85rem;
+  box-shadow: var(--shadow-sm); font-weight: 600;
+}
+.chat-tooltip::after {
+  content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent var(--navy-deep);
+}
+.chat-float:hover .chat-tooltip { opacity: 1; }
+.back-to-top {
+  position: fixed; bottom: 168px; right: 30px;
+  width: 48px; height: 48px;
+  background: var(--navy); color: #fff;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 18px;
+  cursor: pointer; border: 2px solid var(--gold);
+  box-shadow: var(--shadow-md);
+  opacity: 0; visibility: hidden; transition: all var(--transition-fast); z-index: 998;
+}
+.back-to-top.show { opacity: 1; visibility: visible; }
+.back-to-top:hover, .back-to-top:focus {
+  background: var(--gold); color: var(--navy-deep);
+  transform: translateY(-5px); outline: none;
+}
+.back-to-top:focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
 
-        .mobile-page-title h2 {
-            font-size: 0.75rem;
-            color: var(--lilac-dark);
-            font-weight: 600;
-            line-height: 1.3;
-            margin: 0;
-            background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+/* RESPONSIVE - 1024 px */
+@media (max-width: 1024px) {
+  .header-text h2 { font-size: 1.1rem; }
+  nav ul { gap: 2px; }
+  nav a { font-size: .87rem; padding: 9px 11px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .hero-inner h1 { font-size: 2.5rem; }
+  .contact-layout { grid-template-columns: 1fr; }
+  .contact-info { padding-top: 0; order: 2; display: grid; grid-template-columns: 1fr 1fr; }
+}
 
-        .mobile-page-title p {
-            font-size: 0.55rem;
-            color: #7c3aed;
-            margin: 2px 0 0 0;
-            font-weight: 500;
-        }
+/* RESPONSIVE - 768 px */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  body { padding-top: 72px; }
+  .main-header { padding: 10px 5%; }
+  nav { display: none; }
+  .mobile-menu-toggle { display: flex; }
+  .header-divider, .header-text p { display: none; }
+  .header-text h2 { font-size: 13px; line-height: 1.3; }
+  .logo img { height: 40px; }
+  .logo-tagline { font-size: .62rem; }
 
-           .container {
-            max-width: 1140px;
-            margin: 140px auto 80px;
-            padding: 0 24px;
-        }
+  .page-hero { padding: 56px 5% 100px; }
+  .hero-inner h1 { font-size: 2rem; }
+  .hero-inner p { font-size: 1rem; }
 
-        .page-header { text-align: center; margin-bottom: 50px; }
-        .page-header h1 { font-size: 2.2rem; color: var(--navy-deep); margin-bottom: 10px; }
+  .section-form { padding: 0 5% 50px; }
+  .contact-info { grid-template-columns: 1fr; }
+  .info-card { padding: 18px; }
+  .form-container { margin-top: -56px; padding: 26px 20px; }
+  .form-header h2 { font-size: 1.4rem; }
+  .form-grid { grid-template-columns: 1fr; gap: 18px; }
+  .full-width { grid-column: auto; }
 
+  .footer-main { padding: 46px 5% 22px; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-brand { grid-column: 1; }
+  .footer-logo-container { flex-direction: column; align-items: flex-start; }
+  .footer-logo-container img { height: 58px; }
+  .footer-bottom { padding: 20px 5%; }
+  .footer-bottom-content { flex-direction: column; text-align: center; }
+  .footer-links { flex-direction: column; gap: 10px; }
 
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 60px;
-        }
+  .chat-float { bottom: 20px; right: 20px; }
+  .chat-btn { width: 52px; height: 52px; }
+  .chat-btn img { width: 26px; height: 26px; }
+  .back-to-top { bottom: 148px; right: 20px; width: 44px; height: 44px; }
+}
 
-        .card {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            transition: 0.3s;
-        }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1); }
-        .card h3 { font-size: 1.1rem; color: var(--lilac-dark); margin-bottom: 10px; }
+/* RESPONSIVE - 480 px */
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .hero-inner h1 { font-size: 1.7rem; }
+  .header-text h2 { font-size: 11px; }
+  .footer-brand-text h3 { font-size: 1.08rem; }
+  .social-links { justify-content: center; }
+  .chat-float { gap: 10px; }
+  .back-to-top { bottom: 138px; }
+}
 
-        .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-        .social-icons img { width: 28px; height: 28px; transition: 0.2s; }
-
-        .form-box {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
-        }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--navy-deep); }
-        
-        input, textarea {
-            width: 100%; padding: 12px 16px;
-            border: 2px solid #e2e8f0; border-radius: 10px;
-            font-size: 0.95rem; transition: 0.3s;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--lilac-primary); background: #fff; }
-
-        .submit-btn {
-            width: 100%; padding: 16px; background: var(--lilac-primary);
-            color: white; border: none; border-radius: 10px;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
-        }
-        .submit-btn:hover { background: var(--lilac-dark); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-
-        .site-footer {
-            background: var(--navy-deep);
-            color: #f1f5f9;
-            padding: 70px 6% 30px;
-            margin-top: 80px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr;
-            gap: 50px;
-            max-width: 1140px;
-            margin: 0 auto;
-        }
-
-
-        .footer-brand img {
-            height: 60px;
-            width: auto;
-            margin-bottom: 20px;
-            filter: brightness(0) invert(1);
-        }
-
-        .footer-brand p { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; max-width: 300px; }
-
-        .footer-links h4 { color: var(--white); margin-bottom: 20px; font-size: 1rem; border-left: 3px solid var(--lilac-primary); padding-left: 10px; }
-        .footer-links ul { list-style: none; }
-        .footer-links li { margin-bottom: 12px; }
-        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
-        .footer-links a:hover { color: var(--lilac-accent); padding-left: 5px; }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 60px;
-            padding-top: 25px;
-            border-top: 1px solid #1e293b;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-
-        .wa-float {
-            position: fixed; bottom: 30px; right: 30px;
-            background: #25D366; color: white; padding: 12px 20px;
-            border-radius: 50px; display: flex; align-items: center; gap: 10px;
-            text-decoration: none; font-weight: 600; z-index: 1000;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        @media (max-width: 992px) {
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .header-divider, .header-title p { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            .form-row { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-            
-            /* Hide desktop nav, show hamburger */
-            nav { display: none; }
-            .hamburger { display: flex; }
-            
-            /* Show mobile page title */
-            .mobile-page-title { display: flex; }
-            
-            .header-title { display: none; }
-            .header-divider { display: none; }
-            
-            .main-header {
-                padding: 12px 4%;
-            }
-            
-            .logo-box img {
-                height: 45px;
-            }
-            
-            .logo-tagline {
-                font-size: 0.55rem;
-            }
-            
-            .container { margin-top: 110px; }
-            
-            .page-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-box {
-                padding: 25px 20px;
-            }
-            
-            .wa-float {
-                bottom: 20px;
-                right: 20px;
-                padding: 10px 15px;
-                font-size: 0.85rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .mobile-page-title h2 {
-                font-size: 0.65rem;
-            }
-            
-            .mobile-page-title p {
-                font-size: 0.5rem;
-            }
-            
-            .page-header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .logo-box img {
-                height: 40px;
-            }
-        }
-    </style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
+
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- HEADER -->
 <header class="main-header">
-    <div class="header-left">
-        <a href="/" class="logo-box">
-            <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA Logo">
-            <span class="logo-tagline">consumer rights first</span>
-        </a>
-        <div class="header-divider"></div>
-        <div class="header-title">
-            <h2>Ondo State Competition & Consumer Protection Agency</h2>
-            <p>Committed to Consumer Protection & Fair Trade</p>
-        </div>
+  <div class="header-left">
+    <div class="logo">
+      <a href="/" aria-label="OSCCPA Home">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="eager">
+        <span class="logo-tagline">consumer rights first</span>
+      </a>
     </div>
-    
-    <div class="mobile-page-title">
-        <h2>Ondo State Competition & Consumer Protection Agency</h2>
-        <p>Committed to Consumer Protection</p>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition &amp; Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
     </div>
-    
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/news">News</a></li>
-            <li><a href="/complaints">Complaints</a></li>
-            <li><a href="/contact">Contact</a></li>
-        </ul>
-    </nav>
-    
-    <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
+  </div>
+
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News &amp; Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/contact" aria-current="page">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu" role="menu">
+    <a href="/" role="menuitem">Home</a>
+    <a href="/about" role="menuitem">About</a>
+    <a href="/news" role="menuitem">News &amp; Activities</a>
+    <a href="/services" role="menuitem">Services</a>
+    <a href="/complaints" role="menuitem">Complaints</a>
+    <a href="/contact" role="menuitem">Contact</a>
+  </div>
 </header>
 
-<div class="mobile-nav" id="mobileNav">
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/news">News</a></li>
-        <li><a href="/complaints">Complaints</a></li>
-        <li><a href="/contact">Contact</a></li>
-    </ul>
-</div>
+<main id="main-content">
 
-<div class="container">
-    <div class="page-header">
-        <h1>Connect With Us</h1>
-        <p>Our support team is available Monday - Friday, 8am - 4pm.</p>
-    </div>
+<!-- HERO -->
+<section class="page-hero" aria-labelledby="contact-heading">
+  <img class="hero-bg" src="{{ url_for('static', filename='gallery/a1.jpeg') }}" alt="" loading="eager">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Contact</span>
+    <h1 id="contact-heading">Connect with us</h1>
+    <p>Our support team is available Monday to Friday, 8AM to 5PM. Send a message or reach us directly.</p>
+  </div>
+</section>
 
-    <div class="contact-grid">
-        <div class="card">
-            <h3>Email Address</h3>
-            <p>info@osccpa.gov.ng</p>
-            <p style="font-size: 0.85rem; color: var(--text-light);">Direct: cpcondo149@gmail.com</p>
-        </div>
-        <div class="card">
-            <h3>Social Media</h3>
-            <div class="social-icons">
-                <a href="#"><img src="{{ url_for('static', filename='logo/facebook.png') }}" alt="FB"></a>
-                <a href="#"><img src="{{ url_for('static', filename='logo/x.png') }}" alt="X"></a>
-                <a href="#"><img src="{{ url_for('static', filename='logo/instagram.png') }}" alt="IG"></a>
-            </div>
-            <p style="margin-top: 10px;">@occpa_ondo</p>
-        </div>
-        <div class="card">
-            <h3>Call / WhatsApp</h3>
-            <p>+234 904 335 3001</p>
-            <a href="https://wa.me/2349043353001" style="color: var(--lilac-primary); font-weight: 600; text-decoration: none;">Start a Chat</a>
-        </div>
-    </div>
+<!-- CONTACT -->
+<section class="section-form">
+  <div class="contact-layout">
 
-  <div class="form-box">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <div class="form-container" id="formCard">
+      <div class="form-header">
+        <div class="section-eyebrow"><i class="fas fa-envelope"></i> Send a Message</div>
+        <h2>How can we help?</h2>
+        <p>Fill in the form and a member of our team will get back to you.</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div id="flash-container">
-                {% for category, message in messages %}
-                    <div class="flash-message {{ category }}" style="margin-bottom: 30px; padding: 18px 24px; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 5px solid #10b981; border-radius: 12px; color: #065f46; font-weight: 500; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 12px; animation: slideInDown 0.4s ease;">
-                        <span style="font-size: 1.5rem; color: #10b981;">✓</span>
-                        <span style="flex: 1; font-size: 1rem;">{{ message }}</span>
-                    </div>
-                {% endfor %}
-            </div>
+          <div id="flash-container">
+            {% for category, message in messages %}
+              <div class="flash {{ 'error' if category == 'error' else '' }}" role="status" tabindex="-1">
+                <i class="fas {{ 'fa-circle-exclamation' if category == 'error' else 'fa-circle-check' }}" aria-hidden="true"></i>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
         {% endif %}
-    {% endwith %}
-    
-    <div id="js-message-container"></div>
+      {% endwith %}
 
-    <form id="occpaForm" method="POST" action="{{ url_for('contact') }}">
-        <div class="form-group">
-            <label for="name">Your Full Name</label>
-            <input type="text" id="name" name="name" placeholder="Enter name" required>
-        </div>
-        
-        <div class="form-row" style="display: flex; gap: 20px;">
-            <div class="form-group" style="flex: 1;">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+      <form id="occpaForm" method="POST" action="{{ url_for('contact') }}" novalidate>
+        <div class="form-grid">
+
+          <div class="form-group full-width">
+            <label for="name">Your full name <span class="req">*</span></label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" maxlength="150" autocomplete="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" placeholder="example@mail.com" maxlength="150" autocomplete="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone number <span class="opt">(optional)</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="+234..." maxlength="50" autocomplete="tel">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="subject">Message subject <span class="req">*</span></label>
+            <input type="text" id="subject" name="subject" placeholder="What is this about?" maxlength="255" required>
+          </div>
+
+          <div class="form-group full-width">
+            <div class="label-row">
+              <label for="message">Tell us how we can help <span class="req">*</span></label>
+              <span class="counter" id="msgCount" aria-hidden="true">0 / 5000</span>
             </div>
-            <div class="form-group" style="flex: 1;">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="+234...">
-            </div>
+            <textarea id="message" name="message" placeholder="Write your message here..." maxlength="5000" required></textarea>
+          </div>
+
         </div>
 
-        <div class="form-group">
-            <label for="subject">Message Subject</label>
-            <input type="text" id="subject" name="subject" required>
-        </div>
-
-        <div class="form-group">
-            <label for="message">Tell us how we can help</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
+        <div class="form-error" id="formError" role="alert" aria-live="assertive">
+          <i class="fas fa-circle-exclamation" aria-hidden="true" style="margin-top:3px"></i>
+          <span id="formErrorText"></span>
         </div>
 
         <button type="submit" class="submit-btn" id="submitBtn">
-            <span id="btnTxt">Send Message</span>
-            <span id="btnSpinner" style="display: none;">Sending...</span>
+          <span id="btnTxt">Send Message</span> <i class="fas fa-paper-plane" aria-hidden="true"></i>
         </button>
-    </form>
-</div>
-
-<footer class="site-footer">
-    <div class="footer-grid">
-        <div class="footer-brand">
-            <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA Logo">
-            <p>The official agency dedicated to protecting the rights of consumers and promoting healthy market competition in Ondo State.</p>
-        </div>
-        
-        <div class="footer-links">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About Agency</a></li>
-                <li><a href="/services">Our Services</a></li>
-                <li><a href="/news">Press Releases</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-links">
-            <h4>Legal & Support</h4>
-            <ul>
-                <li><a href="/complaints">File a Complaint</a></li>
-                <li><a href="/contact">Contact Us</a></li>
-                <li><a href="/">Privacy Policy</a></li>
-                <li><a href="/">Terms of Use</a></li>
-            </ul>
-        </div>
+      </form>
     </div>
 
-    <div class="footer-bottom">
+    <aside class="contact-info" aria-label="Contact details">
+      <div class="info-card">
+        <span class="info-icon"><i class="fas fa-envelope"></i></span>
+        <div>
+          <h3>Email</h3>
+          <p><a href="mailto:info@occpa.on.gov.ng">info@occpa.on.gov.ng</a></p>
+          <p class="small">Direct: <a href="mailto:cpcondo149@gmail.com">cpcondo149@gmail.com</a></p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <span class="info-icon"><i class="fas fa-phone"></i></span>
+        <div>
+          <h3>Call or WhatsApp</h3>
+          <p><a href="tel:+2349043353001">+234 904 335 3001</a></p>
+          <p class="small"><a href="https://wa.me/2349043353001" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Start a chat</a></p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <span class="info-icon"><i class="fas fa-map-marker-alt"></i></span>
+        <div>
+          <h3>Visit us</h3>
+          <address>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</address>
+          <p class="small">Mon – Fri: 8AM – 5PM</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <span class="info-icon"><i class="fas fa-share-nodes"></i></span>
+        <div>
+          <h3>Social media</h3>
+          <p>@occpa_ondo</p>
+          <div class="info-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo-container">
+          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="lazy">
+          <div class="footer-brand-text">
+            <h3>Ondo State Competition &amp; Consumer Protection Agency</h3>
+            <span class="tagline">consumer rights first</span>
+          </div>
+        </div>
+        <p class="footer-description">
+          Dedicated to protecting consumer rights and promoting fair competition across Ondo State. We ensure transparency, accountability, and justice in the marketplace.
+        </p>
+        <div class="footer-mission">
+          <p><strong>Our Mission:</strong> To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
+        </div>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-column">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/news">News &amp; Activities</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Our Services</h4>
+        <ul>
+          <li><a href="/complaints">File a Complaint</a></li>
+          <li><a href="/services">Consumer Advocacy</a></li>
+          <li><a href="/services">Market Surveillance</a></li>
+          <li><a href="/services">Business Compliance</a></li>
+          <li><a href="/services">Public Education</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact Us</h4>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+          <span>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-envelope"></i></span>
+          <span>info@occpa.on.gov.ng</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-phone"></i></span>
+          <span>+234 904 335 3001</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-clock"></i></span>
+          <span>Mon – Fri: 8AM – 5PM</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <div class="footer-credit">
         &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech 08134812419</strong>
+      </div>
+      <div class="footer-links">
+        <a href="/">Privacy Policy</a>
+        <a href="/">Terms of Service</a>
+        <a href="/">Sitemap</a>
+      </div>
     </div>
+  </div>
 </footer>
 
-<a href="https://wa.me/2349043353001" class="wa-float" target="_blank">
-    <span>WhatsApp Support</span>
-</a>
+<!-- CHAT FLOAT -->
+<div class="chat-float">
+  <a href="https://wa.me/2349043353001" target="_blank" rel="noopener" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+  </a>
+  <a href="https://m.me/occpa" target="_blank" rel="noopener" class="chat-btn facebook" aria-label="Chat on Facebook">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+  </a>
+  <span class="chat-tooltip">Chat with us</span>
+</div>
+
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
 
 <script>
-    const hamburger = document.getElementById('hamburger');
-    const mobileNav = document.getElementById('mobileNav');
+document.addEventListener("DOMContentLoaded", function () {
 
-    hamburger.addEventListener('click', function() {
-        this.classList.toggle('active');
-        mobileNav.classList.toggle('active');
-    });
+  /* Back to top */
+  const backToTopBtn = document.getElementById("backToTop");
+  let scrollTicking = false;
+  window.addEventListener("scroll", function () {
+    if (!scrollTicking) {
+      window.requestAnimationFrame(function () {
+        backToTopBtn.classList.toggle("show", window.pageYOffset > 300);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  });
+  backToTopBtn.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-    const mobileLinks = mobileNav.querySelectorAll('a');
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            hamburger.classList.remove('active');
-            mobileNav.classList.remove('active');
-        });
-    });
+  /* Mobile menu */
+  const menuToggle = document.querySelector(".mobile-menu-toggle");
+  const mobileMenu = document.getElementById("mobileMenu");
 
-    document.addEventListener('click', function(event) {
-        const isClickInsideNav = mobileNav.contains(event.target);
-        const isClickOnHamburger = hamburger.contains(event.target);
-        
-        if (!isClickInsideNav && !isClickOnHamburger && mobileNav.classList.contains('active')) {
-            hamburger.classList.remove('active');
-            mobileNav.classList.remove('active');
-        }
-    });
+  window.toggleMobileMenu = function () {
+    const isOpen = mobileMenu.classList.toggle("open");
+    menuToggle.classList.toggle("active");
+    menuToggle.setAttribute("aria-expanded", isOpen);
+    if (isOpen) document.addEventListener("click", closeMenuOutside);
+    else document.removeEventListener("click", closeMenuOutside);
+  };
 
+  function closeMenuOutside(e) {
+    if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", closeMenuOutside);
+    }
+  }
 
-const form = document.getElementById('occpaForm');
-const btnTxt = document.getElementById('btnTxt');
-const btnSpinner = document.getElementById('btnSpinner');
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768 && mobileMenu.classList.contains("open")) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+  });
 
-form.addEventListener('submit', function() {
-    document.getElementById('submitBtn').disabled = true;
-    btnTxt.style.display = 'none';
-    btnSpinner.style.display = 'inline';
+  /* Contact form */
+  const form = document.getElementById("occpaForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const btnTxt = document.getElementById("btnTxt");
+  const formError = document.getElementById("formError");
+  const formErrorText = document.getElementById("formErrorText");
+  const message = document.getElementById("message");
+  const msgCount = document.getElementById("msgCount");
+
+  function updateCount() { msgCount.textContent = message.value.length + " / " + message.maxLength; }
+  message.addEventListener("input", updateCount);
+  updateCount();
+
+  form.addEventListener("submit", function (e) {
+    formError.classList.remove("show");
+
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      const bad = form.querySelector(":invalid");
+      formErrorText.textContent = bad && bad.type === "email"
+        ? "Please enter a valid email address."
+        : "Please fill in all the required fields marked with *.";
+      formError.classList.add("show");
+      if (bad) bad.focus();
+      return;
+    }
+
+    // Normal form post: the server saves the message, then reloads this page with a confirmation
+    submitBtn.disabled = true;
+    btnTxt.textContent = "Sending...";
+  });
+
+  // If the person comes back with the browser Back button, unlock the button again
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) { submitBtn.disabled = false; btnTxt.textContent = "Send Message"; }
+  });
+
+  // After sending, the page reloads: bring the confirmation into view
+  const flash = document.querySelector("#flash-container .flash");
+  if (flash) {
+    setTimeout(function () {
+      const top = flash.getBoundingClientRect().top + window.pageYOffset - 130;
+      window.scrollTo({ top: top, behavior: "smooth" });
+      flash.focus({ preventScroll: true });
+    }, 150);
+  }
+
 });
 </script>
 

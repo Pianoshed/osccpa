@@ -1,506 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File a Complaint | OCCPA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File a Complaint | Ondo State Competition &amp; Consumer Protection Agency</title>
 
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 
-    <style>
-        :root {
-            --lilac-primary: #8b5cf6;
-            --lilac-dark: #6d28d9;
-            --lilac-soft: #f5f3ff;
-            --lilac-medium: #a78bfa;
-            --lilac-light: #c4b5fd;
-            --lilac-accent: #7c3aed;
-            --purple-deep: #5b21b6;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-            --white: #ffffff;
-            --transition: all 0.3s ease;
-            --gradient-lilac: linear-gradient(135deg, #6d28d9, #8b5cf6, #a78bfa);
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+<style>
+/* ===================================================================
+   DESIGN TOKENS  (identical to the homepage)
+=================================================================== */
+:root {
+  --navy:        #6D28D9;
+  --navy-deep:   #4C1D95;
+  --navy-mid:    #7C3AED;
+  --navy-soft:   #F1EBFC;
+  --gold:        #A855F7;
+  --gold-dark:   #7C3AED;
+  --gold-soft:   #F1E7FE;
+  --cream:       #F6F1FC;
+  --paper:       #FFFFFF;
+  --text-dark:   #241B33;
+  --text-muted:  #665D77;
+  --line:        #E9E1F7;
+  --success:     #2F7A4D;
+  --danger:      #B42318;
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #f8fafc;
-            color: var(--text-dark);
-            line-height: 1.6;
-            padding-top: 80px;
-        }
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', sans-serif;
 
-        /* ================= HEADER ================= */
-        .main-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 6%;
-            background: var(--white);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.35s ease;
+  --shadow-sm: 0 2px 8px rgba(11,42,74,.08);
+  --shadow-md: 0 6px 20px rgba(11,42,74,.10);
+  --shadow-lg: 0 16px 40px rgba(11,42,74,.16);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
 
-        .header-left { display: flex; align-items: center; gap: 18px; }
-        .logo a { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
-        .logo img { height: 50px; width: auto; }
-        .logo-tagline { font-family: "Playfair Display", serif; font-size: 0.65rem; letter-spacing: 0.04em; color: var(--text-muted); font-style: italic; }
-        .header-divider { width: 2px; height: 40px; background: var(--lilac-primary); }
-        .header-text h2 { font-family: 'Poppins', sans-serif; font-size: 1rem; margin: 0; color: var(--lilac-dark); line-height: 1.2; }
-        .header-text p { font-size: 10px; margin-top: 2px; color: var(--text-muted); font-weight: 500; }
+/* RESET */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  padding-top: 96px;
+  line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); }
+img { max-width: 100%; }
+a { color: inherit; }
 
-        nav ul { display: flex; list-style: none; gap: 20px; }
-        nav a { text-decoration: none; font-weight: 600; color: #4b5563; font-size: 0.85rem; transition: var(--transition); }
-        nav a:hover { color: var(--lilac-primary); }
+.skip-link {
+  position: absolute; left: 8px; top: -60px;
+  background: var(--navy); color: #fff;
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  z-index: 2000; text-decoration: none; font-weight: 600;
+  transition: top var(--transition-fast);
+}
+.skip-link:focus { top: 8px; }
 
-        /* ================= HAMBURGER MENU ================= */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            gap: 5px;
-            padding: 5px;
-        }
+/* HEADER */
+.main-header {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 6%; background: var(--paper);
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 2px 14px rgba(11,42,74,.08);
+}
+.header-left { display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1; }
+.logo a { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+.logo img { height: 58px; max-width: 100%; object-fit: contain; }
+.logo-tagline {
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: .72rem; letter-spacing: .06em; color: var(--gold-dark); margin-top: 2px;
+}
+.header-divider { width: 1px; height: 46px; background: var(--line); flex-shrink: 0; }
+.header-text { flex: 1; min-width: 0; }
+.header-text h2 {
+  font-size: 1.32rem; color: var(--navy); line-height: 1.25; font-weight: 600;
+  letter-spacing: -.01em;
+}
+.header-text p  { font-size: 12.5px; color: var(--text-muted); font-weight: 500; letter-spacing: .02em; }
+nav ul { display: flex; gap: 6px; list-style: none; }
+nav a  {
+  text-decoration: none; font-weight: 600; color: var(--text-dark); font-size: .93rem;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  white-space: nowrap; padding: 10px 14px; border-radius: var(--radius-sm);
+}
+nav a:hover, nav a:focus { color: var(--navy); background: var(--navy-soft); outline: none; }
+nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+nav a[aria-current="page"] { color: var(--navy); background: var(--navy-soft); }
 
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: var(--lilac-accent);
-            border-radius: 3px;
-            transition: 0.3s;
-        }
+.mobile-menu-toggle {
+  width: 44px; height: 44px; display: none;
+  background: var(--navy-soft); border: none; border-radius: 10px;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  align-items: center; justify-content: center;
+  transition: background var(--transition-fast);
+}
+.mobile-menu-toggle:hover { background: #E4D9F7; }
+.mobile-menu-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mobile-menu-toggle span {
+  position: absolute; left: 50%; width: 22px; height: 2.5px;
+  background: var(--navy); border-radius: 2px;
+  transform: translateX(-50%); transition: var(--transition-medium);
+}
+.mobile-menu-toggle span:nth-child(1) { top: 13px; }
+.mobile-menu-toggle span:nth-child(2) { top: 21px; }
+.mobile-menu-toggle span:nth-child(3) { top: 29px; }
+.mobile-menu-toggle.active span:nth-child(1) { transform: translate(-50%, 8px) rotate(45deg); }
+.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
+.mobile-menu-toggle.active span:nth-child(3) { transform: translate(-50%, -8px) rotate(-45deg); }
 
-        .hamburger.active span {
-            background: var(--purple-deep);
-        }
+.mobile-menu {
+  position: absolute; top: 100%; left: 0; width: 100%;
+  background: var(--paper); display: none; flex-direction: column;
+  box-shadow: 0 14px 30px rgba(11,42,74,.16);
+  max-height: 0; overflow: hidden; transition: max-height var(--transition-medium);
+  border-top: 1px solid var(--line);
+}
+.mobile-menu a {
+  padding: 16px 6%; border-bottom: 1px solid var(--line);
+  text-decoration: none; font-weight: 600; color: var(--text-dark);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.mobile-menu a:hover, .mobile-menu a:focus { background: var(--navy-soft); color: var(--navy); outline: none; }
+.mobile-menu.open { display: flex; max-height: 500px; animation: slideDown .35s ease; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
+/* SHARED EYEBROWS */
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--navy-soft); color: var(--navy);
+  padding: 6px 16px; border-radius: 50px;
+  font-size: .76rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 18px;
+}
+.section-eyebrow i { font-size: .68rem; color: var(--gold-dark); }
 
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
+/* PAGE HERO */
+.page-hero {
+  position: relative; overflow: hidden; background: var(--navy-deep);
+  padding: 84px 7% 130px; color: #fff;
+}
+.page-hero .hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 35%;
+}
+.page-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(100deg, rgba(46,16,101,.92) 10%, rgba(46,16,101,.6) 60%, rgba(46,16,101,.45) 100%);
+}
+.hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 18px;
+}
+.hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--gold); display: inline-block; }
+.hero-inner h1 { font-size: 3rem; font-weight: 600; line-height: 1.15; margin-bottom: 14px; }
+.hero-inner p { font-size: 1.1rem; max-width: 52ch; opacity: .92; }
 
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
+/* FORM CARD */
+.section-form { padding: 0 7% 70px; }
+.form-container {
+  max-width: 900px; margin: -70px auto 0; position: relative; z-index: 5;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  padding: 44px;
+}
+.form-header { margin-bottom: 30px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.form-header h2 { font-size: 1.75rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+.form-header p { color: var(--text-muted); font-size: .96rem; }
 
-        /* Mobile Header Title */
-        .mobile-page-title {
-            display: none;
-            flex-direction: column;
-            text-align: center;
-            flex: 1;
-            padding: 0 10px;
-        }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; min-width: 0; }
+.form-group > label { font-size: .84rem; font-weight: 700; margin-bottom: 7px; color: var(--text-dark); }
+.form-group > label .req { color: var(--gold-dark); margin-left: 2px; }
 
-        .mobile-page-title h2 {
-            font-size: 0.75rem;
-            color: var(--lilac-dark);
-            font-weight: 600;
-            line-height: 1.3;
-            margin: 0;
-            background: linear-gradient(135deg, var(--lilac-dark), var(--lilac-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+  width: 100%; padding: 13px 14px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--line); background: var(--cream);
+  font-family: var(--font-body); font-size: .95rem; color: var(--text-dark);
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+}
+input::placeholder, textarea::placeholder { color: #9A90AB; }
+input:hover, select:hover, textarea:hover { border-color: #D3C5EE; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--navy); background: #fff;
+  box-shadow: 0 0 0 4px rgba(109,40,217,.12);
+}
+select {
+  appearance: none; cursor: pointer; padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236D28D9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
 
-        .mobile-page-title p {
-            font-size: 0.55rem;
-            color: #7c3aed;
-            margin: 2px 0 0 0;
-            font-weight: 500;
-        }
+.file-drop {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 16px; border: 1.5px dashed #CDBBEE; border-radius: var(--radius-md);
+  background: var(--cream); transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.file-drop:hover, .file-drop:focus-within { border-color: var(--navy); background: var(--navy-soft); }
+.file-drop i { font-size: 1.3rem; color: var(--navy); }
+.file-drop input[type="file"] { flex: 1; min-width: 200px; font-family: var(--font-body); font-size: .88rem; color: var(--text-muted); }
+.file-drop input[type="file"]::file-selector-button {
+  margin-right: 12px; padding: 9px 16px; border: 0; border-radius: 4px;
+  background: var(--navy); color: #fff; font-family: var(--font-body);
+  font-weight: 700; font-size: .84rem; cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.file-drop input[type="file"]::file-selector-button:hover { background: var(--navy-mid); }
+.field-hint { font-size: .78rem; color: var(--text-muted); margin-top: 6px; }
 
-        /* Mobile Navigation */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: 80px;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
-            z-index: 999;
-            border-bottom: 2px solid var(--lilac-light);
-        }
+.agreement { display: flex; align-items: flex-start; gap: 12px; margin: 26px 0 8px; }
+.agreement input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--navy); cursor: pointer; flex-shrink: 0; }
+.agreement label { font-size: .88rem; color: var(--text-muted); cursor: pointer; line-height: 1.55; }
 
-        .mobile-nav.active {
-            display: block;
-            animation: slideDown 0.3s ease-out;
-        }
+.form-error {
+  display: none; align-items: flex-start; gap: 10px;
+  margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-md);
+  background: #FEF3F2; border: 1px solid #FDA29B; color: var(--danger);
+  font-size: .9rem; font-weight: 500;
+}
+.form-error.show { display: flex; }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.submit-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; margin-top: 18px; padding: 16px 30px;
+  background: var(--navy); color: #fff; border: none; border-radius: 4px;
+  font-family: var(--font-body); font-weight: 700; font-size: 1rem; cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.submit-btn:hover, .submit-btn:focus-visible {
+  background: var(--navy-mid); transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(11,42,74,.28); outline: none;
+}
+.submit-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.submit-btn:disabled { opacity: .7; cursor: progress; transform: none; box-shadow: none; }
 
-        .mobile-nav ul {
-            list-style: none;
-            padding: 20px 6%;
-        }
+.form-alt {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line);
+  font-size: .88rem; color: var(--text-muted); text-align: center;
+}
+.form-alt a { color: var(--navy); font-weight: 700; text-decoration: none; }
+.form-alt a:hover { color: var(--gold-dark); text-decoration: underline; }
 
-        .mobile-nav li {
-            margin-bottom: 12px;
-        }
+/* SUCCESS */
+.success-message { display: none; text-align: center; padding: 30px 0 10px; }
+.success-message.show { display: block; }
+.success-icon {
+  width: 84px; height: 84px; margin: 0 auto 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #E7F4EC; color: var(--success); font-size: 2.2rem;
+}
+.success-message h2 { font-size: 2rem; font-weight: 600; margin-bottom: 12px; }
+.success-message p { color: var(--text-muted); max-width: 46ch; margin: 0 auto 28px; }
+.again-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 30px;
+  background: var(--navy); color: #fff; border: none; border-radius: 4px;
+  font-family: var(--font-body); font-weight: 700; font-size: .92rem; cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.again-btn:hover { background: var(--navy-mid); transform: translateY(-2px); }
+.again-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
-        .mobile-nav a {
-            display: block;
-            padding: 12px 15px;
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            border-radius: 8px;
-            transition: 0.3s;
-            border-left: 3px solid transparent;
-        }
+/* FOOTER */
+footer { background: var(--navy-deep); color: #C6CEDA; position: relative; overflow: hidden; }
+footer::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), transparent 60%);
+}
+.footer-main { padding: 70px 7% 34px; position: relative; z-index: 1; }
+.footer-top {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 44px; margin-bottom: 44px; padding-bottom: 44px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.footer-brand { display: flex; flex-direction: column; gap: 22px; }
+.footer-logo-container { display: flex; align-items: center; gap: 16px; }
+.footer-logo-container img { height: 74px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
+.footer-brand-text h3 { font-size: 1.24rem; color: #fff; margin-bottom: 6px; line-height: 1.3; font-weight: 600; }
+.footer-brand-text .tagline { font-family: var(--font-display); font-style: italic; font-size: .88rem; color: var(--gold-soft); letter-spacing: .04em; }
+.footer-description { color: #A9B4C6; line-height: 1.8; font-size: .93rem; }
+.footer-mission {
+  background: rgba(168,85,247,.12); padding: 16px 20px;
+  border-radius: 8px; border-left: 3px solid var(--gold);
+}
+.footer-mission p { font-size: .88rem; color: #D9DEE7; font-style: italic; line-height: 1.6; }
+.footer-column h4 {
+  color: #fff; font-size: 1.02rem; margin-bottom: 20px; font-weight: 600;
+  position: relative; padding-bottom: 12px; font-family: var(--font-body);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.footer-column h4::after {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 32px; height: 2px; background: var(--gold);
+}
+.footer-column ul { list-style: none; }
+.footer-column ul li { margin-bottom: 13px; }
+.footer-column a {
+  color: #A9B4C6; text-decoration: none;
+  transition: all var(--transition-fast); display: inline-flex;
+  align-items: center; gap: 8px; font-size: .92rem;
+}
+.footer-column a::before {
+  content: '\f054'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  font-size: .58rem; color: var(--gold); opacity: 0;
+  transform: translateX(-8px); transition: all var(--transition-fast);
+}
+.footer-column a:hover, .footer-column a:focus { color: #fff; padding-left: 4px; outline: none; }
+.footer-column a:hover::before, .footer-column a:focus::before { opacity: 1; transform: translateX(0); }
+.footer-column a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+.contact-item { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 16px; color: #A9B4C6; font-size: .89rem; }
+.contact-item .icon { color: var(--gold); font-size: 1.05rem; margin-top: 2px; flex-shrink: 0; width: 18px; text-align: center; }
+.social-links { display: flex; gap: 12px; margin-top: 4px; }
+.social-link {
+  width: 42px; height: 42px; background: rgba(255,255,255,.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; font-size: 1.05rem;
+  transition: all var(--transition-fast);
+}
+.social-link:hover, .social-link:focus { background: var(--gold); color: var(--navy-deep); transform: translateY(-3px); outline: none; }
+.social-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.footer-bottom { padding: 22px 7%; background: rgba(0,0,0,.22); position: relative; z-index: 1; }
+.footer-bottom-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.footer-credit { color: #7E8AA0; font-size: .87rem; }
+.footer-credit strong { color: var(--gold); font-weight: 600; }
+.footer-links { display: flex; gap: 26px; }
+.footer-links a { color: #7E8AA0; text-decoration: none; font-size: .87rem; transition: color var(--transition-fast); }
+.footer-links a:hover, .footer-links a:focus { color: #fff; outline: none; }
+.footer-links a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
 
-        .mobile-nav a:hover,
-        .mobile-nav a:active {
-            background: var(--lilac-soft);
-            color: var(--lilac-dark);
-            border-left-color: var(--lilac-primary);
-            transform: translateX(5px);
-        }
+/* FLOATING CHAT & BACK-TO-TOP */
+.chat-float { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; gap: 14px; }
+.chat-btn {
+  width: 58px; height: 58px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md); transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+}
+.chat-btn:hover, .chat-btn:focus { transform: scale(1.08); box-shadow: var(--shadow-lg); outline: none; }
+.chat-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.chat-btn.whatsapp { background: #25D366; }
+.chat-btn.facebook { background: #1877F2; }
+.chat-btn img { width: 30px; height: 30px; }
+.chat-tooltip {
+  position: absolute; right: 72px; top: 50%; transform: translateY(-50%);
+  background: var(--navy-deep); color: #fff; padding: 8px 14px;
+  border-radius: 6px; white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--transition-fast); font-size: .85rem;
+  box-shadow: var(--shadow-sm); font-weight: 600;
+}
+.chat-tooltip::after {
+  content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+  border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent var(--navy-deep);
+}
+.chat-float:hover .chat-tooltip { opacity: 1; }
+.back-to-top {
+  position: fixed; bottom: 168px; right: 30px;
+  width: 48px; height: 48px;
+  background: var(--navy); color: #fff;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 18px;
+  cursor: pointer; border: 2px solid var(--gold);
+  box-shadow: var(--shadow-md);
+  opacity: 0; visibility: hidden; transition: all var(--transition-fast); z-index: 998;
+}
+.back-to-top.show { opacity: 1; visibility: visible; }
+.back-to-top:hover, .back-to-top:focus {
+  background: var(--gold); color: var(--navy-deep);
+  transform: translateY(-5px); outline: none;
+}
+.back-to-top:focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
 
-        .complaint-hero { position: relative; background: url("{{ url_for('static', filename='Slide/m1.jpeg') }}") center/cover no-repeat; padding: 80px 5% 120px; color: var(--white); text-align: center; }
-        .complaint-hero::before { content: ""; position: absolute; inset: 0; background: rgba(76, 29, 149, 0.85); }
-        .hero-content { position: relative; z-index: 1; }
-        .hero-content h1 { font-family: 'Poppins', sans-serif; font-size: 2.2rem; margin-bottom: 10px; }
+/* RESPONSIVE - 1024 px */
+@media (max-width: 1024px) {
+  .header-text h2 { font-size: 1.1rem; }
+  nav ul { gap: 2px; }
+  nav a { font-size: .87rem; padding: 9px 11px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .hero-inner h1 { font-size: 2.5rem; }
+}
 
-        .section-form { padding: 0 5% 60px; }
-        .form-container { max-width: 850px; margin: -60px auto 0; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); position: relative; z-index: 10; }
-        
-        .form-header { margin-bottom: 30px; border-bottom: 2px solid var(--lilac-soft); padding-bottom: 20px; }
-        .form-header h2 { color: var(--lilac-dark); font-family: 'Poppins', sans-serif; font-size: 1.5rem; }
+/* RESPONSIVE - 768 px */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  body { padding-top: 72px; }
+  .main-header { padding: 10px 5%; }
+  nav { display: none; }
+  .mobile-menu-toggle { display: flex; }
+  .header-divider, .header-text p { display: none; }
+  .header-text h2 { font-size: 13px; line-height: 1.3; }
+  .logo img { height: 40px; }
+  .logo-tagline { font-size: .62rem; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: 1 / span 2; }
-        .form-group { display: flex; flex-direction: column; }
+  .page-hero { padding: 56px 5% 100px; }
+  .hero-inner h1 { font-size: 2rem; }
+  .hero-inner p { font-size: 1rem; }
 
-        label { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dark); }
-        input, select, textarea { padding: 12px; border-radius: 8px; border: 1.5px solid #e5e7eb; background: #fafafa; font-family: inherit; transition: var(--transition); }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--lilac-primary); background: #fff; }
-        textarea { min-height: 120px; resize: vertical; }
+  .section-form { padding: 0 5% 50px; }
+  .form-container { margin-top: -56px; padding: 26px 20px; }
+  .form-header h2 { font-size: 1.4rem; }
+  .form-grid { grid-template-columns: 1fr; gap: 18px; }
+  .full-width { grid-column: auto; }
 
-        .submit-btn { background: var(--lilac-primary); color: #fff; padding: 16px; border: none; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; transition: var(--transition); margin-top: 10px; font-size: 1rem; }
-        .submit-btn:hover { background: var(--lilac-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+  .footer-main { padding: 46px 5% 22px; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-brand { grid-column: 1; }
+  .footer-logo-container { flex-direction: column; align-items: flex-start; }
+  .footer-logo-container img { height: 58px; }
+  .footer-bottom { padding: 20px 5%; }
+  .footer-bottom-content { flex-direction: column; text-align: center; }
+  .footer-links { flex-direction: column; gap: 10px; }
 
-        .agreement { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; margin: 20px 0; color: var(--text-muted); }
-        .agreement input { margin-top: 4px; cursor: pointer; }
+  .chat-float { bottom: 20px; right: 20px; }
+  .chat-btn { width: 52px; height: 52px; }
+  .chat-btn img { width: 26px; height: 26px; }
+  .back-to-top { bottom: 148px; right: 20px; width: 44px; height: 44px; }
+}
 
-        /* ================= FOOTER ================= */
-        footer { background: #111827; color: #d1d5db; padding: 60px 6% 30px; margin-top: 60px; }
-        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; max-width: 1140px; margin: 0 auto; }
-        .footer-logo img { height: 45px; filter: brightness(0) invert(1); margin-bottom: 15px; }
-        .footer-section h4 { color: var(--white); font-family: 'Poppins', sans-serif; margin-bottom: 20px; font-size: 1.1rem; }
-        
-        .footer-links-list { display: flex; flex-direction: column; gap: 12px; }
-        .footer-links-list a { color: #9ca3af; text-decoration: none; transition: var(--transition); font-size: 0.95rem; }
-        .footer-links-list a:hover { color: var(--lilac-primary); padding-left: 5px; }
-        
-        .contact-info p { margin-bottom: 10px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+/* RESPONSIVE - 480 px */
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .hero-inner h1 { font-size: 1.7rem; }
+  .header-text h2 { font-size: 11px; }
+  .footer-brand-text h3 { font-size: 1.08rem; }
+  .social-links { justify-content: center; }
+  .chat-float { gap: 10px; }
+  .back-to-top { bottom: 138px; }
+}
 
-        /* ================= RESPONSIVE DESIGN ================= */
-        @media (max-width: 992px) {
-            .header-text h2 { font-size: 0.9rem; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .header-divider, .header-text p { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            body { padding-top: 70px; }
-            nav, .header-divider, .header-text { display: none; }
-            .hamburger { display: flex; }
-            .mobile-page-title { display: flex; }
-            
-            .logo img { height: 40px; }
-            .logo-tagline { font-size: 0.55rem; }
-            
-            .main-header {
-                padding: 12px 4%;
-            }
-            
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: auto; }
-            .form-container { margin-top: -40px; padding: 25px; }
-            .hero-content h1 { font-size: 1.8rem; }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; }
-            .footer-logo img { margin: 0 auto 15px; }
-            .footer-links-list a:hover { padding-left: 0; }
-        }
-
-        @media (max-width: 480px) {
-            .mobile-page-title h2 {
-                font-size: 0.65rem;
-            }
-            
-            .mobile-page-title p {
-                font-size: 0.5rem;
-            }
-            
-            .hero-content h1 {
-                font-size: 1.5rem;
-            }
-            
-            .logo img {
-                height: 38px;
-            }
-        }
-    </style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<header class="main-header">
-    <div class="header-left">
-        <div class="logo">
-            <a href="/">
-                <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA Logo">
-                <span class="logo-tagline">consumer rights first</span>
-            </a>
-        </div>
-        <div class="header-divider"></div>
-        <div class="header-text">
-            <h2>Ondo State Competition & Consumer Protection Agency</h2>
-            <p>Committed to Consumer Protection & Fair Competition</p>
-        </div>
-    </div>
-    
-     <div class="mobile-page-title">
-        <h2>Ondo State Competition & Consumer Protection Agency</h2>
-        <p>Committed to Consumer Protection</p>
-    </div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/news">News</a></li>
-            <li><a href="/services">Services</a></li>
-            <li><a href="/complaints">Complaints</a></li>
-            <li><a href="/contact">Contact</a></li>
-        </ul>
-    </nav>
-    
-    <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+<!-- HEADER -->
+<header class="main-header">
+  <div class="header-left">
+    <div class="logo">
+      <a href="/" aria-label="OSCCPA Home">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="eager">
+        <span class="logo-tagline">consumer rights first</span>
+      </a>
     </div>
+    <div class="header-divider"></div>
+    <div class="header-text">
+      <h2>Ondo State Competition &amp; Consumer Protection Agency</h2>
+      <p>Committed to Consumer Protection</p>
+    </div>
+  </div>
+
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News &amp; Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints" aria-current="page">Complaints</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu" role="menu">
+    <a href="/" role="menuitem">Home</a>
+    <a href="/about" role="menuitem">About</a>
+    <a href="/news" role="menuitem">News &amp; Activities</a>
+    <a href="/services" role="menuitem">Services</a>
+    <a href="/complaints" role="menuitem">Complaints</a>
+    <a href="/contact" role="menuitem">Contact</a>
+  </div>
 </header>
 
-<div class="mobile-nav" id="mobileNav">
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/news">News</a></li>
-        <li><a href="/services">Services</a></li>
-        <li><a href="/complaints">Complaints</a></li>
-        <li><a href="/contact">Contact</a></li>
-    </ul>
-</div>
+<main id="main-content">
 
-<section class="complaint-hero">
-    <div class="hero-content">
-        <h1>File a Complaint</h1>
-        <p>Your rights matter. Let us help you seek redress.</p>
-    </div>
+<!-- HERO -->
+<section class="page-hero" aria-labelledby="complaint-heading">
+  <img class="hero-bg" src="{{ url_for('static', filename='gallery/m1.jpeg') }}" alt="" loading="eager">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Complaints</span>
+    <h1 id="complaint-heading">File a Complaint</h1>
+    <p>Your rights matter. Tell us what happened and we will help you seek redress.</p>
+  </div>
 </section>
 
+<!-- FORM -->
 <section class="section-form">
-    <div class="form-container">
-        <div id="formSection">
-            <div class="form-header">
-                <h2>Complaint Submission Form</h2>
-                <p>Please provide detailed information to help us investigate your case.</p>
+  <div class="form-container" id="formCard">
+
+    <div id="formSection">
+      <div class="form-header">
+        <div class="section-eyebrow"><i class="fas fa-shield-alt"></i> Consumer Complaint</div>
+        <h2>Complaint Submission Form</h2>
+        <p>Please give as much detail as you can to help us investigate your case.</p>
+      </div>
+
+      <form id="complaintForm" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="full_name">Full name <span class="req">*</span></label>
+            <input type="text" id="full_name" name="full_name" placeholder="John Doe" autocomplete="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" placeholder="john@example.com" autocomplete="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone number <span class="req">*</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="+234..." autocomplete="tel" required>
+          </div>
+
+          <div class="form-group">
+            <label for="lga">Local Government Area <span class="req">*</span></label>
+            <select id="lga" name="lga" required>
+              <option value="">Select LGA</option>
+              <option>Akoko North-East</option>
+              <option>Akoko North-West</option>
+              <option>Akoko South-East</option>
+              <option>Akoko South-West</option>
+              <option>Akure North</option>
+              <option>Akure South</option>
+              <option>Ese Odo</option>
+              <option>Idanre</option>
+              <option>Ifedore</option>
+              <option>Ilaje</option>
+              <option>Ile Oluji/Okeigbo</option>
+              <option>Irele</option>
+              <option>Odigbo</option>
+              <option>Okitipupa</option>
+              <option>Ondo East</option>
+              <option>Ondo West</option>
+              <option>Ose</option>
+              <option>Owo</option>
+              <option>Other / Outside Ondo</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="business_name">Name of business / trader <span class="req">*</span></label>
+            <input type="text" id="business_name" name="business_name" placeholder="Who are you reporting?" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="complaint_type">Nature of complaint <span class="req">*</span></label>
+            <select id="complaint_type" name="complaint_type" required>
+              <option value="">Select complaint type</option>
+              <option>Overpricing / Price Gouging</option>
+              <option>Substandard / Counterfeit Product</option>
+              <option>Expired Goods</option>
+              <option>Unfair Business Practice</option>
+              <option>Refusal to Refund / Replace</option>
+              <option>Poor Service Delivery</option>
+              <option>False Advertising</option>
+              <option>Weights and Measures Issues</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="complaint_details">Complaint details <span class="req">*</span></label>
+            <textarea id="complaint_details" name="complaint_details" placeholder="Describe exactly what happened, including dates and amounts paid..." required></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="evidence">Upload evidence (receipts, photos, etc.)</label>
+            <div class="file-drop">
+              <i class="fas fa-paperclip" aria-hidden="true"></i>
+              <input type="file" id="evidence" name="evidence" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.mp4">
             </div>
+            <span class="field-hint">Optional. Photos, PDF, Word, Excel or MP4, up to 10 MB.</span>
+          </div>
 
-            <form id="complaintForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" name="full_name" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address *</label>
-                        <input type="email" name="email" placeholder="john@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number *</label>
-                        <input type="tel" name="phone" placeholder="+234..." required>
-                    </div>
-                    <div class="form-group">
-                        <label>Local Government Area *</label>
-                        <select name="lga" required>
-                            <option value="">Select LGA</option>
-                            <option>Akoko North-East</option>
-                            <option>Akoko North-West</option>
-                            <option>Akoko South-East</option>
-                            <option>Akoko South-West</option>
-                            <option>Akure North</option>
-                            <option>Akure South</option>
-                            <option>Ese Odo</option>
-                            <option>Idanre</option>
-                            <option>Ifedore</option>
-                            <option>Ilaje</option>
-                            <option>Ile Oluji/Okeigbo</option>
-                            <option>Irele</option>
-                            <option>Odigbo</option>
-                            <option>Okitipupa</option>
-                            <option>Ondo East</option>
-                            <option>Ondo West</option>
-                            <option>Ose</option>
-                            <option>Owo</option>
-                            <option>Other / Outside Ondo</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Name of Business / Trader *</label>
-                        <input type="text" name="business_name" placeholder="Who are you reporting?" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Nature of Complaint *</label>
-                        <select name="complaint_type" required>
-                            <option value="">Select Complaint Type</option>
-                            <option>Overpricing / Price Gouging</option>
-                            <option>Substandard / Counterfeit Product</option>
-                            <option>Expired Goods</option>
-                            <option>Unfair Business Practice</option>
-                            <option>Refusal to Refund / Replace</option>
-                            <option>Poor Service Delivery</option>
-                            <option>False Advertising</option>
-                            <option>Weights and Measures Issues</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Complaint Details *</label>
-                        <textarea name="complaint_details" placeholder="Please describe exactly what happened, including dates and amounts paid..." required></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Upload Evidence (Receipts, Photos, etc.)</label>
-                        <input type="file" name="evidence" style="border:none; padding: 10px 0;">
-                    </div>
-                </div>
-                <div class="agreement">
-                    <input type="checkbox" id="confirm" required>
-                    <label for="confirm">I confirm that the information provided is true and accurate to the best of my knowledge.</label>
-                </div>
-                <button type="submit" class="submit-btn" id="submitBtn">Submit Complaint</button>
-            </form>
         </div>
 
-        <div id="successMessage" style="display: none; text-align: center; padding: 40px 0;">
-            <div style="font-size: 80px; color: #10b981; margin-bottom: 20px;">✓</div>
-            <h2 style="color: var(--lilac-dark); font-family: 'Poppins';">Submission Successful!</h2>
-            <p style="color: var(--text-muted); margin: 15px 0 30px;">Thank you. Your complaint has been received. Our team will contact you within 48 business hours.</p>
-            <button onclick="window.location.reload()" style="background: var(--lilac-primary); color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;">File Another Complaint</button>
+        <div class="agreement">
+          <input type="checkbox" id="confirm" required>
+          <label for="confirm">I confirm that the information provided is true and accurate to the best of my knowledge.</label>
         </div>
+
+        <div class="form-error" id="formError" role="alert" aria-live="assertive">
+          <i class="fas fa-circle-exclamation" aria-hidden="true" style="margin-top:3px"></i>
+          <span id="formErrorText">Something went wrong. Please try again.</span>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="submitLabel">Submit Complaint</span> <i class="fas fa-paper-plane" aria-hidden="true"></i>
+        </button>
+      </form>
+
+      <div class="form-alt">
+        <span>Prefer to talk to us?</span>
+        <a href="https://wa.me/2349043353001" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp +234 904 335 3001</a>
+        <span>Mon – Fri, 8AM – 5PM</span>
+      </div>
     </div>
+
+    <div class="success-message" id="successMessage" role="status" aria-live="polite" tabindex="-1">
+      <div class="success-icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+      <h2>Submission successful</h2>
+      <p>Thank you. Your complaint has been received. Our team will contact you within 48 business hours.</p>
+      <button type="button" class="again-btn" id="againBtn"><i class="fas fa-rotate-left" aria-hidden="true"></i> File another complaint</button>
+    </div>
+
+  </div>
 </section>
 
+</main>
+
+<!-- FOOTER -->
 <footer>
-    <div class="footer-grid">
-        <div class="footer-about">
-            <div class="footer-logo"><img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OCCPA"></div>
-            <p>The Ondo State Competition & Consumer Protection Agency is dedicated to ensuring fair pricing and protecting consumer rights across all 18 LGAs.</p>
+  <div class="footer-main">
+    <div class="footer-top">
+
+      <div class="footer-brand">
+        <div class="footer-logo-container">
+          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="lazy">
+          <div class="footer-brand-text">
+            <h3>Ondo State Competition &amp; Consumer Protection Agency</h3>
+            <span class="tagline">consumer rights first</span>
+          </div>
         </div>
-        <div class="footer-section">
-            <h4>Quick Links</h4>
-            <div class="footer-links-list">
-                <a href="/">Home</a>
-                <a href="/about">About Us</a>
-                <a href="/complaints">File a Complaint</a>
-                <a href="/services">Our Services</a>
-                <a href="/contact">Get in Touch</a>
-            </div>
+        <p class="footer-description">
+          Dedicated to protecting consumer rights and promoting fair competition across Ondo State. We ensure transparency, accountability, and justice in the marketplace.
+        </p>
+        <div class="footer-mission">
+          <p><strong>Our Mission:</strong> To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
         </div>
-        <div class="footer-section contact-info">
-            <h4>Contact Us</h4>
-            <p>📧 info@occpa.on.gov.ng</p>
-            <p>📍 Old board of internal revenue building after CUDA Alagbaka Akure, Ondo State</p>
-            <p>📞 +2349043353001</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
         </div>
+      </div>
+
+      <div class="footer-column">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/news">News &amp; Activities</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Our Services</h4>
+        <ul>
+          <li><a href="/complaints">File a Complaint</a></li>
+          <li><a href="/services">Consumer Advocacy</a></li>
+          <li><a href="/services">Market Surveillance</a></li>
+          <li><a href="/services">Business Compliance</a></li>
+          <li><a href="/services">Public Education</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact Us</h4>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+          <span>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-envelope"></i></span>
+          <span>info@occpa.on.gov.ng</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-phone"></i></span>
+          <span>+234 904 335 3001</span>
+        </div>
+        <div class="contact-item">
+          <span class="icon"><i class="fas fa-clock"></i></span>
+          <span>Mon – Fri: 8AM – 5PM</span>
+        </div>
+      </div>
+
     </div>
-    <div style="text-align: center; margin-top: 50px; font-size: 0.85rem; border-top: 1px solid #374151; padding-top: 25px; opacity: 0.7;">
-        &copy; 2026 OCCPA. All rights reserved. | Powered by Euphoria Tech 08134812419
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <div class="footer-credit">
+        &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech 08134812419</strong>
+      </div>
+      <div class="footer-links">
+        <a href="/">Privacy Policy</a>
+        <a href="/">Terms of Service</a>
+        <a href="/">Sitemap</a>
+      </div>
     </div>
+  </div>
 </footer>
 
+<!-- CHAT FLOAT -->
+<div class="chat-float">
+  <a href="https://wa.me/2349043353001" target="_blank" rel="noopener" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+  </a>
+  <a href="https://m.me/occpa" target="_blank" rel="noopener" class="chat-btn facebook" aria-label="Chat on Facebook">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+  </a>
+  <span class="chat-tooltip">Chat with us</span>
+</div>
+
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+
 <script>
-    const hamburger = document.getElementById('hamburger');
-    const mobileNav = document.getElementById('mobileNav');
+document.addEventListener("DOMContentLoaded", function () {
 
-    hamburger.addEventListener('click', function() {
-        this.classList.toggle('active');
-        mobileNav.classList.toggle('active');
-    });
+  /* Back to top */
+  const backToTopBtn = document.getElementById("backToTop");
+  let scrollTicking = false;
+  window.addEventListener("scroll", function () {
+    if (!scrollTicking) {
+      window.requestAnimationFrame(function () {
+        backToTopBtn.classList.toggle("show", window.pageYOffset > 300);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  });
+  backToTopBtn.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-    const mobileLinks = mobileNav.querySelectorAll('a');
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            hamburger.classList.remove('active');
-            mobileNav.classList.remove('active');
-        });
-    });
+  /* Mobile menu */
+  const menuToggle = document.querySelector(".mobile-menu-toggle");
+  const mobileMenu = document.getElementById("mobileMenu");
 
-    document.addEventListener('click', function(event) {
-        const isClickInsideNav = mobileNav.contains(event.target);
-        const isClickOnHamburger = hamburger.contains(event.target);
-        
-        if (!isClickInsideNav && !isClickOnHamburger && mobileNav.classList.contains('active')) {
-            hamburger.classList.remove('active');
-            mobileNav.classList.remove('active');
+  window.toggleMobileMenu = function () {
+    const isOpen = mobileMenu.classList.toggle("open");
+    menuToggle.classList.toggle("active");
+    menuToggle.setAttribute("aria-expanded", isOpen);
+    if (isOpen) document.addEventListener("click", closeMenuOutside);
+    else document.removeEventListener("click", closeMenuOutside);
+  };
+
+  function closeMenuOutside(e) {
+    if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.removeEventListener("click", closeMenuOutside);
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768 && mobileMenu.classList.contains("open")) {
+      mobileMenu.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  /* Complaint form */
+  const form = document.getElementById("complaintForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const submitLabel = document.getElementById("submitLabel");
+  const formSection = document.getElementById("formSection");
+  const successMessage = document.getElementById("successMessage");
+  const formError = document.getElementById("formError");
+  const formErrorText = document.getElementById("formErrorText");
+  const formCard = document.getElementById("formCard");
+
+  function showError(msg) {
+    formErrorText.textContent = msg;
+    formError.classList.add("show");
+  }
+  function clearError() { formError.classList.remove("show"); }
+  function scrollToCard() {
+    const top = formCard.getBoundingClientRect().top + window.pageYOffset - 110;
+    window.scrollTo({ top: top, behavior: "smooth" });
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    clearError();
+
+    // Native validation, with a clear message and focus on the first problem
+    if (!form.checkValidity()) {
+      const bad = form.querySelector(":invalid");
+      showError(bad && bad.type === "checkbox"
+        ? "Please tick the confirmation box before submitting."
+        : "Please fill in all the required fields marked with *.");
+      if (bad) bad.focus();
+      return;
+    }
+
+    var file = form.elements.evidence && form.elements.evidence.files[0];
+    if (file && file.size > 10 * 1024 * 1024) {
+      showError("That file is larger than 10 MB. Please choose a smaller file.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = "Submitting...";
+
+    fetch("/complaints", {
+      method: "POST",
+      body: new FormData(form),
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+      .then(function (response) {
+        if (response.ok) {
+          formSection.style.display = "none";
+          successMessage.classList.add("show");
+          scrollToCard();
+          successMessage.focus({ preventScroll: true });
+          return;
         }
-    });
-
-    const complaintForm = document.getElementById("complaintForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const formSection = document.getElementById("formSection");
-    const successMessage = document.getElementById("successMessage");
-
-    complaintForm.addEventListener("submit", function(e) {
-        e.preventDefault(); 
-
-        submitBtn.innerText = "Processing...";
-        submitBtn.disabled = true;
-
-        const formData = new FormData(complaintForm);
-
-        fetch("/complaints", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                formSection.style.display = "none";
-                successMessage.style.display = "block";
-                window.scrollTo({ top: 100, behavior: 'smooth' });
-            } else {
-                throw new Error('Server Error');
-            }
-        })
-        .catch(error => {
-            alert("Oops! Something went wrong. Please try again.");
-            submitBtn.innerText = "Submit Complaint";
-            submitBtn.disabled = false;
+        return response.json().catch(function () { return {}; }).then(function (d) {
+          var err = new Error(d.error || "Server error");
+          err.fromServer = !!d.error;
+          throw err;
         });
-    });
+      })
+      .catch(function (err) {
+        showError(err && err.fromServer
+          ? err.message
+          : "We could not submit your complaint. Check your connection and try again, or reach us on WhatsApp.");
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitLabel.textContent = "Submit Complaint";
+      });
+  });
+
+  document.getElementById("againBtn").addEventListener("click", function () {
+    form.reset();
+    clearError();
+    successMessage.classList.remove("show");
+    formSection.style.display = "";
+    scrollToCard();
+  });
+
+});
 </script>
 
 </body>

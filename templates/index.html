@@ -15,19 +15,19 @@
 <style>
 /* ===================================================================
    DESIGN TOKENS
-   Palette: deep civic navy + muted gold seal accent, on a warm paper
-   background. Built for a state regulatory agency — the goal is
-   "trustworthy institution", not "consumer startup".
+   Palette: deep purple + soft lilac accent, on a light lilac-tinted
+   paper background. Built for a state regulatory agency — the goal
+   is "trustworthy institution", not "consumer startup".
 =================================================================== */
 :root {
   --navy:        #6D28D9;
   --navy-deep:   #4C1D95;
   --navy-mid:    #7C3AED;
   --navy-soft:   #F1EBFC;
-  --gold:        #B3872F;
-  --gold-dark:   #8C6A22;
-  --gold-soft:   #F3E9D2;
-  --cream:       #F8F6FC;
+  --gold:        #A855F7;
+  --gold-dark:   #7C3AED;
+  --gold-soft:   #F1E7FE;
+  --cream:       #F6F1FC;
   --paper:       #FFFFFF;
   --text-dark:   #241B33;
   --text-muted:  #665D77;
@@ -157,7 +157,7 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .slider { display: flex; transition: transform .6s ease; }
 .slide  { min-width: 100%; position: relative; }
 .slide img { width: 100%; height: 640px; object-fit: cover; display: block; }
-.vignette { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(7,27,48,.88) 10%, rgba(7,27,48,.35) 55%, rgba(7,27,48,.15) 100%); }
+.vignette { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(46,16,101,.88) 10%, rgba(46,16,101,.35) 55%, rgba(46,16,101,.15) 100%); }
 .slide-text {
   position: absolute; top: 50%; left: 7%;
   transform: translateY(-50%); color: #fff; max-width: 600px;
@@ -179,13 +179,13 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
   cursor: pointer; border: none;
 }
 .slide-cta:hover, .slide-cta:focus {
-  background: #c99b3f; transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(179,135,47,.4); outline: none;
+  background: #9333EA; transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(168,85,247,.4); outline: none;
 }
 .slide-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .prev, .next {
   position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgba(7,27,48,.4); border: 1px solid rgba(255,255,255,.25); color: #fff;
+  background: rgba(46,16,101,.4); border: 1px solid rgba(255,255,255,.25); color: #fff;
   font-size: 18px; border-radius: 50%;
   cursor: pointer; opacity: .55; transition: opacity var(--transition-fast), background var(--transition-fast);
   z-index: 10; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
@@ -193,7 +193,7 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .prev { left: 22px; }
 .next { right: 22px; }
 .prev:hover, .next:hover, .prev:focus, .next:focus {
-  opacity: 1; background: rgba(179,135,47,.85); border-color: var(--gold); outline: none;
+  opacity: 1; background: rgba(168,85,247,.85); border-color: var(--gold); outline: none;
 }
 .prev:focus-visible, .next:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .slider-container:hover .prev,
@@ -235,65 +235,48 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
+  grid-template-columns: 1.2fr 1fr;
   gap: 64px;
   align-items: center;
   position: relative;
   z-index: 1;
 }
 
-/* Left: Image Column */
+/* Left: leadership pair. Chairman larger, secretary beside him,
+   photos share a baseline and each has a caption underneath. */
 .about-image-col { position: relative; }
-.about-image-wrapper { position: relative; display: inline-block; }
-.about-image-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 18px; left: -18px;
-  width: 100%; height: 100%;
-  border: 2px solid var(--gold);
-  border-radius: var(--radius-lg);
-  z-index: 0;
+.leaders {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  column-gap: 18px;
+  max-width: 620px;
+  text-align: left;
 }
-.about-img-main {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 380px;
+.leader-photo {
+  align-self: end;
+  display: block; width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover; object-position: top center;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  background: var(--navy-soft);
+}
+.leader-cap {
+  align-self: start;
+  margin-top: 14px; padding-left: 12px;
+  border-left: 3px solid var(--gold);
+}
+.leader-cap strong {
   display: block;
+  font-family: var(--font-display); font-size: 1rem; font-weight: 600;
+  color: var(--text-dark); line-height: 1.3;
 }
-
-/* Floating badge / seal card */
-.about-badge {
-  position: absolute;
-  bottom: -24px;
-  right: -24px;
-  background: var(--navy);
-  padding: 18px 22px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  z-index: 2;
-  min-width: 210px;
-  display: flex; align-items: center; gap: 12px;
+.leader-cap span {
+  display: block; margin-top: 2px;
+  font-size: .78rem; font-weight: 600; color: var(--gold-dark);
 }
-.about-badge .badge-seal {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--gold); color: var(--navy-deep);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; flex-shrink: 0;
-}
-.about-badge h4 {
-  font-size: .92rem;
-  color: #fff;
-  margin-bottom: 2px;
-  font-weight: 600;
-}
-.about-badge p {
-  font-size: .78rem;
-  color: var(--gold-soft);
-  font-family: var(--font-body);
-}
+.leader-cap.chairman strong { font-size: 1.25rem; }
+.leader-cap.chairman span { font-size: .86rem; }
 
 /* Stats row under image */
 .about-stats { display: flex; gap: 0; margin-top: 46px; border-top: 1px solid var(--line); padding-top: 24px; }
@@ -402,326 +385,97 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 }
 .about-contact-link:hover i { background: var(--gold); color: #fff; }
 
-/* GALLERY — compact expandable preview + lightbox, instead of a
-   space-hungry full grid. The section only ever costs one small
-   box; everything else lives behind the "View Full Gallery" action. */
-.gallery-section { padding: 80px 7%; background: var(--cream); }
-.gallery-layout {
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: 320px 1fr;
-  gap: 56px; align-items: center;
-}
-
-/* Left: the compact stacked-photo box that acts as the trigger */
-.gallery-preview-trigger {
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  background: none; border: none; padding: 0; cursor: pointer;
-  width: 100%; max-width: 300px; margin: 0 auto;
-  font-family: var(--font-body);
-}
-.gallery-preview-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: var(--radius-md); }
-.gallery-stack {
-  position: relative;
-  width: 100%; aspect-ratio: 4 / 5;
-}
-.stack-img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: cover;
-  border-radius: var(--radius-lg);
-  border: 4px solid var(--paper);
-  box-shadow: var(--shadow-md);
+/* NEWS LINK CARD — click-through to the News & Activities page */
+.news-link-card {
+  display: flex; align-items: center; gap: 22px;
+  padding: 24px 28px; text-decoration: none; color: #fff;
+  background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
   transition: transform var(--transition-medium), box-shadow var(--transition-medium);
 }
-.stack-img-3 { transform: rotate(7deg) translate(10px, 6px); z-index: 1; filter: brightness(.94); }
-.stack-img-2 { transform: rotate(-5deg) translate(-8px, 4px); z-index: 2; filter: brightness(.97); }
-.stack-img-1 { transform: rotate(0deg); z-index: 3; }
-.gallery-preview-trigger:hover .stack-img-1,
-.gallery-preview-trigger:focus-visible .stack-img-1 { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.gallery-preview-trigger:hover .stack-img-2 { transform: rotate(-8deg) translate(-12px, 2px); }
-.gallery-preview-trigger:hover .stack-img-3 { transform: rotate(10deg) translate(14px, 4px); }
-.stack-count {
-  position: absolute; bottom: 12px; right: 12px; z-index: 4;
-  background: var(--navy-deep); color: #fff;
-  padding: 6px 14px; border-radius: 50px;
-  font-size: .78rem; font-weight: 700;
-  display: inline-flex; align-items: center; gap: 6px;
-  box-shadow: var(--shadow-sm);
+.news-link-card:hover, .news-link-card:focus-visible { transform: translateY(-4px); box-shadow: var(--shadow-lg); outline: none; }
+.news-link-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.nl-icon {
+  width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%;
+  background: var(--gold); color: var(--navy-deep);
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
 }
-.gallery-preview-cta {
-  display: inline-flex; align-items: center; gap: 9px;
-  background: var(--navy); color: #fff;
-  padding: 12px 24px; border-radius: 4px;
-  font-weight: 700; font-size: .88rem;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+.nl-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.nl-tag { font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-soft); }
+.nl-text strong { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; }
+.nl-text span:last-child { font-size: .92rem; opacity: .85; }
+.nl-arrow {
+  display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+  padding: 12px 22px; background: #fff; color: var(--navy-deep);
+  border-radius: 4px; font-weight: 700; font-size: .88rem;
+  transition: gap var(--transition-fast);
 }
-.gallery-preview-trigger:hover .gallery-preview-cta,
-.gallery-preview-trigger:focus-visible .gallery-preview-cta { background: var(--navy-mid); transform: translateY(-2px); }
+.news-link-card:hover .nl-arrow { gap: 16px; }
 
-/* Right: supporting copy */
-.gallery-copy h2 { font-size: 2.2rem; color: var(--text-dark); margin-bottom: 16px; font-weight: 600; }
-.gallery-copy p { color: var(--text-muted); font-size: 1.02rem; line-height: 1.75; max-width: 52ch; }
+/* NEWS + GALLERY */
+.news-gallery-section { padding: 56px 7%; background: var(--paper); border-top: 1px solid var(--line); }
+.news-gallery-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.7fr; gap: 28px; align-items: stretch;
+}
+.news-gallery-inner .news-link-card {
+  flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 18px; padding: 32px 28px; height: 100%; max-width: none; margin: 0;
+}
+.news-gallery-inner .nl-arrow { align-self: stretch; justify-content: center; }
 
-/* Lightbox modal */
+.gallery-panel {
+  background: var(--cream); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 24px;
+}
+.gallery-head { margin-bottom: 14px; }
+.gallery-head h3 { font-size: 1.5rem; font-weight: 600; color: var(--text-dark); }
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 120px; gap: 10px; min-height: 250px;
+}
+.gallery-item {
+  position: relative; overflow: hidden; padding: 0; border: 0; cursor: pointer;
+  border-radius: var(--radius-md); background: var(--navy-soft);
+  opacity: 0; transform: translateY(18px) scale(.97);
+  transition: opacity .5s ease, transform .5s ease, box-shadow var(--transition-fast);
+}
+.gallery-item.in { opacity: 1; transform: none; }
+.gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block;
+  transition: transform .5s ease, opacity .4s ease;
+}
+.gallery-item:hover img { transform: scale(1.07); }
+.gallery-item:hover { box-shadow: var(--shadow-md); }
+.gallery-item:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.gallery-more {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(46,16,101,.65); color: #fff;
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 600;
+}
+
+/* LIGHTBOX */
 .lightbox {
-  position: fixed; inset: 0; z-index: 2000;
-  background: rgba(15,10,26,.94);
-  display: flex; align-items: center; justify-content: center;
-  padding: 70px 90px;
+  position: fixed; inset: 0; z-index: 3000; background: rgba(36,27,51,.94);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
 }
 .lightbox[hidden] { display: none; }
-.lightbox-stage { position: relative; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.lightbox-stage img {
-  max-width: 100%; max-height: 78vh; object-fit: contain;
-  border-radius: var(--radius-md); box-shadow: 0 20px 60px rgba(0,0,0,.5);
-  background: #1a1224;
+.lightbox img, .lightbox video {
+  max-width: 90vw; max-height: 82vh; object-fit: contain;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-lg); background: #000;
 }
-.lightbox-counter { color: rgba(255,255,255,.75); font-size: .85rem; font-weight: 600; letter-spacing: .04em; }
-.lightbox-close {
-  position: absolute; top: 22px; right: 26px;
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); color: #fff;
-  font-size: 1.6rem; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.lightbox-close:hover, .lightbox-close:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
-.lightbox-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.lightbox-nav {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); color: #fff;
-  font-size: 1.1rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.lightbox-nav:hover, .lightbox-nav:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
-.lightbox-nav:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.lightbox-prev { left: 24px; }
-.lightbox-next { right: 24px; }
-body.lightbox-open,
-body.news-modal-open { overflow: hidden; }
-
-/* NEWS — same "compact box that expands" pattern as the gallery.
-   The homepage only spends space on one preview card; the full feed
-   of articles and videos lives inside a modal opened on demand. */
-.news-section { padding: 80px 7%; background: var(--paper); border-top: 1px solid var(--line); }
-.news-layout {
-  max-width: 1200px; margin: 0 auto 3rem;
-  display: grid; grid-template-columns: 320px 1fr;
-  gap: 56px; align-items: center;
-}
-
-.news-preview-trigger {
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  background: none; border: none; padding: 0; cursor: pointer;
-  width: 100%; max-width: 300px; margin: 0 auto;
-  font-family: var(--font-body); text-align: left;
-}
-.news-preview-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: var(--radius-md); }
-.news-preview-card {
-  position: relative; width: 100%;
-  background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  overflow: hidden; box-shadow: var(--shadow-md);
-  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
-}
-.news-preview-trigger:hover .news-preview-card,
-.news-preview-trigger:focus-visible .news-preview-card { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.news-preview-banner {
-  height: 110px;
-  background: linear-gradient(135deg, var(--navy-deep), var(--navy));
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-}
-.news-preview-banner i { font-size: 2rem; color: var(--gold); }
-.news-preview-banner .mini-avatars { position: absolute; bottom: 10px; right: 12px; display: flex; }
-.news-preview-banner .mini-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--navy-mid); border: 2px solid var(--navy-deep);
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: .7rem; margin-left: -8px;
-}
-.news-preview-body { padding: 16px 18px 18px; }
-.news-preview-tag {
-  display: inline-block; font-size: .68rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--gold-dark); background: var(--gold-soft);
-  padding: 3px 10px; border-radius: 50px; margin-bottom: 8px;
-}
-.news-preview-body h3 {
-  font-size: .92rem; font-weight: 700; color: var(--text-dark); line-height: 1.4;
-  font-family: var(--font-body);
-}
-.news-preview-count {
-  position: absolute; top: 10px; left: 10px; z-index: 2;
-  background: rgba(15,10,26,.55); color: #fff;
-  padding: 5px 12px; border-radius: 50px;
-  font-size: .72rem; font-weight: 700;
-  display: inline-flex; align-items: center; gap: 6px;
-  backdrop-filter: blur(2px);
-}
-.news-preview-cta {
-  display: inline-flex; align-items: center; gap: 9px;
-  background: var(--navy); color: #fff;
-  padding: 12px 24px; border-radius: 4px;
-  font-weight: 700; font-size: .88rem;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.news-preview-trigger:hover .news-preview-cta,
-.news-preview-trigger:focus-visible .news-preview-cta { background: var(--navy-mid); transform: translateY(-2px); }
-
-.news-copy h2 { font-size: 2.1rem; color: var(--text-dark); margin-bottom: 16px; font-weight: 600; }
-.news-copy p { color: var(--text-muted); font-size: 1.02rem; line-height: 1.75; max-width: 52ch; }
-
-/* News modal — holds the real feed (article + videos) */
-.news-modal {
-  position: fixed; inset: 0; z-index: 2000;
-  background: rgba(15,10,26,.82);
-  display: flex; align-items: center; justify-content: center;
-  padding: 40px 5%;
-}
-.news-modal[hidden] { display: none; }
-.news-modal-inner {
-  background: var(--cream); border-radius: var(--radius-lg);
-  width: 100%; max-width: 1160px; max-height: 88vh;
-  display: flex; flex-direction: column;
-  box-shadow: 0 30px 70px rgba(0,0,0,.4);
-  overflow: hidden;
-}
-.news-modal-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 26px; background: var(--navy); flex-shrink: 0;
-}
-.news-modal-header h3 { color: #fff; font-size: 1.2rem; font-weight: 600; }
-.news-modal-close {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(255,255,255,.12); border: none; color: #fff;
-  font-size: 1.4rem; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+.lightbox img[hidden], .lightbox video[hidden] { display: none; }
+.lb-close, .lb-nav {
+  position: absolute; background: rgba(255,255,255,.12); color: #fff; border: 0;
+  border-radius: 50%; cursor: pointer; width: 46px; height: 46px; font-size: 20px;
   transition: background var(--transition-fast);
 }
-.news-modal-close:hover, .news-modal-close:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
-.news-modal-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.news-modal-body { padding: 26px; overflow-y: auto; }
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px; align-items: start;
-}
-.news-card {
-  background: var(--paper); border-radius: 12px;
-  box-shadow: var(--shadow-sm); border: 1px solid var(--line);
-  overflow: hidden; transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  display: flex; flex-direction: column; height: 100%;
-}
-.news-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--gold); }
-
-.news-image { position: relative; overflow: hidden; background: var(--navy-deep); }
-.news-image img { width: 100%; height: 190px; object-fit: cover; display: block; }
-.news-date {
-  position: absolute; top: 10px; right: 10px;
-  background: var(--gold); color: var(--navy-deep);
-  padding: 4px 11px; border-radius: 4px;
-  font-size: .68rem; font-weight: 800; letter-spacing: .03em;
-  pointer-events: none; z-index: 2;
-}
-
-/* External article banner */
-.news-ext-banner {
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 10px; height: 190px;
-  background: linear-gradient(135deg, var(--navy-deep), var(--navy));
-  padding: 20px; text-align: center;
-}
-.news-ext-banner .ext-icon { font-size: 1.5rem; color: var(--gold); }
-.news-ext-banner .ext-label {
-  font-size: .68rem; font-weight: 800; letter-spacing: .12em;
-  text-transform: uppercase; color: rgba(255,255,255,.6);
-}
-.news-ext-banner .ext-source { font-size: .92rem; font-weight: 700; color: #fff; }
-.news-ext-banner .ext-read-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 4px; padding: 7px 16px;
-  background: var(--gold); border: none;
-  border-radius: 4px; color: var(--navy-deep); text-decoration: none;
-  font-size: .76rem; font-weight: 800;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.news-ext-banner .ext-read-link:hover, .news-ext-banner .ext-read-link:focus {
-  background: #c99b3f; transform: translateY(-1px); outline: none;
-}
-.news-ext-banner .ext-read-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-
-/* Click-to-play video card — no unreliable cross-origin detection,
-   always backed by a real outbound link so it can never "silently fail" */
-.video-card {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 9 / 16;
-  background: linear-gradient(150deg, var(--navy-deep) 0%, var(--navy-mid) 100%);
-  overflow: hidden;
-}
-.video-poster {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 14px; cursor: pointer; border: none; width: 100%; height: 100%;
-  background: transparent; padding: 20px; text-align: center;
-}
-.video-poster-ring {
-  width: 62px; height: 62px; border-radius: 50%;
-  background: var(--gold);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--navy-deep); font-size: 1.2rem;
-  box-shadow: 0 0 0 8px rgba(179,135,47,.18);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-.video-poster:hover .video-poster-ring, .video-poster:focus-visible .video-poster-ring {
-  transform: scale(1.08); box-shadow: 0 0 0 12px rgba(179,135,47,.24);
-}
-.video-poster:focus-visible { outline: 2px solid var(--gold); outline-offset: -4px; }
-.video-poster-label {
-  font-size: .78rem; font-weight: 700; color: #fff;
-  display: flex; align-items: center; gap: 7px;
-}
-.video-poster-label i { color: #4a9bf0; }
-.video-card iframe { width: 100%; height: 100%; border: none; display: block; }
-.video-card.is-playing .video-poster { display: none; }
-
-.news-content {
-  padding: 1.15rem 1.3rem 1.3rem;
-  flex: 1; display: flex; flex-direction: column;
-}
-.news-content h3 {
-  color: var(--navy); font-size: .96rem; font-family: var(--font-body);
-  margin-bottom: .7rem; line-height: 1.4; font-weight: 700;
-}
-.news-content .preview  { color: var(--text-muted); font-size: .85rem; line-height: 1.65; margin-bottom: .7rem; flex: 1; }
-.news-content .more-text { display: none; color: var(--text-muted); font-size: .85rem; line-height: 1.65; margin-bottom: .7rem; }
-.news-content .more-text strong { color: var(--text-dark); }
-
-.read-more-btn {
-  align-self: flex-start;
-  background: var(--navy-soft); color: var(--navy);
-  border: none; padding: 9px 18px; border-radius: 4px;
-  cursor: pointer; font-weight: 700; font-size: .8rem;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-.read-more-btn:hover, .read-more-btn:focus { background: var(--navy); color: #fff; outline: none; }
-.read-more-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.read-more-btn.expanded { background: var(--navy); color: #fff; }
-
-.fb-watch-link {
-  align-self: flex-start;
-  background: var(--navy); color: #fff;
-  padding: 9px 18px; border-radius: 4px;
-  font-weight: 700; font-size: .8rem;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
-  transition: background var(--transition-fast), transform var(--transition-fast);
-}
-.fb-watch-link i { color: #4a9bf0; }
-.fb-watch-link:hover, .fb-watch-link:focus {
-  background: var(--navy-mid); transform: translateY(-1px); outline: none;
-}
-.fb-watch-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.news-footer { text-align: center; margin-top: 2.4rem; }
+.lb-close:hover, .lb-nav:hover { background: var(--gold); }
+.lb-close { top: 20px; right: 20px; font-size: 28px; }
+.lb-prev { left: 20px; top: 50%; transform: translateY(-50%); }
+.lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
+.lb-count { position: absolute; bottom: 20px; color: #fff; font-size: .85rem; letter-spacing: .08em; }
 
 /* FOOTER */
 footer { background: var(--navy-deep); color: #C6CEDA; position: relative; overflow: hidden; }
@@ -742,7 +496,7 @@ footer::before {
 .footer-brand-text .tagline { font-family: var(--font-display); font-style: italic; font-size: .88rem; color: var(--gold-soft); letter-spacing: .04em; }
 .footer-description { color: #A9B4C6; line-height: 1.8; font-size: .93rem; }
 .footer-mission {
-  background: rgba(179,135,47,.12); padding: 16px 20px;
+  background: rgba(168,85,247,.12); padding: 16px 20px;
   border-radius: 8px; border-left: 3px solid var(--gold);
 }
 .footer-mission p { font-size: .88rem; color: #D9DEE7; font-style: italic; line-height: 1.6; }
@@ -840,69 +594,58 @@ footer::before {
   nav a { font-size: .87rem; padding: 9px 11px; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
   .footer-brand { grid-column: 1 / -1; }
-  .gallery-layout { grid-template-columns: 260px 1fr; gap: 40px; }
-  .news-layout { grid-template-columns: 260px 1fr; gap: 40px; }
-  .news-grid { grid-template-columns: repeat(2, 1fr); }
   .slide img { height: 480px; }
   .slide-text h2 { font-size: 2.5rem; }
 
   .about-inner { grid-template-columns: 1fr 1.1fr; gap: 42px; }
   .about-text-col h2 { font-size: 2rem; }
-  .about-img-main { max-width: 320px; }
+  .leaders { max-width: 480px; }
+
+  .news-gallery-inner { grid-template-columns: 1fr; }
+  .news-gallery-inner .news-link-card { height: auto; }
 }
 
 /* RESPONSIVE - 768 px */
 @media (max-width: 768px) {
+  html { font-size: 15px; }
   body { padding-top: 72px; }
   .main-header { padding: 10px 5%; }
   nav { display: none; }
   .mobile-menu-toggle { display: flex; }
   .header-divider, .header-text p { display: none; }
-  .header-text h2 { font-size: 14px; line-height: 1.3; }
-  .logo img { height: 46px; }
+  .header-text h2 { font-size: 13px; line-height: 1.3; }
+  .logo img { height: 40px; }
   .logo-tagline { font-size: .62rem; }
 
-  .slide img { height: 400px; }
+  .slide img { height: 320px; }
   .slide-text { left: 50%; transform: translate(-50%, -50%); text-align: center; padding: 0 22px; max-width: 94%; }
-  .slide-text h2 { font-size: 1.7rem; }
-  .slide-text p  { font-size: .95rem; }
-  .slide-cta { font-size: .88rem; padding: 11px 22px; }
+  .slide-text h2 { font-size: 1.5rem; }
+  .slide-text p  { font-size: .88rem; margin-bottom: 1.1rem; }
+  .slide-cta { font-size: .82rem; padding: 10px 20px; }
   .slider-dots { bottom: 15px; }
 
   .about { padding: 56px 5%; }
   .about-inner { grid-template-columns: 1fr; gap: 44px; text-align: center; }
   .about-image-col { display: flex; flex-direction: column; align-items: center; }
-  .about-image-wrapper { margin: 0 auto; }
-  .about-image-wrapper::before { top: 12px; left: -12px; }
-  .about-img-main { max-width: 280px; }
-  .about-badge { position: relative; bottom: auto; right: auto; margin-top: 22px; margin-left: auto; margin-right: auto; }
+  .leaders { max-width: 330px; column-gap: 12px; margin: 0 auto; }
+  .leader-photo { border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
+  .leader-cap { margin-top: 10px; padding-left: 8px; border-left-width: 2px; }
+  .leader-cap strong { font-size: .82rem; }
+  .leader-cap span { font-size: .68rem; }
+  .leader-cap.chairman strong { font-size: 1rem; }
+  .leader-cap.chairman span { font-size: .74rem; }
   .about-stats { justify-content: center; margin-top: 32px; }
-  .about-text-col h2 { font-size: 1.7rem; }
+  .about-text-col h2 { font-size: 1.5rem; }
   .about-features { grid-template-columns: 1fr; text-align: left; }
   .about-cta-row { justify-content: center; flex-direction: column; gap: 18px; }
 
-  .gallery-section { padding: 50px 5%; }
-  .gallery-layout { grid-template-columns: 1fr; gap: 30px; text-align: center; justify-items: center; }
-  .gallery-preview-trigger { max-width: 220px; }
-  .gallery-copy p { margin: 0 auto; }
-
-  .lightbox { padding: 60px 16px; }
-  .lightbox-stage img { max-height: 62vh; }
-  .lightbox-nav { width: 44px; height: 44px; font-size: 1rem; }
-  .lightbox-prev { left: 8px; }
-  .lightbox-next { right: 8px; }
-  .lightbox-close { top: 14px; right: 14px; width: 40px; height: 40px; }
-
-  .news-section { padding: 50px 5%; }
-  .news-layout { grid-template-columns: 1fr; gap: 30px; text-align: center; justify-items: center; }
-  .news-preview-trigger { max-width: 220px; }
-  .news-copy p { margin: 0 auto; }
-
-  .news-modal { padding: 0; }
-  .news-modal-inner { max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; }
-  .news-modal-body { padding: 18px; }
-  .news-grid { grid-template-columns: 1fr; gap: 16px; }
-  .news-card { width: 100%; }
+  .news-gallery-section { padding: 36px 5%; }
+  .gallery-panel { padding: 16px; }
+  .gallery-grid { grid-auto-rows: 78px; gap: 8px; min-height: 164px; }
+  .news-link-card { flex-direction: column; text-align: center; padding: 24px 20px; }
+  .news-gallery-inner .news-link-card { align-items: center; }
+  .nl-arrow { width: 100%; justify-content: center; }
+  .nl-icon { width: 46px; height: 46px; font-size: 1.1rem; }
 
   .footer-main { padding: 46px 5% 22px; }
   .footer-top { grid-template-columns: 1fr; gap: 32px; }
@@ -921,23 +664,19 @@ footer::before {
 
 /* RESPONSIVE - 480 px */
 @media (max-width: 480px) {
-  .slide img { height: 320px; }
-  .slide-text h2 { font-size: 1.35rem; }
-  .slide-text p  { font-size: .88rem; }
-  .slide-cta { font-size: .84rem; padding: 10px 18px; }
+  html { font-size: 14px; }
+  .slide img { height: 260px; }
+  .slide-text h2 { font-size: 1.25rem; margin-bottom: .5rem; }
+  .slide-text p  { font-size: .82rem; margin-bottom: .9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .slide-eyebrow { margin-bottom: 10px; }
+  .slide-cta { font-size: .8rem; padding: 9px 16px; }
 
-  .about-img-main { max-width: 240px; }
-  .about-text-col h2 { font-size: 1.4rem; }
-  .about-badge { min-width: 180px; padding: 14px 16px; }
-  .about-badge h4 { font-size: .85rem; }
+  .leaders { max-width: 290px; }
+  .about-text-col h2 { font-size: 1.3rem; }
   .stat-number { font-size: 1.5rem; }
   .stat-label { font-size: .68rem; }
 
-  .gallery-preview-trigger { max-width: 190px; }
-  .gallery-copy h2 { font-size: 1.55rem; }
-
-  .news-preview-trigger { max-width: 190px; }
-  .news-copy h2 { font-size: 1.55rem; }
+  .nl-text strong { font-size: 1.2rem; }
   .header-text h2 { font-size: 11px; }
 
   .footer-brand-text h3 { font-size: 1.08rem; }
@@ -1010,34 +749,47 @@ footer::before {
   <div class="slider" id="slider">
 
     <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
-      <img src="{{ url_for('static', filename='Slide/slide1.jpg') }}" alt="Know Your Power Rights" loading="eager">
+      <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="eager">
       <div class="vignette"></div>
       <div class="slide-text">
-        <span class="slide-eyebrow">Consumer Alert</span>
-        <h2>Know Your Power Rights</h2>
-        <p>NERC has released a clear guide for resolving electricity billing and supply complaints nationwide. Start with your DisCo — escalate to NERC if unresolved.</p>
+        <span class="slide-eyebrow">Consumer Protection Bill</span>
+        <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
+        <p>Ondo Assembly passes Consumer Protection Agency bill into law </p>
         <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
     </div>
 
     <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-      <img src="{{ url_for('static', filename='Slide/slide2.jpg') }}" alt="Consumer Rights" loading="lazy">
+      <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="Consumer Protection" loading="lazy">
       <div class="vignette"></div>
       <div class="slide-text">
         <span class="slide-eyebrow">Our Mandate</span>
-        <h2>Consumer Rights</h2>
-        <p>Transparency, accountability &amp; justice for every citizen in Ondo State.</p>
+        <h2>Consumer Protection</h2>
+        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
     </div>
 
     <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
       <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
       <div class="vignette"></div>
+        <div class="slide-text">
+        <span class="slide-eyebrow">Our Mandate</span>
+        <h2>Consumer Protection</h2>
+        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+      </div>
     </div>
 
     <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
       <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
       <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Updates</span>
+        <h2>OCCPA Management</h2>
+        <p>Ondo State Consumer Protection Agency strengthens management structure, Governor appoints new Chairman.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+      </div>
     </div>
 
   </div>
@@ -1053,19 +805,26 @@ footer::before {
 
     <!-- Left: Image Column -->
     <div class="about-image-col">
-      <div class="about-image-wrapper">
+      <div class="leaders">
         <img
-          src="{{ url_for('static', filename='exec/as.jpg') }}"
-          alt="Hajia Modelelayo Kudirat Ola, Administrative Secretary of OSCCPA"
-          class="about-img-main"
+          class="leader-photo"
+          src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.png') }}"
+          alt="Honorable Oluyemi Fasipe, Executive Chairman of OSCCPA"
           loading="lazy"
         >
-        <div class="about-badge">
-          <span class="badge-seal"><i class="fas fa-shield-halved"></i></span>
-          <div>
-            <h4>Hajia Modelelayo Kudirat Ola</h4>
-            <p>Administrative Secretary</p>
-          </div>
+        <img
+          class="leader-photo"
+          src="{{ url_for('static', filename='exec/as.jpg') }}"
+          alt="Hajia Modelelayo Kudirat Ola, Administrative Secretary of OSCCPA"
+          loading="lazy"
+        >
+        <div class="leader-cap chairman">
+          <strong>Hon. Oluyemi Fasipe</strong>
+          <span>Executive Chairman</span>
+        </div>
+        <div class="leader-cap">
+          <strong>Hajia Modelelayo Kudirat Ola</strong>
+          <span>Administrative Secretary</span>
         </div>
       </div>
 
@@ -1142,194 +901,31 @@ footer::before {
 </section>
 
 
-<!-- GALLERY -->
-<section class="gallery-section" aria-labelledby="gallery-heading">
-  <div class="gallery-layout">
+<!-- NEWS + GALLERY -->
+<section class="news-gallery-section" id="newsGallery" aria-label="News and gallery">
+  <div class="news-gallery-inner">
 
-    <div class="gallery-preview">
-      <button type="button" class="gallery-preview-trigger" id="openGalleryBtn" aria-haspopup="dialog" aria-controls="galleryLightbox">
-        <div class="gallery-stack">
-          <img class="stack-img stack-img-3" src="{{ url_for('static', filename='gallery/gal16.png') }}" alt="" loading="lazy" aria-hidden="true">
-          <img class="stack-img stack-img-2" src="{{ url_for('static', filename='gallery/gal15.png') }}" alt="" loading="lazy" aria-hidden="true">
-          <img class="stack-img stack-img-1" src="{{ url_for('static', filename='gallery/gal14.jpg') }}" alt="Preview of OCCPA field activities" loading="lazy">
-          <span class="stack-count"><i class="fas fa-images"></i> 9 Photos</span>
-        </div>
-        <span class="gallery-preview-cta"><i class="fas fa-expand"></i> View Full Gallery</span>
-      </button>
-    </div>
+    <a href="/news" target="_self" class="news-link-card">
+      <span class="nl-icon"><i class="fas fa-newspaper"></i></span>
+      <span class="nl-text">
+        <span class="nl-tag">Latest</span>
+        <strong>News &amp; Recent Activities</strong>
+        <span>NERC outlines steps for resolving electricity complaints, plus field videos from across Ondo State.</span>
+      </span>
+      <span class="nl-arrow">View all updates <i class="fas fa-arrow-right"></i></span>
+    </a>
 
-    <div class="gallery-copy">
-      <div class="section-eyebrow"><i class="fas fa-images"></i> Gallery</div>
-      <h2 id="gallery-heading">Our Work in the Field</h2>
-      <p>A glimpse of our market inspections, sensitization drives, and enforcement operations across Ondo State. Tap the photos to open the full gallery.</p>
-    </div>
-
-  </div>
-</section>
-
-<!-- GALLERY LIGHTBOX -->
-<div class="lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="Photo gallery" hidden>
-  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close gallery">&times;</button>
-  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
-  <div class="lightbox-stage">
-    <img id="lightboxImg" src="" alt="">
-    <span class="lightbox-counter" id="lightboxCounter"></span>
-  </div>
-  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
-</div>
-
-
-<!-- NEWS -->
-<section class="news-section" aria-labelledby="news-heading">
-  <div class="news-layout">
-
-    <div class="news-preview">
-      <button type="button" class="news-preview-trigger" id="openNewsBtn" aria-haspopup="dialog" aria-controls="newsModal">
-        <div class="news-preview-card">
-          <span class="news-preview-count"><i class="fas fa-layer-group"></i> 5 Updates</span>
-          <div class="news-preview-banner">
-            <i class="fas fa-newspaper"></i>
-            <div class="mini-avatars">
-              <span class="mini-avatar"><i class="fab fa-facebook-f"></i></span>
-              <span class="mini-avatar"><i class="fab fa-facebook-f"></i></span>
-              <span class="mini-avatar"><i class="fas fa-plus"></i></span>
-            </div>
-          </div>
-          <div class="news-preview-body">
-            <span class="news-preview-tag">Latest</span>
-            <h3>NERC Outlines Steps for Resolving Electricity Complaints Nationwide</h3>
-          </div>
-        </div>
-        <span class="news-preview-cta"><i class="fas fa-expand"></i> View All News &amp; Activities</span>
-      </button>
-    </div>
-
-    <div class="news-copy">
-      <div class="section-eyebrow"><i class="fas fa-newspaper"></i> Updates</div>
-      <h2 id="news-heading">News &amp; Recent Activities</h2>
-      <p>Latest updates, programs, and enforcement activities across Ondo State. Open the feed to read articles and watch our field videos.</p>
+    <div class="gallery-panel">
+      <div class="gallery-head">
+        <div class="section-eyebrow"><i class="fas fa-images"></i> Gallery</div>
+        <h3>Agency in Action</h3>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"
+           data-base="{{ url_for('static', filename='gallery/') }}"></div>
     </div>
 
   </div>
 </section>
-
-<!-- NEWS MODAL -->
-<div class="news-modal" id="newsModal" role="dialog" aria-modal="true" aria-label="News and recent activities" hidden>
-  <div class="news-modal-inner">
-    <div class="news-modal-header">
-      <h3>News &amp; Recent Activities</h3>
-      <button type="button" class="news-modal-close" id="newsModalClose" aria-label="Close">&times;</button>
-    </div>
-    <div class="news-modal-body">
-      <div class="news-grid">
-
-    <!-- CARD 1 - NERC (external article) -->
-    <article class="news-card">
-      <div class="news-image">
-        <div class="news-ext-banner">
-          <i class="fas fa-file-lines ext-icon"></i>
-          <span class="ext-label">External Article</span>
-          <span class="ext-source">Vanguard News</span>
-          <a class="ext-read-link"
-             href="https://www.vanguardngr.com/2026/02/nerc-outlines-steps-for-resolving-electricity-complaints-nationwide/"
-             target="_blank" rel="noopener noreferrer">
-            Read on Vanguard <i class="fas fa-external-link-alt" style="font-size:.62rem;"></i>
-          </a>
-        </div>
-        <span class="news-date">Mar 2026</span>
-      </div>
-      <div class="news-content">
-        <h3>NERC Outlines Steps for Resolving Electricity Complaints Nationwide</h3>
-        <p class="preview">
-          The Nigerian Electricity Regulatory Commission (NERC) has issued a step-by-step guide for consumers facing power supply and billing issues, urging them to follow established complaint channels.
-        </p>
-        <div class="more-text">
-          <p>According to NERC, consumers should first contact their Distribution Company (DisCo) customer care unit for faults, outages, metering concerns, or billing disputes. Where a complaint remains unresolved, customers in states with a State Electricity Regulator (SER) should escalate to that authority.</p>
-          <p style="margin-top: .8rem;"><i class="fas fa-phone" style="color: var(--gold-dark);"></i> <strong>0201 344 4331</strong> &nbsp;|&nbsp; <strong>0908 899 9244</strong></p>
-          <p><i class="fas fa-envelope" style="color: var(--gold-dark);"></i> consumeraffairs@nerc.gov.ng</p>
-          <p style="margin-top: .8rem;"><strong>OCCPA encourages all Ondo State residents to use these channels to assert their consumer rights.</strong></p>
-        </div>
-        <button class="read-more-btn" aria-expanded="false">View More</button>
-      </div>
-    </article>
-
-    <!-- CARD 2 - Facebook Video 1 -->
-    <article class="news-card">
-      <div class="news-image">
-        <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="OCCPA Clamps Down on Unfair Trade Practices in Ondo State">
-          <button class="video-poster" type="button">
-            <span class="video-poster-ring"><i class="fas fa-play"></i></span>
-            <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
-          </button>
-        </div>
-      </div>
-      <div class="news-content">
-        <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-        <a href="https://web.facebook.com/reel/933525072786066/"
-           target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
-      </div>
-    </article>
-
-    <!-- CARD 3 - Facebook Video 2 -->
-    <article class="news-card">
-      <div class="news-image">
-        <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1853786275175803%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="OCCPA Consumer Sensitization Drive Across Ondo State">
-          <button class="video-poster" type="button">
-            <span class="video-poster-ring"><i class="fas fa-play"></i></span>
-            <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
-          </button>
-        </div>
-      </div>
-      <div class="news-content">
-        <h3>OCCPA Consumer Sensitization Drive Across Ondo State</h3>
-        <a href="https://web.facebook.com/reel/1853786275175803/"
-           target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
-      </div>
-    </article>
-
-    <!-- CARD 4 - Facebook Video 3 -->
-    <article class="news-card">
-      <div class="news-image">
-        <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F1840859706594273%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="Market Surveillance & Enforcement Operations by OCCPA">
-          <button class="video-poster" type="button">
-            <span class="video-poster-ring"><i class="fas fa-play"></i></span>
-            <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
-          </button>
-        </div>
-      </div>
-      <div class="news-content">
-        <h3>Market Surveillance &amp; Enforcement Operations by OCCPA</h3>
-        <a href="https://web.facebook.com/reel/1840859706594273/"
-           target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
-      </div>
-    </article>
-
-    <!-- CARD 5 - Facebook Video 4 -->
-    <article class="news-card">
-      <div class="news-image">
-        <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F26279987428370429%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="OCCPA Public Awareness Campaign: Know Your Consumer Rights">
-          <button class="video-poster" type="button">
-            <span class="video-poster-ring"><i class="fas fa-play"></i></span>
-            <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
-          </button>
-        </div>
-      </div>
-      <div class="news-content">
-        <h3>OCCPA Public Awareness Campaign: Know Your Consumer Rights</h3>
-        <a href="https://web.facebook.com/reel/26279987428370429/"
-           target="_blank" rel="noopener noreferrer"
-           class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
-      </div>
-    </article>
-
-  </div><!-- /.news-grid -->
-
-    </div><!-- /.news-modal-body -->
-  </div><!-- /.news-modal-inner -->
-</div><!-- /.news-modal -->
 
 </main>
 
@@ -1433,6 +1029,16 @@ footer::before {
 
 <!-- BACK TO TOP -->
 <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo gallery" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Close gallery">&times;</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photo">&#10094;</button>
+  <img id="lbImg" alt="">
+  <video id="lbVideo" controls playsinline preload="none" hidden></video>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next photo">&#10095;</button>
+  <div class="lb-count" id="lbCount"></div>
+</div>
 
 
 <script>
@@ -1540,181 +1146,163 @@ document.addEventListener("DOMContentLoaded", function () {
   sliderContainer.addEventListener("mouseenter", () => clearInterval(slideInterval));
   sliderContainer.addEventListener("mouseleave", startInterval);
 
-  /* Read more / less */
-  document.querySelectorAll(".read-more-btn").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      const card = this.closest(".news-content");
-      const moreText = card.querySelector(".more-text");
-      if (!moreText) return;
-
-      const expanded = moreText.style.display === "block";
-      moreText.style.display = expanded ? "none" : "block";
-      this.textContent = expanded ? "View More" : "View Less";
-      this.setAttribute("aria-expanded", !expanded);
-      this.classList.toggle("expanded", !expanded);
-    });
-  });
-
-  /* Click-to-play video cards.
-     Cross-origin Facebook iframes can't be reliably probed with JS
-     (contentDocument access always throws), so instead of guessing
-     whether an embed "failed", we never auto-load it. The poster is
-     the guaranteed-working state; the iframe is loaded only on an
-     explicit click, and every card also ships a permanent "Watch on
-     Facebook" link outside the embed as a true fallback. */
-  document.querySelectorAll(".video-card").forEach(function (card) {
-    const poster = card.querySelector(".video-poster");
-    if (!poster) return;
-
-    function play() {
-      const src = card.getAttribute("data-video-src");
-      const title = card.getAttribute("data-video-title") || "Video";
-      if (!src) return;
-
-      const iframe = document.createElement("iframe");
-      iframe.src = src;
-      iframe.setAttribute("scrolling", "no");
-      iframe.setAttribute("frameborder", "0");
-      iframe.setAttribute("allowfullscreen", "true");
-      iframe.setAttribute("allow", "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share");
-      iframe.setAttribute("title", title);
-
-      card.appendChild(iframe);
-      card.classList.add("is-playing");
-    }
-
-    poster.addEventListener("click", play);
-    poster.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        play();
-      }
-    });
-  });
-
-  /* Gallery lightbox — the "Our Work in the Field" section shows one
-     small stacked-photo box; all 9 photos live behind it and open
-     here so the homepage never has to spend a huge grid on them. */
-  const galleryImages = [
-    { src: "{{ url_for('static', filename='gallery/gal14.jpg') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal15.png') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal16.png') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal17.png') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal18.png') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal19.jpg') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal20.jpg') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal21.jpg') }}", alt: "OCCPA field activity" },
-    { src: "{{ url_for('static', filename='gallery/gal22.jpg') }}", alt: "OCCPA field activity" }
-  ];
-
-  const openGalleryBtn = document.getElementById("openGalleryBtn");
-  const lightbox = document.getElementById("galleryLightbox");
-  const lightboxImg = document.getElementById("lightboxImg");
-  const lightboxCounter = document.getElementById("lightboxCounter");
-  const lightboxClose = document.getElementById("lightboxClose");
-  const lightboxPrev = document.getElementById("lightboxPrev");
-  const lightboxNext = document.getElementById("lightboxNext");
-  let galleryIndex = 0;
-  let lastFocusedEl = null;
-
-  function renderGalleryImage() {
-    const item = galleryImages[galleryIndex];
-    lightboxImg.src = item.src;
-    lightboxImg.alt = item.alt;
-    lightboxCounter.textContent = (galleryIndex + 1) + " / " + galleryImages.length;
-  }
-
-  function openLightbox(startIndex) {
-    galleryIndex = startIndex || 0;
-    renderGalleryImage();
-    lastFocusedEl = document.activeElement;
-    lightbox.hidden = false;
-    document.body.classList.add("lightbox-open");
-    lightboxClose.focus();
-  }
-
-  function closeLightbox() {
-    lightbox.hidden = true;
-    document.body.classList.remove("lightbox-open");
-    lightboxImg.src = "";
-    if (lastFocusedEl) lastFocusedEl.focus();
-  }
-
-  function showNext() {
-    galleryIndex = (galleryIndex + 1) % galleryImages.length;
-    renderGalleryImage();
-  }
-
-  function showPrev() {
-    galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
-    renderGalleryImage();
-  }
-
-  if (openGalleryBtn) {
-    openGalleryBtn.addEventListener("click", function () { openLightbox(0); });
-  }
-  lightboxClose.addEventListener("click", closeLightbox);
-  lightboxNext.addEventListener("click", showNext);
-  lightboxPrev.addEventListener("click", showPrev);
-
-  lightbox.addEventListener("click", function (e) {
-    if (e.target === lightbox) closeLightbox();
-  });
-
-  document.addEventListener("keydown", function (e) {
-    if (lightbox.hidden) return;
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowRight") showNext();
-    if (e.key === "ArrowLeft") showPrev();
-  });
-
-  /* Basic swipe support for mobile */
-  let touchStartX = 0;
-  lightbox.addEventListener("touchstart", function (e) {
-    touchStartX = e.changedTouches[0].clientX;
-  }, { passive: true });
-  lightbox.addEventListener("touchend", function (e) {
-    const delta = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(delta) > 40) {
-      delta < 0 ? showNext() : showPrev();
-    }
-  }, { passive: true });
-
-  /* News modal — the "News & Recent Activities" section shows one
-     compact preview card; the full article + video feed lives here
-     and opens on demand instead of taking up the whole homepage. */
-  const openNewsBtn = document.getElementById("openNewsBtn");
-  const newsModal = document.getElementById("newsModal");
-  const newsModalClose = document.getElementById("newsModalClose");
-  let lastNewsFocusedEl = null;
-
-  function openNewsModal() {
-    lastNewsFocusedEl = document.activeElement;
-    newsModal.hidden = false;
-    document.body.classList.add("news-modal-open");
-    newsModalClose.focus();
-  }
-
-  function closeNewsModal() {
-    newsModal.hidden = true;
-    document.body.classList.remove("news-modal-open");
-    if (lastNewsFocusedEl) lastNewsFocusedEl.focus();
-  }
-
-  if (openNewsBtn) {
-    openNewsBtn.addEventListener("click", openNewsModal);
-  }
-  newsModalClose.addEventListener("click", closeNewsModal);
-
-  newsModal.addEventListener("click", function (e) {
-    if (e.target === newsModal) closeNewsModal();
-  });
-
-  document.addEventListener("keydown", function (e) {
-    if (!newsModal.hidden && e.key === "Escape") closeNewsModal();
-  });
-
 });
+</script>
+
+<!-- SMART GALLERY: loads and animates only when scrolled into view -->
+<script>
+(function () {
+  const section = document.getElementById("newsGallery");
+  const grid = document.getElementById("galleryGrid");
+  if (!section || !grid) return;
+
+  const base = grid.dataset.base;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const PREVIEW = 5; // tiles shown on the page; the rest open in the lightbox
+
+  // [file in static/gallery, type, featured?]
+  // The first PREVIEW items are the tiles. "featured" items (landscape event
+  // photos only) rotate through the big tile, so nothing important is cropped.
+  const items = [
+    ["3.jpeg", "photo", 1],
+    ["a1.jpeg", "photo", 1],
+    ["m1.jpeg", "photo", 1],
+    ["partnerncdc.jpg", "photo", 1],
+    ["15.jpeg", "photo", 1],
+    ["a2.jpeg", "photo", 1],
+    ["13.jpeg", "photo", 1],
+    ["14.jpeg", "photo"],
+    ["gal13.jpeg", "photo", 1],
+    ["WhatsApp Image 2026-09-23 at 3.43.47 AM.jpeg", "photo"],
+    ["atwap.jpg", "photo"],
+    ["a3.jpeg", "photo"],
+    ["m2.jpeg", "photo"],
+    ["m3.jpeg", "photo"],
+    ["m4.jpeg", "photo"],
+    ["WhatsApp Image 2026-09-23 at 3.45.45 AM.jpeg", "photo"],
+    ["f1.jpeg", "photo"],
+    ["WhatsApp Image 2026-09-23 at 8.36.15 AM.jpeg", "poster"],
+    ["gal14.jpg", "poster"],
+    ["gal15.png", "poster"],
+    ["gal16.png", "poster"],
+    ["gal17.png", "poster"],
+    ["gal18.png", "poster"],
+    ["gal19.jpg", "poster"],
+    ["gal20.jpg", "poster"],
+    ["gal21.jpg", "poster"],
+    ["gal22.jpg", "poster"],
+    ["gal23.jpg", "poster"],
+    ["chairman.mp4", "video"]
+  ].map(([f, t, feat]) => ({ src: encodeURI(base + f), type: t, feat: !!feat }));
+
+  const LABEL = { photo: "Photo", poster: "Consumer poster", video: "Video" };
+  const pool = items.filter(i => i.feat);
+  let started = false, timer = null, poolIdx = 0, lbIndex = 0;
+
+  function build() {
+    started = true;
+    for (let i = 0; i < PREVIEW; i++) {
+      const btn = document.createElement("button");
+      btn.className = "gallery-item";
+      btn.setAttribute("aria-label", "Open photo " + (i + 1));
+      const img = document.createElement("img");
+      img.alt = "Agency activity photo " + (i + 1);
+      img.decoding = "async";
+      img.src = items[i].src;
+      img.onerror = () => btn.remove(); // never leave a broken tile
+      btn.appendChild(img);
+      if (i === PREVIEW - 1 && items.length > PREVIEW) {
+        btn.insertAdjacentHTML("beforeend",
+          '<span class="gallery-more">+' + (items.length - PREVIEW) + '</span>');
+      }
+      btn.addEventListener("click", () => {
+        // the big tile opens whichever photo it is showing right now
+        openLightbox(i === 0 ? items.indexOf(pool[poolIdx]) : i);
+      });
+      grid.appendChild(btn);
+      setTimeout(() => btn.classList.add("in"), reduceMotion ? 0 : i * 110); // staggered reveal
+    }
+    startRotate();
+  }
+
+  function rotate() {
+    const img = grid.querySelector(".gallery-item img");
+    if (!img || pool.length < 2) return;
+    const next = (poolIdx + 1) % pool.length;
+    const pre = new Image();
+    pre.onload = () => {            // swap only once the next photo is ready
+      img.style.opacity = 0;
+      setTimeout(() => { img.src = pool[next].src; img.style.opacity = 1; poolIdx = next; }, 400);
+    };
+    pre.src = pool[next].src;
+  }
+  function startRotate() {
+    if (reduceMotion || timer || pool.length < 2) return;
+    timer = setInterval(rotate, 5000);
+  }
+  function stopRotate() { clearInterval(timer); timer = null; }
+
+  // Build and reveal when the section scrolls into view; pause when it leaves
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { started ? startRotate() : build(); }
+      else { stopRotate(); }
+    });
+  }, { threshold: 0.25 }).observe(section);
+
+  // Lightbox (photos, posters and video)
+  const lb = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbVideo = document.getElementById("lbVideo");
+  const lbCount = document.getElementById("lbCount");
+
+  function stopVideo() {
+    lbVideo.pause();
+    lbVideo.removeAttribute("src");
+    lbVideo.load();
+  }
+  function showLb() {
+    const it = items[lbIndex];
+    stopVideo();
+    if (it.type === "video") {
+      lbImg.hidden = true; lbVideo.hidden = false; lbVideo.src = it.src;
+    } else {
+      lbVideo.hidden = true; lbImg.hidden = false;
+      lbImg.alt = LABEL[it.type] + " " + (lbIndex + 1);
+      lbImg.src = it.src;
+    }
+    lbCount.textContent = LABEL[it.type] + "  ·  " + (lbIndex + 1) + " / " + items.length;
+  }
+  function openLightbox(i) {
+    lbIndex = i; showLb(); lb.hidden = false;
+    document.body.style.overflow = "hidden"; stopRotate();
+    document.getElementById("lbClose").focus();
+  }
+  function closeLightbox() {
+    stopVideo(); lb.hidden = true; document.body.style.overflow = ""; startRotate();
+  }
+  function step(d) { lbIndex = (lbIndex + d + items.length) % items.length; showLb(); }
+
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbPrev").addEventListener("click", () => step(-1));
+  document.getElementById("lbNext").addEventListener("click", () => step(1));
+  lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener("keydown", e => {
+    if (lb.hidden) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  });
+
+  // Swipe left/right on phones
+  let touchX = null;
+  lb.addEventListener("touchstart", e => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  lb.addEventListener("touchend", e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+    if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+  });
+})();
 </script>
 
 </body>

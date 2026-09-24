@@ -1,204 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Login | OSCCPA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Standard Favicon -->
+<meta charset="UTF-8">
+<title>Admin Login | OSCCPA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <style>
-    :root{
-      --primary:#5f4b8b;
-      --light:#f5f2fb;
-      --danger:#d9534f;
-      --text:#333;
-    }
+<style>
+:root{
+  --navy:#6D28D9; --navy-deep:#4C1D95; --navy-mid:#7C3AED; --navy-soft:#F1EBFC;
+  --gold:#A855F7; --cream:#F6F1FC; --paper:#FFFFFF;
+  --text:#241B33; --muted:#665D77; --line:#E9E1F7;
+  --danger:#B42318; --danger-soft:#FEF3F2;
+  --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',sans-serif;
+  --shadow-sm:0 2px 8px rgba(11,42,74,.08); --shadow-md:0 6px 20px rgba(11,42,74,.10); --shadow-lg:0 16px 40px rgba(11,42,74,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-body);color:var(--text);
+  background:linear-gradient(135deg,var(--cream),#ffffff);
+  padding:24px;
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-    *{ box-sizing:border-box; }
+.login-wrapper{
+  width:100%;max-width:400px;background:var(--paper);
+  padding:40px 34px;border-radius:16px;
+  border-top:3px solid var(--gold);
+  box-shadow:var(--shadow-lg);
+}
 
-    body{
-      margin:0;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:'Poppins',sans-serif;
-      background:linear-gradient(135deg,#f3eefb,#ffffff);
-    }
+.login-logo{text-align:center;margin-bottom:18px}
+.login-logo img{height:64px;width:auto;object-fit:contain}
 
-    .login-wrapper{
-      width:100%;
-      max-width:400px;
-      background:#fff;
-      padding:40px 32px;
-      border-radius:16px;
-      box-shadow:0 15px 35px rgba(0,0,0,.12);
-    }
+h2{text-align:center;margin-bottom:6px;color:var(--navy);font-size:1.5rem}
+.subtitle{text-align:center;font-size:.86rem;color:var(--muted);margin-bottom:26px}
 
-    /* Logo */
-    .login-logo{
-      text-align:center;
-      margin-bottom:20px;
-    }
+.form-group{margin-bottom:16px;position:relative}
+.form-group label{
+  display:block;font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:6px
+}
+.form-group input{
+  width:100%;padding:12px 42px 12px 14px;
+  border:1.5px solid var(--line);border-radius:8px;
+  background:var(--cream);
+  font-family:var(--font-body);font-size:.92rem;color:var(--text);
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.form-group input::placeholder{color:#9A90AB}
+.form-group input:hover{border-color:#D3C5EE}
+.form-group input:focus{
+  outline:none;border-color:var(--navy);background:#fff;
+  box-shadow:0 0 0 4px rgba(109,40,217,.12);
+}
 
-    .login-logo img{
-      height:80px;
-    }
+.toggle-password{
+  position:absolute;right:12px;top:38px;
+  cursor:pointer;font-size:.78rem;font-weight:600;color:var(--navy);
+  user-select:none;
+}
+.toggle-password:hover{color:var(--navy-mid)}
 
-    h2{
-      text-align:center;
-      margin-bottom:6px;
-      color:var(--primary);
-      font-weight:600;
-    }
+.login-btn{
+  width:100%;margin-top:8px;padding:13px;
+  background:var(--navy);color:#fff;border:none;border-radius:6px;
+  font-family:var(--font-body);font-size:.95rem;font-weight:700;cursor:pointer;
+  transition:background .2s,transform .2s,box-shadow .2s;
+}
+.login-btn:hover{background:var(--navy-mid);box-shadow:0 8px 18px rgba(76,29,149,.25)}
+.login-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.login-btn:disabled{opacity:.7;cursor:progress}
 
-    .subtitle{
-      text-align:center;
-      font-size:14px;
-      color:#666;
-      margin-bottom:28px;
-    }
+.error-message{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-top:18px;padding:12px 14px;border-radius:10px;
+  background:var(--danger-soft);border:1px solid #FDA29B;color:var(--danger);
+  font-size:.84rem;font-weight:500;
+}
 
-    .form-group{
-      margin-bottom:18px;
-      position:relative;
-    }
+.back-link{text-align:center;margin-top:22px;font-size:.84rem;padding-top:18px;border-top:1px solid var(--line)}
+.back-link a{text-decoration:none;color:var(--navy);font-weight:700}
+.back-link a:hover{color:var(--gold-dark,var(--navy-mid));text-decoration:underline}
 
-    .form-group input{
-      width:100%;
-      padding:12px 42px 12px 14px;
-      border:1px solid #ddd;
-      border-radius:8px;
-      font-size:14px;
-    }
-
-    .form-group input:focus{
-      outline:none;
-      border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(95,75,139,.15);
-    }
-
-    /* Show/Hide Toggle */
-    .toggle-password{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      cursor:pointer;
-      font-size:13px;
-      color:#777;
-      user-select:none;
-    }
-
-    .login-btn{
-      width:100%;
-      padding:12px;
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      border-radius:8px;
-      font-size:15px;
-      font-weight:500;
-      cursor:pointer;
-      transition:.3s ease;
-    }
-
-    .login-btn:hover{
-      background:#4c3a74;
-    }
-
-    .error-message{
-      margin-top:16px;
-      padding:10px;
-      background:#fdecea;
-      color:var(--danger);
-      border-radius:8px;
-      font-size:13px;
-      text-align:center;
-    }
-
-    /* Back link */
-    .back-link{
-      text-align:center;
-      margin-top:20px;
-      font-size:13px;
-    }
-
-    .back-link a{
-      text-decoration:none;
-      color:var(--primary);
-      font-weight:500;
-    }
-
-    .back-link a:hover{
-      text-decoration:underline;
-    }
-
-    @media(max-width:480px){
-      .login-wrapper{
-        padding:32px 24px;
-      }
-    }
-  </style>
+@media(max-width:480px){
+  .login-wrapper{padding:32px 22px}
+}
+</style>
 </head>
 
 <body>
 
-  <div class="login-wrapper">
+<div class="login-wrapper">
 
-    <div class="login-logo">
-      <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
-    </div>
-
-    <h2>Admin Login</h2>
-    <p class="subtitle">Authorized access only</p>
-
-    <form method="POST">
-
-      <div class="form-group">
-        <input type="text" name="username" placeholder="Username" required>
-      </div>
-
-      <div class="form-group">
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <span class="toggle-password" onclick="togglePassword()">Show</span>
-      </div>
-
-      <button type="submit" class="login-btn">Login</button>
-    </form>
-
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="error-message">
-        {{ messages[0] }}
-      </div>
-    {% endif %}
-    {% endwith %}
-
-    <!-- Back to site -->
-    <div class="back-link">
-      <a href="/">← Back to OSCCPA Website</a>
-    </div>
-
+  <div class="login-logo">
+    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
   </div>
 
-  <script>
-    function togglePassword(){
-      const password = document.getElementById("password");
-      const toggle = document.querySelector(".toggle-password");
+  <h2>Admin Login</h2>
+  <p class="subtitle">Authorized access only</p>
 
-      if(password.type === "password"){
-        password.type = "text";
-        toggle.textContent = "Hide";
-      }else{
-        password.type = "password";
-        toggle.textContent = "Show";
-      }
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+      <span class="toggle-password" onclick="togglePassword()">Show</span>
+    </div>
+
+    <button type="submit" class="login-btn">Login</button>
+  </form>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="error-message">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true" style="margin-top:2px"></i>
+      <span>{{ messages[0] }}</span>
+    </div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="back-link">
+    <a href="/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to OSCCPA Website</a>
+  </div>
+
+</div>
+
+<script>
+  function togglePassword(){
+    const password = document.getElementById("password");
+    const toggle = document.querySelector(".toggle-password");
+
+    if(password.type === "password"){
+      password.type = "text";
+      toggle.textContent = "Hide";
+    }else{
+      password.type = "password";
+      toggle.textContent = "Show";
     }
-  </script>
+  }
+</script>
 
 </body>
 </html>

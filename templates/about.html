@@ -3,1231 +3,587 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About OCCPA</title>
+<title>About | Ondo State Competition &amp; Consumer Protection Agency</title>
 
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-:root{
-  --lilac-primary:#8b5cf6;
-  --lilac-dark:#6d28d9;
-  --lilac-soft:#ede9fe;
-  --text-dark:#2b2b2b;
-  --footer-bg:#1e1b4b;
-  --footer-accent:#2d2658;
+/* ===================================================================
+   DESIGN TOKENS (shared with the home and news pages)
+=================================================================== */
+:root {
+  --navy:        #6D28D9;
+  --navy-deep:   #4C1D95;
+  --navy-mid:    #7C3AED;
+  --navy-soft:   #F1EBFC;
+  --gold:        #A855F7;
+  --gold-dark:   #7C3AED;
+  --gold-soft:   #F1E7FE;
+  --cream:       #F6F1FC;
+  --paper:       #FFFFFF;
+  --text-dark:   #241B33;
+  --text-muted:  #665D77;
+  --line:        #E9E1F7;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', sans-serif;
+
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.35s ease;
+  --shadow-sm: 0 2px 8px rgba(11,42,74,.08);
+  --shadow-md: 0 6px 20px rgba(11,42,74,.10);
+  --shadow-lg: 0 16px 40px rgba(11,42,74,.16);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  padding-top: 96px;
+  line-height: 1.6;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); }
+img { max-width: 100%; }
+a { color: inherit; }
+
+.skip-link {
+  position: absolute; left: 8px; top: -60px;
+  background: var(--navy); color: #fff;
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  z-index: 2000; text-decoration: none; font-weight: 600;
+  transition: top var(--transition-fast);
+}
+.skip-link:focus { top: 8px; }
+
+/* HEADER */
+.main-header {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 6%; background: var(--paper);
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 2px 14px rgba(11,42,74,.08);
+}
+.header-left { display: flex; align-items: center; gap: 18px; min-width: 0; flex: 1; }
+.logo a { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+.logo img { height: 58px; max-width: 100%; object-fit: contain; }
+.logo-tagline { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: .72rem; letter-spacing: .06em; color: var(--gold-dark); margin-top: 2px; }
+.header-divider { width: 1px; height: 46px; background: var(--line); flex-shrink: 0; }
+.header-text { flex: 1; min-width: 0; }
+.header-text h2 { font-size: 1.32rem; color: var(--navy); line-height: 1.25; font-weight: 600; letter-spacing: -.01em; }
+.header-text p  { font-size: 12.5px; color: var(--text-muted); font-weight: 500; letter-spacing: .02em; }
+nav ul { display: flex; gap: 6px; list-style: none; }
+nav a {
+  text-decoration: none; font-weight: 600; color: var(--text-dark); font-size: .93rem;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  white-space: nowrap; padding: 10px 14px; border-radius: var(--radius-sm);
+}
+nav a:hover, nav a:focus { color: var(--navy); background: var(--navy-soft); outline: none; }
+nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+nav a.active { color: var(--navy); background: var(--navy-soft); }
+
+.mobile-menu-toggle {
+  width: 44px; height: 44px; display: none;
+  background: var(--navy-soft); border: none; border-radius: 10px;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  align-items: center; justify-content: center;
+}
+.mobile-menu-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mobile-menu-toggle span { position: absolute; left: 50%; width: 22px; height: 2.5px; background: var(--navy); border-radius: 2px; transform: translateX(-50%); transition: var(--transition-medium); }
+.mobile-menu-toggle span:nth-child(1) { top: 13px; }
+.mobile-menu-toggle span:nth-child(2) { top: 21px; }
+.mobile-menu-toggle span:nth-child(3) { top: 29px; }
+.mobile-menu-toggle.active span:nth-child(1) { transform: translate(-50%, 8px) rotate(45deg); }
+.mobile-menu-toggle.active span:nth-child(2) { opacity: 0; transform: translateX(-50%) scaleX(0); }
+.mobile-menu-toggle.active span:nth-child(3) { transform: translate(-50%, -8px) rotate(-45deg); }
+
+.mobile-menu {
+  position: absolute; top: 100%; left: 0; width: 100%;
+  background: var(--paper); display: none; flex-direction: column;
+  box-shadow: 0 14px 30px rgba(11,42,74,.16); border-top: 1px solid var(--line);
+}
+.mobile-menu a { padding: 16px 6%; border-bottom: 1px solid var(--line); text-decoration: none; font-weight: 600; color: var(--text-dark); }
+.mobile-menu a:hover, .mobile-menu a:focus, .mobile-menu a.active { background: var(--navy-soft); color: var(--navy); outline: none; }
+.mobile-menu.open { display: flex; animation: slideDown .35s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===================================================================
+   HERO
+=================================================================== */
+.page-hero {
+  position: relative; overflow: hidden; color: #fff;
+  padding: 72px 7% 64px;
+  background: url("{{ url_for('static', filename='Slide/group1.jpeg') }}") center/cover no-repeat, var(--navy-deep);
+}
+.page-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(46,16,101,.92) 10%, rgba(76,29,149,.78) 60%, rgba(109,40,217,.65) 100%);
+}
+.page-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-soft); margin-bottom: 14px;
+}
+.hero-eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--gold); display: inline-block; }
+.page-hero h1 { font-size: clamp(2rem, 4.6vw, 3.3rem); font-weight: 600; line-height: 1.15; margin-bottom: 14px; }
+.page-hero p { max-width: 60ch; font-size: 1.08rem; opacity: .92; line-height: 1.7; }
+
+/* SECTIONS */
+.section { padding: 80px 7%; background: var(--paper); border-top: 1px solid var(--line); }
+.section.tint { background: var(--cream); }
+.wrap { max-width: 1200px; margin: 0 auto; }
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--navy-soft); color: var(--navy);
+  padding: 6px 16px; border-radius: 50px;
+  font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 16px;
+}
+.section-eyebrow i { font-size: .68rem; color: var(--gold-dark); }
+.section-head { margin-bottom: 34px; }
+.section-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 600; line-height: 1.2; margin-bottom: 8px; }
+.section-head p { color: var(--text-muted); max-width: 56ch; }
+
+/* INFO CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 24px; }
+.info-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 30px 28px; box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.section:not(.tint) .info-card { background: var(--cream); box-shadow: none; }
+.info-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--gold); }
+.info-icon {
+  width: 44px; height: 44px; border-radius: var(--radius-sm);
+  background: var(--navy); color: var(--gold-soft);
+  display: flex; align-items: center; justify-content: center; font-size: 1.05rem; margin-bottom: 16px;
+}
+.info-card h3 { font-size: 1.3rem; font-weight: 600; color: var(--text-dark); margin-bottom: 10px; }
+.info-card p { color: var(--text-muted); font-size: .96rem; line-height: 1.75; }
+
+.check-list { list-style: none; display: grid; gap: 10px; }
+.check-list li { position: relative; padding-left: 32px; color: var(--text-muted); font-size: .95rem; line-height: 1.5; }
+.check-list li::before {
+  content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; left: 0; top: 1px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--navy-soft); color: var(--navy); font-size: .6rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ===================================================================
+   LEADERSHIP — chairman featured, team below
+=================================================================== */
+.section-head.center { text-align: center; }
+.section-head.center p { margin: 0 auto; }
+
+/* Chairman + Administrative Secretary side by side, chairman a bit larger */
+.leaders-pair {
+  display: grid; grid-template-columns: 1.25fr 1fr; gap: 22px;
+  align-items: end; max-width: 780px; margin: 0 auto;
+}
+.leader-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-md);
+}
+.leader-card img {
+  display: block; width: 100%; aspect-ratio: 4 / 5;
+  object-fit: cover; object-position: top center; background: var(--navy-soft);
+}
+.leader-info { padding: 16px 20px 18px; border-top: 3px solid var(--gold); }
+.leader-info h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.25; color: var(--text-dark); }
+.leader-info p { margin-top: 4px; font-size: .82rem; font-weight: 700; color: var(--gold-dark); }
+
+.leader-card.chair { border-color: var(--gold); box-shadow: var(--shadow-lg); }
+.leader-card.chair .leader-info { background: linear-gradient(150deg, var(--navy-deep), var(--navy)); padding: 18px 22px 20px; }
+.leader-card.chair h3 { color: #fff; font-size: 1.45rem; }
+.leader-card.chair p { color: var(--gold-soft); }
+.leader-link {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
+  font-size: .8rem; font-weight: 700; color: #fff; text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.4); padding-bottom: 2px;
+  transition: gap var(--transition-fast), border-color var(--transition-fast);
+}
+.leader-link:hover, .leader-link:focus { gap: 12px; border-color: var(--gold-soft); outline: none; }
+.leader-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.team-label { max-width: 780px; margin: 34px auto 14px; font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-dark); font-family: var(--font-body); text-align: center; }
+.team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; max-width: 780px; margin: 0 auto; }
+.staff-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 26px 22px; text-align: center; box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.staff-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--gold); }
+.staff-card img {
+  width: 116px; height: 116px; border-radius: 50%; object-fit: cover; object-position: top center;
+  border: 3px solid var(--navy-soft); margin: 0 auto 14px; display: block; background: var(--navy-soft);
+}
+.staff-card h4 { font-size: 1.06rem; font-weight: 600; color: var(--text-dark); line-height: 1.3; margin-bottom: 4px; }
+.staff-card p { font-size: .82rem; font-weight: 700; color: var(--gold-dark); }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+.stat { background: var(--paper); border: 1px solid var(--line); border-left: 5px solid var(--gold); border-radius: var(--radius-lg); padding: 28px 26px; box-shadow: var(--shadow-sm); }
+.stat strong { display: block; font-family: var(--font-display); font-size: 3rem; font-weight: 600; color: var(--navy); line-height: 1; margin-bottom: 8px; }
+.stat span { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+
+/* FOOTER */
+footer { background: var(--navy-deep); color: #C6CEDA; position: relative; overflow: hidden; }
+footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), transparent 60%); }
+.footer-main { padding: 70px 7% 34px; position: relative; z-index: 1; }
+.footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 44px; margin-bottom: 44px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.footer-brand { display: flex; flex-direction: column; gap: 22px; }
+.footer-logo-container { display: flex; align-items: center; gap: 16px; }
+.footer-logo-container img { height: 74px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
+.footer-brand-text h3 { font-size: 1.24rem; color: #fff; margin-bottom: 6px; line-height: 1.3; font-weight: 600; }
+.footer-brand-text .tagline { font-family: var(--font-display); font-style: italic; font-size: .88rem; color: var(--gold-soft); letter-spacing: .04em; }
+.footer-description { color: #A9B4C6; line-height: 1.8; font-size: .93rem; }
+.footer-mission { background: rgba(168,85,247,.12); padding: 16px 20px; border-radius: 8px; border-left: 3px solid var(--gold); }
+.footer-mission p { font-size: .88rem; color: #D9DEE7; font-style: italic; line-height: 1.6; }
+.footer-column h4 { color: #fff; font-size: 1.02rem; margin-bottom: 20px; font-weight: 600; position: relative; padding-bottom: 12px; font-family: var(--font-body); text-transform: uppercase; letter-spacing: .06em; }
+.footer-column h4::after { content: ''; position: absolute; left: 0; bottom: 0; width: 32px; height: 2px; background: var(--gold); }
+.footer-column ul { list-style: none; }
+.footer-column ul li { margin-bottom: 13px; }
+.footer-column a { color: #A9B4C6; text-decoration: none; transition: all var(--transition-fast); display: inline-flex; align-items: center; gap: 8px; font-size: .92rem; }
+.footer-column a::before { content: '\f054'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: .58rem; color: var(--gold); opacity: 0; transform: translateX(-8px); transition: all var(--transition-fast); }
+.footer-column a:hover, .footer-column a:focus { color: #fff; padding-left: 4px; outline: none; }
+.footer-column a:hover::before, .footer-column a:focus::before { opacity: 1; transform: translateX(0); }
+.contact-item { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 16px; color: #A9B4C6; font-size: .89rem; }
+.contact-item .icon { color: var(--gold); font-size: 1.05rem; margin-top: 2px; flex-shrink: 0; width: 18px; text-align: center; }
+.social-links { display: flex; gap: 12px; margin-top: 4px; }
+.social-link { width: 42px; height: 42px; background: rgba(255,255,255,.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 1.05rem; transition: all var(--transition-fast); }
+.social-link:hover, .social-link:focus { background: var(--gold); color: var(--navy-deep); transform: translateY(-3px); outline: none; }
+.footer-bottom { padding: 22px 7%; background: rgba(0,0,0,.22); position: relative; z-index: 1; }
+.footer-bottom-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.footer-credit { color: #7E8AA0; font-size: .87rem; }
+.footer-credit strong { color: var(--gold); font-weight: 600; }
+.footer-links { display: flex; gap: 26px; }
+.footer-links a { color: #7E8AA0; text-decoration: none; font-size: .87rem; transition: color var(--transition-fast); }
+.footer-links a:hover, .footer-links a:focus { color: #fff; outline: none; }
+
+/* FLOATING CHAT & BACK-TO-TOP */
+.chat-float { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; gap: 14px; }
+.chat-btn { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: transform var(--transition-fast), box-shadow var(--transition-fast); text-decoration: none; }
+.chat-btn:hover, .chat-btn:focus { transform: scale(1.08); box-shadow: var(--shadow-lg); outline: none; }
+.chat-btn.whatsapp { background: #25D366; }
+.chat-btn.facebook { background: #1877F2; }
+.chat-btn img { width: 30px; height: 30px; }
+.chat-tooltip { position: absolute; right: 72px; top: 50%; transform: translateY(-50%); background: var(--navy-deep); color: #fff; padding: 8px 14px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--transition-fast); font-size: .85rem; font-weight: 600; }
+.chat-float:hover .chat-tooltip { opacity: 1; }
+.back-to-top { position: fixed; bottom: 168px; right: 30px; width: 48px; height: 48px; background: var(--navy); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; border: 2px solid var(--gold); box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transition: all var(--transition-fast); z-index: 998; }
+.back-to-top.show { opacity: 1; visibility: visible; }
+.back-to-top:hover, .back-to-top:focus { background: var(--gold); color: var(--navy-deep); outline: none; }
+
+/* ===================================================================
+   RESPONSIVE
+=================================================================== */
+@media (max-width: 1024px) {
+  .header-text h2 { font-size: 1.1rem; }
+  nav ul { gap: 2px; }
+  nav a { font-size: .87rem; padding: 9px 11px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  body { padding-top: 72px; }
+  .main-header { padding: 10px 5%; }
+  nav { display: none; }
+  .mobile-menu-toggle { display: flex; }
+  .header-divider, .header-text p { display: none; }
+  .header-text h2 { font-size: 13px; line-height: 1.3; }
+  .logo img { height: 40px; }
+  .logo-tagline { font-size: .62rem; }
+
+  .page-hero { padding: 44px 5% 40px; }
+  .page-hero p { font-size: .96rem; }
+  .section { padding: 48px 5%; }
+  .section-head { margin-bottom: 24px; }
+  .info-card { padding: 22px 20px; }
+  .info-icon { width: 38px; height: 38px; margin-bottom: 12px; }
+  .info-card h3 { font-size: 1.15rem; }
+
+  /* Chairman + secretary stay side by side, smaller */
+  .leaders-pair { gap: 12px; max-width: 420px; }
+  .leader-card { border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+  .leader-card.chair { box-shadow: var(--shadow-md); }
+  .leader-info, .leader-card.chair .leader-info { padding: 10px 11px 12px; border-top-width: 2px; }
+  .leader-info h3 { font-size: .8rem; }
+  .leader-info p { font-size: .66rem; margin-top: 2px; }
+  .leader-card.chair h3 { font-size: 1rem; }
+  .leader-link { font-size: .68rem; margin-top: 8px; }
+
+  /* Team: compact rows */
+  .team-label { margin: 24px auto 12px; }
+  .team-grid { grid-template-columns: 1fr; gap: 12px; }
+  .staff-card { display: flex; align-items: center; gap: 14px; text-align: left; padding: 14px 16px; }
+  .staff-card img { width: 64px; height: 64px; margin: 0; flex-shrink: 0; }
+  .staff-card h4 { font-size: .96rem; }
+  .staff-card p { font-size: .76rem; }
+
+  .stats-grid { gap: 14px; grid-template-columns: 1fr 1fr 1fr; }
+  .stat { padding: 18px 14px; border-left-width: 4px; }
+  .stat strong { font-size: 1.7rem; }
+  .stat span { font-size: .62rem; }
+
+  .footer-main { padding: 46px 5% 22px; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-brand { grid-column: 1; }
+  .footer-logo-container { flex-direction: column; align-items: flex-start; }
+  .footer-logo-container img { height: 58px; }
+  .footer-bottom { padding: 20px 5%; }
+  .footer-bottom-content { flex-direction: column; text-align: center; }
+  .footer-links { flex-direction: column; gap: 10px; }
+
+  .chat-float { bottom: 20px; right: 20px; }
+  .chat-btn { width: 52px; height: 52px; }
+  .chat-btn img { width: 26px; height: 26px; }
+  .back-to-top { bottom: 148px; right: 20px; width: 44px; height: 44px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .header-text h2 { font-size: 11px; }
+  .leaders-pair { max-width: 340px; }
+  .leader-link { display: none; }
+  .stat { padding: 16px 10px; }
+  .stat strong { font-size: 1.5rem; }
+  .footer-brand-text h3 { font-size: 1.08rem; }
+  .social-links { justify-content: center; }
+  .chat-float { gap: 10px; }
+  .back-to-top { bottom: 138px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
-  font-family:'Roboto',sans-serif;
-  color:var(--text-dark);
-  background:#faf9fd;
-  overflow-x:hidden;
-}
-
-.main-header{
-  position:fixed;
-  top:0;
-  width:100%;
-  z-index:1000;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 8%;
-  background:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
-  transition:padding .3s ease;
-}
-
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  min-width:0;
-  flex:1;
-}
-
-/* LOGO */
-.logo a{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-decoration:none;
-}
-
-.logo img{
-  height:60px;
-  max-width:100%;
-  object-fit:contain;
-}
-
-.logo-tagline{
-  font-family:"Playfair Display",cursive;
-  font-size:.75rem;
-  letter-spacing:.08em;
-  color:#6b7280;
-}
-
-/* HEADER TEXT */
-.header-divider{
-  width:2px;
-  height:60px;
-  background:var(--lilac-dark);
-  flex-shrink:0;
-}
-
-.header-text{
-  flex:1;
-  min-width:0;
-}
-
-.header-text h2{
-  font-family:'Poppins',sans-serif;
-  font-size:1.5rem;
-  color:var(--lilac-dark);
-  line-height:1.2;
-}
-
-.header-text p{
-  font-size:13px;
-  color:#555;
-}
-
-nav ul{
-  display:flex;
-  gap:22px;
-  list-style:none;
-}
-
-nav a{
-  text-decoration:none;
-  font-weight:600;
-  color:#444;
-  transition:color .2s ease;
-  white-space:nowrap;
-}
-
-nav a:hover{
-  color:var(--lilac-primary);
-}
-
-.mobile-menu{
-  position:absolute;
-  top:100%;
-  left:0;
-  width:100%;
-  background:#fff;
-  display:none;
-  flex-direction:column;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
-
-.mobile-menu a{
-  padding:16px 8%;
-  border-bottom:1px solid #eee;
-  text-decoration:none;
-  font-weight:600;
-  color:#333;
-}
-
-.mobile-menu.open{
-  display:flex;
-  animation:slideDown .35s ease;
-}
-
-/* HAMBURGER */
-.mobile-menu-toggle{
-  width:42px;
-  height:42px;
-  display:none;
-  background:var(--lilac-soft);
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  position:relative;
-  flex-shrink:0;
-}
-
-.mobile-menu-toggle span{
-  position:absolute;
-  left:50%;
-  width:22px;
-  height:2.5px;
-  background:var(--lilac-dark);
-  border-radius:2px;
-  transform:translateX(-50%);
-  transition:.35s ease;
-}
-
-.mobile-menu-toggle span:nth-child(1){top:12px}
-.mobile-menu-toggle span:nth-child(2){top:20px}
-.mobile-menu-toggle span:nth-child(3){top:28px}
-
-.mobile-menu-toggle.active span:nth-child(1){
-  transform:translate(-50%,8px) rotate(45deg);
-}
-.mobile-menu-toggle.active span:nth-child(2){
-  opacity:0;
-}
-.mobile-menu-toggle.active span:nth-child(3){
-  transform:translate(-50%,-8px) rotate(-45deg);
-}
-
-.about-hero{
-  position:relative;
-  padding:150px 10% 100px;
-  text-align:center;
-  color:#fff;
-  background:url("{{ url_for('static', filename='Slide/group1.jpeg') }}") center/cover no-repeat;
-  margin-top:80px;
-  overflow:hidden;
-}
-
-.about-hero::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(135deg, rgba(109,40,217,.85) 0%, rgba(139,92,246,.75) 100%);
-}
-
-.about-hero::after{
-  content:"";
-  position:absolute;
-  bottom:-50px;
-  left:-50px;
-  width:300px;
-  height:300px;
-  background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  border-radius:50%;
-}
-
-.about-hero *{
-  position:relative;
-  z-index:1;
-}
-
-.about-hero h1{
-  font-size:3.5rem;
-  font-family:'Poppins',sans-serif;
-  font-weight:700;
-  margin-bottom:1rem;
-  animation:fadeInUp .8s ease;
-}
-
-.about-hero p{
-  max-width:700px;
-  margin:0 auto;
-  font-size:1.25rem;
-  line-height:1.6;
-  animation:fadeInUp 1s ease;
-}
-
-.section{
-  padding:80px 8%;
-}
-
-.section.light{
-  background:linear-gradient(180deg, #f6f4ff 0%, #faf9fd 100%);
-}
-
-.section-header{
-  text-align:center;
-  margin-bottom:50px;
-}
-
-.section-header h2{
-  font-family:'Poppins',sans-serif;
-  font-size:2.5rem;
-  color:var(--lilac-dark);
-  margin-bottom:0.5rem;
-}
-
-.section-header p{
-  color:#666;
-  font-size:1.1rem;
-  max-width:600px;
-  margin:0 auto;
-}
-
-.smart-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:30px;
-  margin-top:40px;
-}
-
-.smart-card{
-  background:#fff;
-  padding:30px;
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
-  transition:all .4s ease;
-  opacity:0;
-  transform:translateY(30px);
-  border:2px solid transparent;
-  position:relative;
-  overflow:hidden;
-}
-
-.smart-card::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:4px;
-  background:linear-gradient(90deg, var(--lilac-primary), var(--lilac-dark));
-  transform:scaleX(0);
-  transform-origin:left;
-  transition:transform .4s ease;
-}
-
-.smart-card:hover::before{
-  transform:scaleX(1);
-}
-
-.smart-card.show{
-  opacity:1;
-  transform:translateY(0);
-}
-
-.smart-card:hover{
-  transform:translateY(-8px);
-  box-shadow:0 15px 40px rgba(139,92,246,.2);
-  border-color:var(--lilac-soft);
-}
-
-.smart-card h2{
-  font-family:'Poppins',sans-serif;
-  font-size:1.5rem;
-  color:var(--lilac-dark);
-  margin-bottom:15px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.smart-card h2::before{
-  content:"";
-  width:6px;
-  height:6px;
-  background:var(--lilac-primary);
-  border-radius:50%;
-}
-
-.smart-card p{
-  line-height:1.8;
-  color:#555;
-  font-size:1rem;
-}
-
-.values-list{
-  list-style:none;
-  padding:0;
-  margin:0;
-}
-
-.values-list li{
-  padding:10px 0 10px 35px;
-  position:relative;
-  color:#555;
-  font-size:1rem;
-  transition:all .3s ease;
-}
-
-.values-list li::before{
-  content:"✓";
-  position:absolute;
-  left:0;
-  top:10px;
-  width:24px;
-  height:24px;
-  background:var(--lilac-soft);
-  color:var(--lilac-primary);
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  font-size:0.9rem;
-}
-
-.values-list li:hover{
-  padding-left:40px;
-  color:var(--lilac-dark);
-}
-
-.team-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:35px;
-  margin-top:40px;
-}
-
-.staff-card{
-  background:#fff;
-  padding:30px;
-  border-radius:16px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
-  transition:all .4s ease;
-  position:relative;
-  overflow:hidden;
-}
-
-.staff-card::before{
-  content:"";
-  position:absolute;
-  top:-50%;
-  right:-50%;
-  width:200px;
-  height:200px;
-  background:radial-gradient(circle, var(--lilac-soft) 0%, transparent 70%);
-  border-radius:50%;
-  opacity:0;
-  transition:opacity .4s ease;
-}
-
-.staff-card:hover::before{
-  opacity:1;
-}
-
-.staff-card:hover{
-  transform:translateY(-10px);
-  box-shadow:0 15px 40px rgba(139,92,246,.2);
-}
-
-.staff-img-wrapper{
-  position:relative;
-  width:160px;
-  height:160px;
-  margin:0 auto 20px;
-}
-
-.staff-card img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:50%;
-  border:4px solid var(--lilac-soft);
-  transition:all .4s ease;
-  position:relative;
-  z-index:1;
-}
-
-.staff-card:hover img{
-  border-color:var(--lilac-primary);
-  transform:scale(1.05);
-}
-
-.staff-card h3{
-  font-family:'Poppins',sans-serif;
-  font-size:1.3rem;
-  color:var(--lilac-dark);
-  margin-bottom:8px;
-  position:relative;
-  z-index:1;
-}
-
-.title-role{
-  font-size:0.95rem;
-  color:var(--lilac-primary);
-  font-weight:600;
-  font-style:italic;
-  position:relative;
-  z-index:1;
-}
-
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:30px;
-  margin-top:40px;
-}
-
-.stat{
-  background:#fff;
-  padding:40px 30px;
-  border-radius:16px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
-  transition:all .4s ease;
-  position:relative;
-  overflow:hidden;
-}
-
-.stat::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:linear-gradient(135deg, var(--lilac-soft) 0%, transparent 100%);
-  opacity:0;
-  transition:opacity .4s ease;
-}
-
-.stat:hover::before{
-  opacity:1;
-}
-
-.stat:hover{
-  transform:translateY(-8px);
-  box-shadow:0 15px 40px rgba(139,92,246,.2);
-}
-
-.stat h3{
-  font-size:3.5rem;
-  color:var(--lilac-primary);
-  font-weight:700;
-  margin-bottom:10px;
-  position:relative;
-  z-index:1;
-}
-
-.stat p{
-  font-weight:600;
-  color:#555;
-  font-size:1.1rem;
-  position:relative;
-  z-index:1;
-}
-
-footer{
-  background:linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-accent) 100%);
-  color:#e5e7eb;
-  position:relative;
-  overflow:hidden;
-}
-
-footer::before{
-  content:'';
-  position:absolute;
-  top:-50%;
-  right:-10%;
-  width:500px;
-  height:500px;
-  background:radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
-  border-radius:50%;
-  pointer-events:none;
-}
-
-footer::after{
-  content:'';
-  position:absolute;
-  bottom:-30%;
-  left:-5%;
-  width:400px;
-  height:400px;
-  background:radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
-  border-radius:50%;
-  pointer-events:none;
-}
-
-.footer-main{
-  padding:60px 8% 30px;
-  position:relative;
-  z-index:1;
-}
-
-.footer-top{
-  display:grid;
-  grid-template-columns:1.5fr 1fr 1fr 1fr;
-  gap:40px;
-  margin-bottom:40px;
-  padding-bottom:40px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
-
-.footer-brand{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.footer-logo-container{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.footer-logo-container img{
-  height:80px;
-  width:auto;
-  object-fit:contain;
-  filter:brightness(0) invert(1);
-}
-
-.footer-brand-text h3{
-  font-family:'Poppins', sans-serif;
-  font-size:1.3rem;
-  color:#fff;
-  margin-bottom:5px;
-  line-height:1.3;
-}
-
-.footer-brand-text .tagline{
-  font-family:"Playfair Display", cursive;
-  font-size:0.9rem;
-  color:var(--lilac-soft);
-  font-style:italic;
-  letter-spacing:0.05em;
-}
-
-.footer-description{
-  color:#d1d5db;
-  line-height:1.8;
-  font-size:0.95rem;
-}
-
-.footer-mission{
-  background:rgba(139,92,246,0.15);
-  padding:15px 20px;
-  border-radius:10px;
-  border-left:4px solid var(--lilac-primary);
-  margin-top:15px;
-}
-
-.footer-mission p{
-  font-size:0.9rem;
-  color:#e5e7eb;
-  font-style:italic;
-}
-
-/* Footer Columns */
-.footer-column h4{
-  color:#fff;
-  font-size:1.1rem;
-  margin-bottom:20px;
-  font-weight:600;
-  position:relative;
-  padding-bottom:10px;
-}
-
-.footer-column h4::after{
-  content:'';
-  position:absolute;
-  left:0;
-  bottom:0;
-  width:40px;
-  height:3px;
-  background:var(--lilac-primary);
-  border-radius:2px;
-}
-
-.footer-column ul{
-  list-style:none;
-}
-
-.footer-column ul li{
-  margin-bottom:12px;
-}
-
-.footer-column a{
-  color:#d1d5db;
-  text-decoration:none;
-  transition:all .3s ease;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:0.95rem;
-}
-
-.footer-column a::before{
-  content:'→';
-  opacity:0;
-  transform:translateX(-10px);
-  transition:all .3s ease;
-}
-
-.footer-column a:hover{
-  color:#fff;
-  padding-left:5px;
-}
-
-.footer-column a:hover::before{
-  opacity:1;
-  transform:translateX(0);
-}
-
-.contact-item{
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  margin-bottom:15px;
-  color:#d1d5db;
-  font-size:0.9rem;
-}
-
-.contact-item .icon{
-  color:var(--lilac-primary);
-  font-size:1.2rem;
-  margin-top:2px;
-  flex-shrink:0;
-}
-
-.social-links{
-  display:flex;
-  gap:12px;
-  margin-top:20px;
-}
-
-.social-link{
-  width:45px;
-  height:45px;
-  background:rgba(255,255,255,0.1);
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  text-decoration:none;
-  transition:all .3s ease;
-  font-size:1.2rem;
-}
-
-.social-link:hover{
-  background:var(--lilac-primary);
-  transform:translateY(-3px);
-  box-shadow:0 5px 15px rgba(139,92,246,0.4);
-}
-
-.footer-bottom{
-  padding:25px 8%;
-  background:rgba(0,0,0,0.2);
-  position:relative;
-  z-index:1;
-}
-
-.footer-bottom-content{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:15px;
-}
-
-.footer-credit{
-  color:#9ca3af;
-  font-size:0.9rem;
-}
-
-.footer-credit strong{
-  color:var(--lilac-primary);
-  font-weight:600;
-}
-
-.footer-links{
-  display:flex;
-  gap:25px;
-}
-
-.footer-links a{
-  color:#9ca3af;
-  text-decoration:none;
-  font-size:0.9rem;
-  transition:color .3s ease;
-}
-
-.footer-links a:hover{
-  color:#fff;
-}
-
-.chat-float{
-  position:fixed;
-  bottom:30px;
-  right:30px;
-  z-index:999;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
-
-.chat-btn{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  transition:transform .3s ease;
-  position:relative;
-}
-
-.chat-btn:hover{
-  transform:scale(1.1);
-}
-
-.chat-btn.whatsapp{
-  background:#25D366;
-}
-
-.chat-btn.facebook{
-  background:#1877F2;
-}
-
-.chat-btn img{
-  width:35px;
-  height:35px;
-}
-
-.chat-tooltip{
-  position:absolute;
-  right:70px;
-  background:#333;
-  color:#fff;
-  padding:8px 12px;
-  border-radius:6px;
-  white-space:nowrap;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .3s ease;
-  font-size:0.85rem;
-}
-
-.chat-float:hover .chat-tooltip{
-  opacity:1;
-}
-
-@media(max-width:1024px){
-  .header-text h2{
-    font-size:1.2rem;
-  }
-  
-  nav ul{
-    gap:15px;
-  }
-  
-  nav a{
-    font-size:0.9rem;
-  }
-
-  .footer-top{
-    grid-template-columns:1fr 1fr;
-    gap:35px;
-  }
-
-  .footer-brand{
-    grid-column:1 / -1;
-  }
-
-  .footer-column:nth-child(3){
-    display:none;
-  }
-}
-
-@media(max-width:768px){
-
-  .main-header{
-    padding:10px 5%;
-  }
-
-  nav{display:none}
-  .mobile-menu-toggle{display:flex}
-
-  .header-divider,
-  .header-text p{
-    display:none;
-  }
-
-  .header-text h2{
-    font-size:14px;
-    text-align:left;
-  }
-
-  .logo img{
-    height:48px;
-  }
-
-  .logo-tagline{
-    font-size:0.65rem;
-  }
-
-  /* HERO */
-  .about-hero{
-    padding:120px 5% 80px;
-    margin-top:70px;
-  }
-
-  .about-hero h1{
-    font-size:2.2rem;
-  }
-
-  .about-hero p{
-    font-size:1rem;
-  }
-
-  /* SECTIONS */
-  .section{
-    padding:60px 5%;
-  }
-
-  .section-header h2{
-    font-size:2rem;
-  }
-
-  .section-header p{
-    font-size:1rem;
-  }
-
-  .smart-grid,
-  .team-grid,
-  .stats-grid{
-    grid-template-columns:1fr;
-    gap:20px;
-  }
-
-  .smart-card{
-    padding:20px;
-  }
-
-  .smart-card h2{
-    font-size:1.3rem;
-  }
-
-  .footer-main{
-    padding:40px 5% 20px;
-  }
-
-  .footer-top{
-    grid-template-columns:1fr;
-    gap:30px;
-  }
-
-  .footer-brand{
-    grid-column:1;
-  }
-
-  .footer-logo-container{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .footer-logo-container img{
-    height:60px;
-  }
-
-  .footer-column:nth-child(3),
-  .footer-column:nth-child(4){
-    display:none;
-  }
-
-  .footer-bottom{
-    padding:20px 5%;
-  }
-
-  .footer-bottom-content{
-    flex-direction:column;
-    text-align:center;
-  }
-
-  .footer-links{
-    display:none;
-  }
-
-  .chat-float{
-    bottom:20px;
-    right:20px;
-  }
-
-  .chat-btn{
-    width:50px;
-    height:50px;
-  }
-
-  .chat-btn img{
-    width:28px;
-    height:28px;
-  }
-}
-
-@media(max-width:480px){
-
-  .about-hero h1{
-    font-size:1.8rem;
-  }
-
-  .about-hero p{
-    font-size:0.9rem;
-  }
-
-  .section-header h2{
-    font-size:1.7rem;
-  }
-
-  .smart-card h2{
-    font-size:1.2rem;
-  }
-
-  .smart-card p,
-  .values-list li{
-    font-size:0.9rem;
-  }
-
-  .stat h3{
-    font-size:2.5rem;
-  }
-
-  .stat p{
-    font-size:1rem;
-  }
-
-  .footer-brand-text h3{
-    font-size:1.1rem;
-  }
-
-  .social-links{
-    justify-content:center;
-  }
-}
-
-@keyframes fadeInUp{
-  from{
-    opacity:0;
-    transform:translateY(30px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes slideDown{
-  from{
-    opacity:0;
-    transform:translateY(-10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-/* =========================
-   MOTION SAFETY
-========================= */
-@media (prefers-reduced-motion: reduce){
-  *{
-    animation:none!important;
-    transition:none!important;
-  }
-}
-
 </style>
 </head>
 
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- HEADER -->
 <header class="main-header">
   <div class="header-left">
     <div class="logo">
-      <a href="/">
-        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+      <a href="/" aria-label="OSCCPA Home">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="eager">
         <span class="logo-tagline">consumer rights first</span>
       </a>
     </div>
     <div class="header-divider"></div>
     <div class="header-text">
-      <h2>Ondo State Competition & Consumer Protection Agency</h2>
+      <h2>Ondo State Competition &amp; Consumer Protection Agency</h2>
       <p>Committed to Consumer Protection</p>
     </div>
   </div>
 
-  <nav>
+  <nav aria-label="Main navigation">
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/news">News</a></li>
+      <li><a href="/about" class="active" aria-current="page">About</a></li>
+      <li><a href="/news">News &amp; Activities</a></li>
       <li><a href="/services">Services</a></li>
       <li><a href="/complaints">Complaints</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
   </nav>
 
-  <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+  <button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
     <span></span><span></span><span></span>
   </button>
 
   <div class="mobile-menu" id="mobileMenu">
     <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/news">News</a>
+    <a href="/about" class="active">About</a>
+    <a href="/news">News &amp; Activities</a>
     <a href="/services">Services</a>
     <a href="/complaints">Complaints</a>
     <a href="/contact">Contact</a>
   </div>
 </header>
 
-<section class="about-hero">
-  <h1>About the Agency</h1>
-  <p>OCCPA safeguards consumer rights and promotes fair competition across Ondo State, ensuring transparency, accountability, and justice in the marketplace.</p>
-</section>
+<main id="main-content">
 
-<section class="section light">
-  <div class="section-header">
-    <h2>Our Foundation</h2>
-    <p>Understanding who we are and what drives our mission</p>
-  </div>
-
-  <div class="smart-grid">
-
-    <div class="smart-card">
-      <h2>Who We Are</h2>
-      <p>OCCPA is a statutory government institution established to protect consumers from unfair trade practices, ensuring a safe and transparent marketplace for all citizens of Ondo State.</p>
-    </div>
-
-    <div class="smart-card">
-      <h2>Our Mission</h2>
-      <p>
-        To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, 
-        while promoting ethical trade practices and sustainable socio-economic development across Ondo State.
-      </p>
-    </div>
-
-    <div class="smart-card">
-      <h2>Core Responsibilities</h2>
-      <ul class="values-list">
-        <li>Consumer rights protection</li>
-        <li>Market regulation & surveillance</li>
-        <li>Price monitoring & control</li>
-        <li>Dispute resolution services</li>
-        <li>Public education & awareness</li>
-      </ul>
-    </div>
-
+<!-- HERO -->
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <span class="hero-eyebrow">About the agency</span>
+    <h1>Protecting consumers, promoting fair competition</h1>
+    <p>OCCPA safeguards consumer rights and promotes fair competition across Ondo State, ensuring transparency, accountability, and justice in the marketplace.</p>
   </div>
 </section>
 
-<section class="section">
-  <div class="section-header">
-    <h2>Our Vision & Values</h2>
-    <p>The principles that guide our work and commitment to excellence</p>
-  </div>
-
-  <div class="smart-grid">
-
-    <div class="smart-card">
-      <h2>Our Vision</h2>
-      <p>To establish a fair, safe, and transparent marketplace where consumer rights are fully protected and respected, fostering trust and confidence in business transactions throughout Ondo State.</p>
+<!-- FOUNDATION -->
+<section class="section tint" aria-labelledby="foundation-heading">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><i class="fas fa-shield-alt"></i> Our foundation</div>
+      <h2 id="foundation-heading">Who we are and what drives us</h2>
+      <p>Understanding our role and our mission.</p>
     </div>
 
-    <div class="smart-card">
-      <h2>Our Core Values</h2>
-      <ul class="values-list">
-        <li>Integrity in all operations</li>
-        <li>Transparency & accountability</li>
-        <li>Professionalism & excellence</li>
-        <li>Fairness & impartiality</li>
-        <li>Collaboration & partnership</li>
-      </ul>
-    </div>
-
-  </div>
-</section>
-
-<section class="section light">
-  <div class="section-header">
-    <h2>Our Leadership Team</h2>
-    <p>Dedicated professionals committed to consumer protection</p>
-  </div>
-
-  <div class="team-grid">
-    <div class="staff-card">
-      <div class="staff-img-wrapper">
-        <img src="{{ url_for('static', filename='exec/as.jpg') }}" alt="Hajia Kudirat Ola">
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-landmark"></i></div>
+        <h3>Who we are</h3>
+        <p>OCCPA is a statutory government institution established to protect consumers from unfair trade practices, ensuring a safe and transparent marketplace for all citizens of Ondo State.</p>
       </div>
-      <h3>Hajia Kudirat Ola</h3>
-      <p class="title-role">Administrative Secretary</p>
-    </div>
-
-    <div class="staff-card">
-      <div class="staff-img-wrapper">
-        <img src="{{ url_for('static', filename='exec/dfa.png') }}" alt="Director Finance & Admin">
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-bullseye"></i></div>
+        <h3>Our mission</h3>
+        <p>To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
       </div>
-      <h3>Gbadebo S. Oyewo, ACIPM</h3>
-      <p class="title-role">Director Finance & Admin</p>
-    </div>
-    
-    <div class="staff-card">
-      <div class="staff-img-wrapper">
-        <img src="{{ url_for('static', filename='exec/da.png') }}" alt="Akolurejo Franklin Adeolu">
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-list-check"></i></div>
+        <h3>Core responsibilities</h3>
+        <ul class="check-list">
+          <li>Consumer rights protection</li>
+          <li>Market regulation &amp; surveillance</li>
+          <li>Price monitoring &amp; control</li>
+          <li>Dispute resolution services</li>
+          <li>Public education &amp; awareness</li>
+        </ul>
       </div>
-      <h3>Akolurejo Franklin Adeolu</h3>
-      <p class="title-role">Director of Accounts</p>
     </div>
   </div>
 </section>
 
-<section class="section">
-  <div class="section-header">
-    <h2>Our Impact</h2>
-    <p>Making a real difference in consumer protection across Ondo State</p>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat">
-      <h3>1,000+</h3>
-      <p>Complaints Resolved</p>
+<!-- VISION & VALUES -->
+<section class="section" aria-labelledby="vision-heading">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><i class="fas fa-compass"></i> Vision &amp; values</div>
+      <h2 id="vision-heading">The principles that guide our work</h2>
+      <p>Our commitment to excellence in consumer protection.</p>
     </div>
 
-    <div class="stat">
-      <h3>300+</h3>
-      <p>Market Inspections</p>
-    </div>
-
-    <div class="stat">
-      <h3>18</h3>
-      <p>LGAs Covered</p>
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-eye"></i></div>
+        <h3>Our vision</h3>
+        <p>To establish a fair, safe, and transparent marketplace where consumer rights are fully protected and respected, fostering trust and confidence in business transactions throughout Ondo State.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon"><i class="fas fa-scale-balanced"></i></div>
+        <h3>Our core values</h3>
+        <ul class="check-list">
+          <li>Integrity in all operations</li>
+          <li>Transparency &amp; accountability</li>
+          <li>Professionalism &amp; excellence</li>
+          <li>Fairness &amp; impartiality</li>
+          <li>Collaboration &amp; partnership</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- LEADERSHIP -->
+<section class="section tint" aria-labelledby="leadership-heading">
+  <div class="wrap">
+    <div class="section-head center">
+      <div class="section-eyebrow"><i class="fas fa-users"></i> Leadership</div>
+      <h2 id="leadership-heading">Our leadership team</h2>
+      <p>Dedicated professionals committed to consumer protection.</p>
+    </div>
 
+    <!-- Chairman (larger) and Administrative Secretary, side by side -->
+    <div class="leaders-pair">
+      <article class="leader-card chair">
+        <img src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.png') }}" alt="Honorable Oluyemi Fasipe, Executive Chairman of OSCCPA" loading="lazy">
+        <div class="leader-info">
+          <h3>Hon. Oluyemi Fasipe</h3>
+          <p>Executive Chairman</p>
+          <a class="leader-link" href="/news#latest-activity">Read his latest statement <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </article>
+
+      <article class="leader-card">
+        <img src="{{ url_for('static', filename='exec/as.jpg') }}" alt="Hajia Kudirat Ola, Administrative Secretary of OSCCPA" loading="lazy">
+        <div class="leader-info">
+          <h3>Hajia Kudirat Ola</h3>
+          <p>Administrative Secretary</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Directors -->
+    <h3 class="team-label">Directors</h3>
+    <div class="team-grid">
+      <div class="staff-card">
+        <img src="{{ url_for('static', filename='exec/dfa.png') }}" alt="Gbadebo S. Oyewo" loading="lazy">
+        <div>
+          <h4>Gbadebo S. Oyewo, ACIPM</h4>
+          <p>Director, Finance &amp; Admin</p>
+        </div>
+      </div>
+      <div class="staff-card">
+        <img src="{{ url_for('static', filename='exec/da.png') }}" alt="Akolurejo Franklin Adeolu" loading="lazy">
+        <div>
+          <h4>Akolurejo Franklin Adeolu</h4>
+          <p>Director of Accounts</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="section" aria-labelledby="impact-heading">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><i class="fas fa-chart-line"></i> Impact</div>
+      <h2 id="impact-heading">Making a difference across Ondo State</h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><strong>1,000+</strong><span>Complaints resolved</span></div>
+      <div class="stat"><strong>300+</strong><span>Market inspections</span></div>
+      <div class="stat"><strong>18</strong><span>LGAs covered</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
 <footer>
   <div class="footer-main">
     <div class="footer-top">
-      
+
       <div class="footer-brand">
         <div class="footer-logo-container">
-          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo">
+          <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA Logo" loading="lazy">
           <div class="footer-brand-text">
-            <h3>Ondo State Competition & Consumer Protection Agency</h3>
+            <h3>Ondo State Competition &amp; Consumer Protection Agency</h3>
             <span class="tagline">consumer rights first</span>
           </div>
         </div>
-        
         <p class="footer-description">
           Dedicated to protecting consumer rights and promoting fair competition across Ondo State. We ensure transparency, accountability, and justice in the marketplace.
         </p>
- 
         <div class="footer-mission">
-          <p><strong>Our Mission:</strong>  
-          To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting 
-          ethical trade practices and sustainable socio-economic development across Ondo State.</p>
+          <p><strong>Our Mission:</strong> To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
         </div>
-
         <div class="social-links">
-          <a href="#" class="social-link" aria-label="Facebook">
-            <span>f</span>
-          </a>
-          <a href="#" class="social-link" aria-label="Twitter">
-            <span>𝕏</span>
-          </a>
-          <a href="#" class="social-link" aria-label="Instagram">
-            <span>📷</span>
-          </a>
-          <a href="#" class="social-link" aria-label="LinkedIn">
-            <span>in</span>
-          </a>
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
 
@@ -1237,7 +593,7 @@ footer::after{
           <li><a href="/">Home</a></li>
           <li><a href="/about">About Us</a></li>
           <li><a href="/services">Services</a></li>
-          <li><a href="/news">News & Activities</a></li>
+          <li><a href="/news">News &amp; Activities</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -1253,34 +609,33 @@ footer::after{
         </ul>
       </div>
 
-      <!-- CONTACT INFO -->
       <div class="footer-column">
         <h4>Contact Us</h4>
         <div class="contact-item">
-          <span class="icon">📍</span>
+          <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
           <span>Old board of internal revenue building<br>After CUDA Alagbaka Akure, Ondo State, Nigeria</span>
         </div>
         <div class="contact-item">
-          <span class="icon">📧</span>
+          <span class="icon"><i class="fas fa-envelope"></i></span>
           <span>info@occpa.on.gov.ng</span>
         </div>
         <div class="contact-item">
-          <span class="icon">📞</span>
+          <span class="icon"><i class="fas fa-phone"></i></span>
           <span>+234 904 335 3001</span>
         </div>
         <div class="contact-item">
-          <span class="icon">⏰</span>
-          <span>Mon - Fri: 8AM - 5PM</span>
+          <span class="icon"><i class="fas fa-clock"></i></span>
+          <span>Mon – Fri: 8AM – 5PM</span>
         </div>
       </div>
 
-    </div> 
-  </div> 
+    </div>
+  </div>
 
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-credit">
-        © 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech 08134812419</strong>
+        &copy; 2026 OCCPA. All rights reserved. | Powered by <strong>Euphoria Tech 08134812419</strong>
       </div>
       <div class="footer-links">
         <a href="/">Privacy Policy</a>
@@ -1291,35 +646,56 @@ footer::after{
   </div>
 </footer>
 
+<!-- CHAT FLOAT -->
 <div class="chat-float">
-  <a href="https://wa.me/2349043353001" target="_blank" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/2349043353001" target="_blank" rel="noopener" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
   </a>
-
-  <a href="https://m.me/occpa" target="_blank" class="chat-btn facebook" aria-label="Chat on Facebook">
+  <a href="https://m.me/occpa" target="_blank" rel="noopener" class="chat-btn facebook" aria-label="Chat on Facebook">
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
   </a>
-
   <span class="chat-tooltip">Chat with us</span>
 </div>
 
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 
 <script>
-function toggleMobileMenu(){
-  document.getElementById("mobileMenu").classList.toggle("open");
-  document.querySelector(".mobile-menu-toggle").classList.toggle("active");
-}
+document.addEventListener("DOMContentLoaded", function () {
 
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if(e.isIntersecting){ 
-      e.target.classList.add("show");
+  /* Back to top */
+  var backToTopBtn = document.getElementById("backToTop");
+  var ticking = false;
+  window.addEventListener("scroll", function () {
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        backToTopBtn.classList.toggle("show", window.pageYOffset > 300);
+        ticking = false;
+      });
+      ticking = true;
     }
   });
-}, {threshold: 0.2});
+  backToTopBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
 
-document.querySelectorAll(".smart-card").forEach(card => observer.observe(card));
+  /* Mobile menu */
+  var toggle = document.getElementById("menuToggle");
+  var menu = document.getElementById("mobileMenu");
+  function closeMenu() {
+    menu.classList.remove("open");
+    toggle.classList.remove("active");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+  toggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle("open");
+    toggle.classList.toggle("active", open);
+    toggle.setAttribute("aria-expanded", open);
+  });
+  document.addEventListener("click", function (e) {
+    if (menu.classList.contains("open") && !menu.contains(e.target)) closeMenu();
+  });
+  window.addEventListener("resize", function () { if (window.innerWidth > 768) closeMenu(); });
+
+});
 </script>
 
 </body>
