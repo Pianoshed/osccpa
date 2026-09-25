@@ -479,6 +479,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
 }
 
 @media (max-width: 768px) {
+  html { font-size: 15px; }
   body { padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
   html { scroll-padding-top: calc(84px + env(safe-area-inset-top, 0px)); }
   .main-header { padding: calc(10px + env(safe-area-inset-top, 0px)) 5% 10px; }
@@ -489,7 +490,11 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   .logo img { height: 46px; }
   .logo-tagline { font-size: .62rem; }
 
-  .page-hero { padding: 38px 5% 32px; }
+  .page-hero { padding: 34px 5% 28px; }
+  .page-hero h1 { font-size: 1.65rem; }
+  .page-hero p { font-size: .92rem; }
+  .hero-eyebrow { font-size: .7rem; }
+  .jump-links a { font-size: .78rem; padding: 8px 15px; }
   .jump-links { flex-wrap: nowrap; overflow-x: auto; margin-right: -5%; padding-right: 5%; scrollbar-width: none; }
   .jump-links::-webkit-scrollbar { display: none; }
   .jump-links a { white-space: nowrap; }
@@ -497,21 +502,38 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   .wrap { padding: 0 5%; }
   .top-story { padding: 34px 0 16px; }
   .lead { border-radius: 16px; }
-  .lead-main { padding: 30px 22px 32px; }
+  .lead-main { padding: 26px 20px 28px; }
   .lead-main::before { font-size: 6rem; right: 14px; }
-  .lead-photo { margin: -30px -22px 22px; height: 190px; }
-  .lead-deck { font-size: 1rem; }
+  .lead-photo { margin: -26px -20px 20px; height: 175px; }
+  .lead-flag { font-size: .68rem; padding: 6px 13px; margin-bottom: 16px; }
+  .lead-date { font-size: .76rem; }
+  .lead-main h2 { font-size: 1.5rem; margin-bottom: 14px; }
+  .lead-deck { font-size: .92rem; line-height: 1.6; }
+  .lead-points li { font-size: .84rem; }
+  .btn { font-size: .84rem; padding: 12px 20px; }
   .lead-actions { flex-direction: column; }
   .lead-actions .btn { width: 100%; }
-  .lead-facts { padding: 24px 22px; }
+  .lead-facts h3 { font-size: 1rem; }
+  .lead-facts dd { font-size: .86rem; }
+  .lead-facts dt { font-size: .64rem; }
+  .lead-facts { padding: 22px 20px; }
   .lead-facts dl { grid-template-columns: 1fr; }
   .lead-facts .row:nth-child(2) { border-top: 1px solid var(--line); padding-top: 14px; }
 
   .latest-activity { padding: 16px 0 40px; }
-  .activity-card { padding: 26px 20px; border-left-width: 5px; }
-  .pull-quote { font-size: 1.1rem; }
+  .activity-card { padding: 22px 18px; border-left-width: 5px; }
+  .activity-tag { font-size: .68rem; }
+  .activity-card p { font-size: .88rem; }
+  .targets span { font-size: .72rem; padding: 5px 11px; }
+  .pull-quote { font-size: .98rem; }
+  .press h3 { font-size: .72rem; }
+  .press .outlet strong { font-size: .7rem; }
+  .press .outlet span { font-size: .8rem; }
 
   .activities { padding: 40px 0 60px; }
+  .section-head { margin-bottom: 26px; }
+  .section-head h2 { font-size: 1.4rem; }
+  .section-head p { font-size: .86rem; }
   .news-grid { grid-template-columns: 1fr; gap: 18px; }
 
   .footer-main { padding: 46px 5% 22px; }
@@ -536,10 +558,16 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   .video-poster { -webkit-tap-highlight-color: transparent; }
 
   .news-image > img, .news-image > video { height: 190px; }
-  .news-content { padding: 1rem 1.1rem 1.2rem; }
+  .news-content { padding: .95rem 1.05rem 1.1rem; }
+  .news-content h3 { font-size: .9rem; }
+  .preview, .more-text { font-size: .8rem; }
+  .news-tag { font-size: .6rem; padding: 4px 10px; }
+  .news-date { font-size: .62rem; }
+  .tweet-embed blockquote { font-size: .8rem; }
 }
 
 @media (max-width: 480px) {
+  html { font-size: 14px; }
   .header-text h2 { font-size: 11px; }
   .lead-flag { font-size: .68rem; padding: 6px 13px; }
   .lead-photo { height: 165px; }
@@ -547,7 +575,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   .quote-photo { width: 100px; height: 126px; }
   .press a { padding: 12px; }
   .news-image > img, .news-image > video { height: 170px; }
-  .lead-points li { font-size: .88rem; }
+  .lead-points li { font-size: .8rem; }
   .activity-card h2 { font-size: 1.4rem; }
   .video-card { max-height: 440px; }
   .pagination button { padding: 10px 13px; min-height: 44px; }
@@ -740,23 +768,6 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
 
     <div class="news-grid" id="newsGrid">
 
-      <!-- Facebook video 1 -->
-      <article class="news-card">
-        <div class="news-image">
-          <span class="news-tag">Enforcement</span>
-          <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="OCCPA Clamps Down on Unfair Trade Practices in Ondo State">
-            <button class="video-poster" type="button" aria-label="Play video">
-              <span class="video-poster-ring"><i class="fas fa-play"></i></span>
-              <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
-            </button>
-          </div>
-        </div>
-        <div class="news-content">
-          <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
-          <a href="https://web.facebook.com/reel/933525072786066/" target="_blank" rel="noopener noreferrer" class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
-        </div>
-      </article>
-
       <!-- Chairman appointment / resumption (X posts) -->
       <article class="news-card">
         <div class="news-image">
@@ -782,6 +793,23 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
           </div>
           <blockquote>"The work begins today."</blockquote>
           <a href="https://x.com/YemieFash/status/2099620409565945976" target="_blank" rel="noopener noreferrer">View post on X <i class="fas fa-arrow-up-right-from-square" style="font-size:.68rem;"></i></a>
+        </div>
+      </article>
+
+      <!-- Facebook video 1 -->
+      <article class="news-card">
+        <div class="news-image">
+          <span class="news-tag">Enforcement</span>
+          <div class="video-card" data-video-src="https://www.facebook.com/plugins/video.php?height=476&amp;href=https%3A%2F%2Fweb.facebook.com%2Freel%2F933525072786066%2F&amp;show_text=false&amp;width=267&amp;t=0" data-video-title="OCCPA Clamps Down on Unfair Trade Practices in Ondo State">
+            <button class="video-poster" type="button" aria-label="Play video">
+              <span class="video-poster-ring"><i class="fas fa-play"></i></span>
+              <span class="video-poster-label"><i class="fab fa-facebook"></i> Tap to play video</span>
+            </button>
+          </div>
+        </div>
+        <div class="news-content">
+          <h3>OCCPA Clamps Down on Unfair Trade Practices in Ondo State</h3>
+          <a href="https://web.facebook.com/reel/933525072786066/" target="_blank" rel="noopener noreferrer" class="fb-watch-link"><i class="fab fa-facebook"></i> Watch on Facebook</a>
         </div>
       </article>
 
