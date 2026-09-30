@@ -402,6 +402,35 @@ nav a.active { color: var(--navy); background: var(--navy-soft); }
 .gallery.show { display: grid; animation: fadeIn .3s ease; }
 .gallery img { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; }
 
+
+/* ===================================================================
+   EXTERNAL LINK PREVIEW CARDS — admin-created news links
+=================================================================== */
+.link-preview-card {
+  display: none; margin-top: 14px; border: 1px solid var(--line); border-radius: 12px;
+  overflow: hidden; background: var(--paper); box-shadow: var(--shadow-sm);
+  text-decoration: none; transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.link-preview-card.is-ready { display: grid; grid-template-columns: 150px 1fr; }
+.link-preview-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--gold); }
+.link-preview-image { width: 150px; min-height: 120px; height: 100%; object-fit: cover; background: var(--navy-soft); display: block; }
+.link-preview-copy { padding: 13px 15px; min-width: 0; }
+.link-preview-label { display: flex; align-items: center; gap: 6px; color: var(--gold-dark); font-size: .66rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; }
+.link-preview-title { color: var(--navy); font-size: .9rem; line-height: 1.35; font-weight: 800; margin-bottom: 5px; }
+.link-preview-description { color: var(--text-muted); font-size: .77rem; line-height: 1.5; margin-bottom: 7px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.link-preview-domain { color: var(--text-muted); font-size: .7rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-preview-card.no-image { display: none; }
+.link-preview-card.no-image.is-ready { display: block; }
+.lead-link-preview { max-width: 620px; position: relative; z-index: 1; margin: 0 0 22px; }
+.activity-link-preview { margin-top: 18px; }
+@media (max-width: 600px) {
+  .link-preview-card.is-ready { grid-template-columns: 105px 1fr; }
+  .link-preview-image { width: 105px; min-height: 105px; }
+  .link-preview-copy { padding: 11px 12px; }
+  .link-preview-title { font-size: .82rem; }
+  .link-preview-description { font-size: .72rem; -webkit-line-clamp: 2; }
+}
+
 /* Tweet-embed style card for X posts */
 .tweet-embed {
   margin: 0 1.3rem 1rem; padding: 14px 16px; background: var(--cream);
@@ -682,6 +711,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
         <h2 id="lead-heading">{{ top.title }}</h2>
         <p class="lead-deck">{{ top.summary }}</p>
         {% if top.body %}<div class="lead-body">{{ top.body | truncate(420) | nl2br }}</div>{% endif %}
+        {% if top.link %}<a class="link-preview-card lead-link-preview" data-link-preview-id="{{ top.id }}" href="{{ top.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ top.title }}">
+          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy"></span>
+          <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
+        </a>{% endif %}
         <div class="lead-actions">
           {% if top.link %}
           <a class="btn btn-gold" href="{{ top.link }}" target="_blank" rel="noopener noreferrer">Read the full report <i class="fas fa-arrow-up-right-from-square"></i></a>
@@ -770,6 +803,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
         <p>{{ act.summary }}</p>
         {% if act.body %}<div class="activity-body">{{ act.body | truncate(500) | nl2br }}</div>{% endif %}
         <div class="targets" aria-label="Category"><span>{{ act.tag }}</span></div>
+        {% if act.link %}<a class="link-preview-card activity-link-preview" data-link-preview-id="{{ act.id }}" href="{{ act.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ act.title }}">
+          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy"></span>
+          <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
+        </a>{% endif %}
       </div>
       <div class="press">
         {% if act.images %}
@@ -905,6 +942,10 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
           <h3>{{ post.title }}</h3>
           <p class="preview">{{ post.summary }}</p>
           {% if post.body %}<div class="more-text">{{ post.body | nl2br }}</div>{% endif %}
+          {% if post.link %}<a class="link-preview-card" data-link-preview-id="{{ post.id }}" href="{{ post.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ post.title }}">
+            <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy"></span>
+            <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
+          </a>{% endif %}
           <div class="actions">
             {% if post.body %}<button class="read-more" type="button" aria-expanded="false">Read more</button>{% endif %}
             {% if post.images|length > 1 %}<button class="gallery-btn" type="button" aria-expanded="false">View gallery</button>{% endif %}
@@ -1449,6 +1490,65 @@ document.addEventListener("DOMContentLoaded", function () {
     v.addEventListener("play", function () {
       videos.forEach(function (o) { if (o !== v) o.pause(); });
     });
+  });
+
+  /* External article previews for admin-created news links */
+  document.querySelectorAll(".link-preview-card[data-link-preview-id]").forEach(function (card) {
+    var postId = card.getAttribute("data-link-preview-id");
+    if (!postId) return;
+
+    fetch("/news/" + encodeURIComponent(postId) + "/link-preview", {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+      credentials: "same-origin"
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error("Preview unavailable");
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data || data.error) throw new Error("No preview data");
+
+        var title = data.title || data.og_title || data.twitter_title || "";
+        var description = data.description || data.og_description || data.twitter_description || "";
+        var image = data.image || data.og_image || data.twitter_image || "";
+        var url = data.url || data.canonical || data.source_url || card.getAttribute("href") || "";
+
+        var titleEl = card.querySelector(".link-preview-title");
+        var descEl = card.querySelector(".link-preview-description");
+        var domainEl = card.querySelector(".link-preview-domain");
+        var imageEl = card.querySelector(".link-preview-image");
+
+        if (titleEl) titleEl.textContent = title;
+        if (descEl) {
+          descEl.textContent = description;
+          descEl.style.display = description ? "-webkit-box" : "none";
+        }
+        if (domainEl) {
+          try { domainEl.textContent = new URL(url).hostname.replace(/^www\./, ""); }
+          catch (_) { domainEl.textContent = url; }
+        }
+
+        if (imageEl && image) {
+          imageEl.src = image;
+          imageEl.alt = title || "Article preview";
+          imageEl.addEventListener("error", function () {
+            var wrap = imageEl.closest(".link-preview-image-wrap");
+            if (wrap) wrap.remove();
+            card.classList.add("no-image");
+          }, { once: true });
+        } else {
+          var wrap = card.querySelector(".link-preview-image-wrap");
+          if (wrap) wrap.remove();
+          card.classList.add("no-image");
+        }
+
+        card.classList.add("is-ready");
+      })
+      .catch(function () {
+        /* Keep the existing Read full story button when a site blocks preview fetching. */
+        card.remove();
+      });
   });
 
   /* Pagination (activities grid only) */

@@ -774,49 +774,67 @@ footer::before {
 <section class="slider-container" aria-label="Featured slides">
   <div class="slider" id="slider">
 
-    <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
-      <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="eager">
-      <div class="vignette"></div>
-      <div class="slide-text">
-        <span class="slide-eyebrow">Consumer Protection Bill</span>
-        <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
-        <p>Ondo Assembly passes Consumer Protection Agency bill into law </p>
-        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-      </div>
-    </div>
-
-    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-      <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="Consumer Protection" loading="lazy">
-      <div class="vignette"></div>
-      <div class="slide-text">
-        <span class="slide-eyebrow">Our Mandate</span>
-        <h2>Consumer Protection</h2>
-        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
-        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-      </div>
-    </div>
-
-    <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
-      <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
-      <div class="vignette"></div>
+    {% if homepage_slides %}
+      {% for slide in homepage_slides %}
+      <div class="slide" role="group" aria-roledescription="slide"
+           aria-label="{{ loop.index }} of {{ homepage_slides|length }}">
+        <img src="{{ homepage_img(slide.filename) }}"
+             alt="OCCPA featured image {{ loop.index }}"
+             loading="{{ 'eager' if loop.first else 'lazy' }}">
+        <div class="vignette"></div>
         <div class="slide-text">
-        <span class="slide-eyebrow">Our Mandate</span>
-        <h2>Consumer Protection</h2>
-        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
-        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+          <span class="slide-eyebrow">OCCPA Update</span>
+          <h2>Ondo State Competition &amp; Consumer Protection Agency</h2>
+          <p>Protecting consumers and promoting fair competition across Ondo State.</p>
+          <a href="/news" class="slide-cta">News &amp; Activities &rarr;</a>
+        </div>
       </div>
-    </div>
+      {% endfor %}
+    {% else %}
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+        <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="eager">
+        <div class="vignette"></div>
+        <div class="slide-text">
+          <span class="slide-eyebrow">Consumer Protection Bill</span>
+          <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
+          <p>Ondo Assembly passes Consumer Protection Agency bill into law</p>
+          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+        </div>
+      </div>
 
-    <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
-      <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
-      <div class="vignette"></div>
-      <div class="slide-text">
-        <span class="slide-eyebrow">Updates</span>
-        <h2>OCCPA Management</h2>
-        <p>Ondo State Consumer Protection Agency strengthens management structure, Governor appoints new Chairman.</p>
-        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
+        <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="Consumer Protection" loading="lazy">
+        <div class="vignette"></div>
+        <div class="slide-text">
+          <span class="slide-eyebrow">Our Mandate</span>
+          <h2>Consumer Protection</h2>
+          <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+        </div>
       </div>
-    </div>
+
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
+        <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
+        <div class="vignette"></div>
+        <div class="slide-text">
+          <span class="slide-eyebrow">Our Mandate</span>
+          <h2>Consumer Protection</h2>
+          <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+        </div>
+      </div>
+
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
+        <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
+        <div class="vignette"></div>
+        <div class="slide-text">
+          <span class="slide-eyebrow">Updates</span>
+          <h2>OCCPA Management</h2>
+          <p>Ondo State Consumer Protection Agency strengthens management structure, Governor appoints new Chairman.</p>
+          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
+        </div>
+      </div>
+    {% endif %}
 
   </div>
   <button class="prev" onclick="prevSlide()" aria-label="Previous slide">&#10094;</button>

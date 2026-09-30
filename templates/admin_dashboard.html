@@ -122,6 +122,26 @@ table.data tbody tr:hover{background:#FBF9FE}
 .s-resolved{background-color:#D8F0E1;color:#1E6B3F}
 .badge{display:inline-block;border-radius:20px;padding:4px 12px;font-size:.76rem;font-weight:700}
 
+/* HOMEPAGE SLIDER TAB */
+.homepage-hint{font-size:.82rem;color:var(--muted);margin:-4px 0 14px}
+.homepage-manager{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.homepage-upload-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow-sm)}
+.homepage-upload-card h3{font-size:1.1rem;margin-bottom:4px;color:var(--navy-deep)}
+.homepage-upload-card p{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+.homepage-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.homepage-upload-row input[type="file"]{font-size:.84rem;max-width:100%}
+.homepage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.homepage-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.homepage-card img{display:block;width:100%;height:150px;object-fit:cover;background:var(--navy-soft)}
+.homepage-card-body{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.homepage-card-body strong{font-size:.8rem;color:var(--muted)}
+@media(max-width:600px){
+  .homepage-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .homepage-card img{height:110px}
+  .homepage-upload-row{display:grid}
+  .homepage-upload-row input[type="file"],.homepage-upload-row .btn{width:100%;min-height:42px}
+}
+
 /* NEWS TAB */
 .news-hint{font-size:.82rem;color:var(--muted);margin:-4px 0 14px}
 .news-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;display:block;border:1px solid var(--line);background:var(--navy-soft)}
@@ -353,6 +373,9 @@ table.data tbody tr:hover{background:#FBF9FE}
       </button>
       <button type="button" class="tab-btn" data-tab="newsTab" role="tab" aria-selected="false">
         <i class="fa-solid fa-newspaper"></i> News <span class="count-pill">{{ news_posts|length }}</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="homepageTab" role="tab" aria-selected="false">
+        <i class="fa-solid fa-images"></i> Homepage <span class="count-pill">{{ homepage_slides|length }}</span>
       </button>
     </div>
     <a class="btn" href="{{ url_for('export_excel') }}"><i class="fa-solid fa-file-excel"></i> Download all data (Excel)</a>
@@ -645,6 +668,56 @@ table.data tbody tr:hover{background:#FBF9FE}
   </div>
 </div>
 
+<!-- ========== HOMEPAGE SLIDER ========== -->
+<section class="tab-content" id="homepageTab" role="tabpanel">
+  <p class="homepage-hint">
+    Upload images for the homepage slider. These images are <strong>separate from News photos</strong>.
+    The current static slider remains available automatically when no homepage images are uploaded.
+  </p>
+
+  <div class="homepage-manager">
+    <div class="homepage-upload-card">
+      <h3><i class="fa-solid fa-images"></i> Homepage Slider Images</h3>
+      <p>Upload up to 10 images. New images are added to the end of the slider in upload order.</p>
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('homepage_slides_upload') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="homepage-upload-row">
+          <input type="file" name="homepage_images" multiple
+                 accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                 aria-label="Choose homepage slider images">
+          <button type="submit" class="btn primary">
+            <i class="fa-solid fa-upload"></i> Upload to Homepage
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if homepage_slides %}
+    <div class="homepage-grid">
+      {% for slide in homepage_slides %}
+      <div class="homepage-card">
+        <img src="{{ homepage_img(slide.filename) }}" alt="Homepage slide {{ loop.index }}" loading="lazy">
+        <div class="homepage-card-body">
+          <strong>Slide {{ loop.index }}</strong>
+          <form method="POST" action="{{ url_for('homepage_slide_delete', slide_id=slide.id) }}" class="js-confirm"
+                data-title="Delete homepage image?"
+                data-confirm="This will remove Slide {{ loop.index }} from the homepage slider.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-sm danger"><i class="fa-solid fa-trash"></i> Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <i class="fa-regular fa-images"></i>
+      <span>No homepage images have been uploaded yet. The existing static slider will continue to show.</span>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
 <!-- CONFIRM MODAL -->
 <div class="modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfText" hidden>
   <div class="modal-card small">
@@ -691,6 +764,11 @@ const NEWS_POSTS = [
   'image': news_img(n.image) if n.image else '',
   'images': n.gallery
 } | tojson }}{{ ',' if not loop.last }}
+{%- endfor %}
+];
+const HOMEPAGE_SLIDES = [
+{%- for s in homepage_slides %}
+{{ {'id': s.id, 'image': homepage_img(s.filename), 'position': s.position} | tojson }}{{ ',' if not loop.last }}
 {%- endfor %}
 ];
 {% with msgs = get_flashed_messages(with_categories=true) %}

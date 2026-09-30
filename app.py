@@ -112,6 +112,7 @@ if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
 STORAGE_URL = f"{SUPABASE_URL}/storage/v1"
 EVIDENCE_BUCKET = os.environ.get("EVIDENCE_BUCKET", "evidence")
 NEWS_BUCKET = os.environ.get("NEWS_BUCKET", "news-images")
+HOMEPAGE_BUCKET = os.environ.get("HOMEPAGE_BUCKET", "homepage-images")
 SIGNED_URL_SECONDS = 300
 STORAGE_TIMEOUT = 60
 
@@ -188,10 +189,16 @@ def news_img_url(name):
         return ""
     return f"{STORAGE_URL}/object/public/{NEWS_BUCKET}/{quote(name)}"
 
+def homepage_img_url(name):
+    """Public URL of a homepage slider image (bucket is public)."""
+    if not name:
+        return ""
+    return f"{STORAGE_URL}/object/public/{HOMEPAGE_BUCKET}/{quote(name)}"
+
 
 @app.context_processor
 def inject_storage_helpers():
-    return {"news_img": news_img_url}
+    return {"news_img": news_img_url, "homepage_img": homepage_img_url}
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +232,14 @@ class Complaint(db.Model):
     complaint_details = db.Column(db.Text)
     evidence = db.Column(db.String(255))
     status = db.Column(db.String(50), default="Pending")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class HomepageSlide(db.Model):
+    """Images used only by the public homepage slider."""
+    __tablename__ = 'homepage_slides'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class NewsPost(db.Model):
@@ -273,6 +288,7 @@ def init_storage_command():
     buckets = [
         (EVIDENCE_BUCKET, False),
         (NEWS_BUCKET, True),
+        (HOMEPAGE_BUCKET, True),
     ]
     limit = MAX_UPLOAD_MB * 1024 * 1024
     for name, public in buckets:
@@ -530,6 +546,63 @@ def save_news_image(file_storage):
     finally:
         Image.MAX_IMAGE_PIXELS = old_limit
 
+def save_homepage_image(file_storage):
+    """Validate, resize, compress and upload one homepage slider image."""
+    if not file_storage or not file_storage.filename:
+        return None
+
+    ext = file_storage.filename.rsplit(".", 1)[-1].lower() if "." in file_storage.filename else ""
+    if ext not in ALLOWED_NEWS_IMAGE_EXT:
+        raise ValueError("Homepage images must be PNG, JPG/JPEG or WEBP.")
+
+    old_limit = Image.MAX_IMAGE_PIXELS
+    Image.MAX_IMAGE_PIXELS = NEWS_IMAGE_MAX_PIXELS
+    try:
+        file_storage.stream.seek(0)
+        try:
+            probe = Image.open(file_storage.stream)
+            probe.verify()
+        except Exception:
+            raise ValueError("That homepage file is not a valid image.")
+
+        file_storage.stream.seek(0)
+        try:
+            img = Image.open(file_storage.stream)
+            img.load()
+            img = ImageOps.exif_transpose(img)
+            if img.mode in ("RGBA", "LA", "P"):
+                rgba = img.convert("RGBA")
+                flat = Image.new("RGB", rgba.size, (255, 255, 255))
+                flat.paste(rgba, mask=rgba.split()[-1])
+                img = flat
+            else:
+                img = img.convert("RGB")
+            img.thumbnail((NEWS_IMAGE_MAX_DIMENSION, NEWS_IMAGE_MAX_DIMENSION), Image.LANCZOS)
+        except ValueError:
+            raise
+        except Exception:
+            raise ValueError("Could not process that homepage image. Please try a different file.")
+
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=NEWS_IMAGE_JPEG_QUALITY, optimize=True)
+        stored = f"{uuid.uuid4().hex[:16]}.jpg"
+        sb_upload(HOMEPAGE_BUCKET, stored, buf.getvalue(), "image/jpeg",
+                  cache_control="max-age=31536000")
+        return stored
+    finally:
+        Image.MAX_IMAGE_PIXELS = old_limit
+
+
+def remove_homepage_image(name):
+    """Delete a homepage slider image from the public bucket."""
+    if not name:
+        return
+    safe = os.path.basename(name)
+    if safe != name:
+        return
+    sb_delete(HOMEPAGE_BUCKET, [safe])
+
+
 def remove_news_image(name):
     """Delete a news image from the public bucket."""
     if not name:
@@ -679,7 +752,11 @@ def change_password():
 def index():
     latest_news = NewsPost.query.filter_by(published=True) \
                                  .order_by(NewsPost.created_at.desc()).first()
-    return render_template("index.html", latest_news=latest_news)
+    homepage_slides = HomepageSlide.query.order_by(
+        HomepageSlide.position.asc(), HomepageSlide.id.asc()
+    ).all()
+    return render_template("index.html", latest_news=latest_news,
+                           homepage_slides=homepage_slides)
 
 @app.route("/about")
 def about():
@@ -766,8 +843,10 @@ def admin_dashboard():
     complaints_data = Complaint.query.order_by(Complaint.created_at.desc()).all()
     contacts_data = Contact.query.order_by(Contact.created_at.desc()).all()
     news_data = NewsPost.query.order_by(NewsPost.created_at.desc()).all()
+    homepage_data = HomepageSlide.query.order_by(HomepageSlide.position.asc(), HomepageSlide.id.asc()).all()
     return render_template("admin_dashboard.html", complaints=complaints_data,
-                            contacts=contacts_data, news_posts=news_data)
+                            contacts=contacts_data, news_posts=news_data,
+                            homepage_slides=homepage_data)
 
 @app.route("/admin/evidence/<path:filename>")
 @login_required
@@ -834,6 +913,80 @@ def delete_contact(contact_id):
     db.session.delete(contact_obj)
     db.session.commit()
     flash("Contact deleted successfully", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+# ---------------------------------------------------------------------------
+# ADMIN: HOMEPAGE SLIDER
+# ---------------------------------------------------------------------------
+@app.route("/admin/homepage-slides/upload", methods=["POST"])
+@login_required
+@csrf_protect
+def homepage_slides_upload():
+    files = [f for f in request.files.getlist("homepage_images")
+             if f and f.filename][:10]
+
+    if not files:
+        flash("Choose at least one homepage image.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    existing_count = HomepageSlide.query.count()
+    if existing_count >= 10:
+        flash("The homepage slider already has 10 images. Delete an old image before adding another.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    room = 10 - existing_count
+    files = files[:room]
+    saved = []
+    try:
+        for file_storage in files:
+            name = save_homepage_image(file_storage)
+            if name:
+                saved.append(name)
+
+        start_position = db.session.query(db.func.max(HomepageSlide.position)).scalar()
+        start_position = (start_position + 1) if start_position is not None else 0
+
+        for offset, name in enumerate(saved):
+            db.session.add(HomepageSlide(filename=name, position=start_position + offset))
+        db.session.commit()
+    except ValueError as e:
+        db.session.rollback()
+        for name in saved:
+            remove_homepage_image(name)
+        flash(str(e), "error")
+        return redirect(url_for("admin_dashboard"))
+    except Exception:
+        db.session.rollback()
+        for name in saved:
+            remove_homepage_image(name)
+        flash("Could not save the homepage images. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    flash(f"{len(saved)} homepage image(s) uploaded successfully.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/homepage-slides/delete/<int:slide_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def homepage_slide_delete(slide_id):
+    slide = HomepageSlide.query.get_or_404(slide_id)
+    name = slide.filename
+    db.session.delete(slide)
+    db.session.commit()
+
+    remove_homepage_image(name)
+
+    # Keep the remaining slides numbered from zero.
+    remaining = HomepageSlide.query.order_by(
+        HomepageSlide.position.asc(), HomepageSlide.id.asc()
+    ).all()
+    for pos, item in enumerate(remaining):
+        item.position = pos
+    db.session.commit()
+
+    flash("Homepage image deleted.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
