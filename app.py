@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, ".env"))   # must run before anything reads os.environ
+
 import io
 import re
 import math
@@ -6,19 +11,23 @@ import time
 import uuid
 import secrets
 import threading
+import click
+import requests
 import pandas as pd
+from urllib.parse import quote
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import (Flask, Response, render_template, request, redirect, send_file,
-                   send_from_directory, url_for, session, flash, jsonify, abort)
+                   url_for, session, flash, jsonify, abort)
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from markupsafe import Markup, escape
+# Pillow is used to safely re-encode/compress news images (pip install Pillow)
+from PIL import Image, ImageOps
 
 app = Flask(__name__)
-
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 # ---------------------------------------------------------------------------
@@ -26,7 +35,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # ---------------------------------------------------------------------------
 def load_secret_key():
     """Use the SECRET_KEY env var if set, otherwise create and reuse a random
-    key stored in .secret_key (never hard-code it, never commit it)."""
+    key stored in .secret_key (never hard-code it, never commit it).
+    In production ALWAYS set SECRET_KEY as an env var (disk may be wiped on deploy)."""
     key = os.environ.get("SECRET_KEY")
     if key:
         return key
@@ -48,7 +58,22 @@ def load_secret_key():
 
 app.secret_key = load_secret_key()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'complaints.db')
+# ---------------------------------------------------------------------------
+# DATABASE: Supabase (Postgres)
+# Set DATABASE_URL to the Supabase *Session pooler* URI (Connect -> Session pooler, port 5432):
+#   postgresql://postgres.<ref>:<PASSWORD>@aws-0-<region>.pooler.supabase.com:5432/postgres
+# ---------------------------------------------------------------------------
+db_url = os.environ.get("DATABASE_URL")
+if not db_url:
+    raise RuntimeError("DATABASE_URL is not set. Add your Supabase connection string to the environment.")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,   # drop dead connections instead of erroring
+    "pool_recycle": 300,     # recycle before the pooler closes idle connections
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 MAX_UPLOAD_MB = 10
@@ -67,15 +92,106 @@ if os.environ.get("TRUST_PROXY") == "1":
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
-# Evidence is stored OUTSIDE /static so it is never publicly reachable.
-UPLOAD_FOLDER = os.path.join(basedir, "private_uploads")
-# Files uploaded by the old version live here. They stay readable, but only by a logged-in admin.
-LEGACY_UPLOAD_FOLDER = os.path.join(basedir, "static", "uploads")
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+
+# ---------------------------------------------------------------------------
+# SUPABASE STORAGE
+#   SUPABASE_URL          https://<project-ref>.supabase.co
+#   SUPABASE_SERVICE_KEY  the service_role / secret key (SERVER ONLY, never in templates or JS)
+# Two buckets (create with `flask init-storage`):
+#   evidence     -> PRIVATE. Only reachable through short-lived signed links for a logged-in admin.
+#   news-images  -> PUBLIC.  Cover/gallery photos shown on the site.
+# ---------------------------------------------------------------------------
+SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "").rstrip("/")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or ""
+if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    raise RuntimeError("SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in the environment.")
+
+STORAGE_URL = f"{SUPABASE_URL}/storage/v1"
+EVIDENCE_BUCKET = os.environ.get("EVIDENCE_BUCKET", "evidence")
+NEWS_BUCKET = os.environ.get("NEWS_BUCKET", "news-images")
+SIGNED_URL_SECONDS = 300
+STORAGE_TIMEOUT = 60
+
+if SUPABASE_SERVICE_KEY.startswith("sb_publishable_"):
+    raise RuntimeError("SUPABASE_SERVICE_KEY is a *publishable* key. Use the secret key "
+                       "(sb_secret_...) or the legacy service_role key instead.")
+
+_sb = requests.Session()
+_sb.headers.update({"apikey": SUPABASE_SERVICE_KEY})
+# Legacy service_role keys are JWTs and go in Authorization too.
+# New sb_secret_ keys are NOT JWTs and must only be sent in the apikey header.
+if SUPABASE_SERVICE_KEY.startswith("eyJ"):
+    _sb.headers["Authorization"] = f"Bearer {SUPABASE_SERVICE_KEY}"
+
+UPLOAD_ERROR = "We could not store the file right now. Please try again."
+
+
+def sb_upload(bucket, key, data, content_type, cache_control=None):
+    """Upload bytes to Supabase Storage. Raises ValueError (user-friendly) on failure."""
+    headers = {"Content-Type": content_type, "x-upsert": "false"}
+    if cache_control:
+        headers["cache-control"] = cache_control
+    try:
+        r = _sb.post(f"{STORAGE_URL}/object/{bucket}/{quote(key)}",
+                     data=data, headers=headers, timeout=STORAGE_TIMEOUT)
+    except requests.RequestException as e:
+        app.logger.error("Supabase upload error: %s", e)
+        raise ValueError(UPLOAD_ERROR)
+    if r.status_code not in (200, 201):
+        app.logger.error("Supabase upload failed (%s): %s", r.status_code, r.text[:300])
+        raise ValueError(UPLOAD_ERROR)
+
+
+def sb_delete(bucket, keys):
+    """Best-effort delete of one or more objects. Never raises."""
+    keys = [k for k in keys if k]
+    if not keys:
+        return
+    try:
+        r = _sb.delete(f"{STORAGE_URL}/object/{bucket}",
+                       json={"prefixes": keys}, timeout=STORAGE_TIMEOUT)
+        if r.status_code not in (200, 201):
+            app.logger.warning("Supabase delete failed (%s): %s", r.status_code, r.text[:300])
+    except requests.RequestException as e:
+        app.logger.warning("Supabase delete error: %s", e)
+
+
+def sb_signed_url(bucket, key, expires=SIGNED_URL_SECONDS, download_name=None):
+    """Create a short-lived link to a private object. Returns None on failure."""
+    try:
+        r = _sb.post(f"{STORAGE_URL}/object/sign/{bucket}/{quote(key)}",
+                     json={"expiresIn": expires}, timeout=STORAGE_TIMEOUT)
+        if r.status_code != 200:
+            return None
+        signed = r.json().get("signedURL")
+    except (requests.RequestException, ValueError):
+        return None
+    if not signed:
+        return None
+    if signed.startswith("/storage/v1"):
+        url = f"{SUPABASE_URL}{signed}"
+    elif signed.startswith("/"):
+        url = f"{STORAGE_URL}{signed}"
+    else:
+        url = signed
+    if download_name:
+        url += f"&download={quote(download_name)}"
+    return url
+
+
+def news_img_url(name):
+    """Public URL of a news image (bucket is public)."""
+    if not name:
+        return ""
+    return f"{STORAGE_URL}/object/public/{NEWS_BUCKET}/{quote(name)}"
+
+
+@app.context_processor
+def inject_storage_helpers():
+    return {"news_img": news_img_url}
 
 
 # ---------------------------------------------------------------------------
@@ -110,6 +226,78 @@ class Complaint(db.Model):
     evidence = db.Column(db.String(255))
     status = db.Column(db.String(50), default="Pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class NewsPost(db.Model):
+    __tablename__ = 'news_posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    tag = db.Column(db.String(60), default="Update")
+    summary = db.Column(db.String(500), nullable=False)   # short preview shown on cards / homepage
+    body = db.Column(db.Text)                             # optional longer "read more" text
+    image = db.Column(db.String(255))                     # cover photo -- object name in the news-images bucket
+    link = db.Column(db.String(500))                      # optional external press/source link
+    published = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @property
+    def gallery(self):
+        return [{'id': i.id, 'f': i.filename} for i in self.images]
+
+class NewsImage(db.Model):
+    """Extra gallery photos for a news post (a post can have several)."""
+    __tablename__ = 'news_images'
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('news_posts.id', ondelete='CASCADE'), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=0, nullable=False)
+    post = db.relationship('NewsPost', backref=db.backref(
+        'images', order_by='NewsImage.position', cascade='all, delete-orphan'))
+
+
+# ---------------------------------------------------------------------------
+# CLI: fresh database setup
+#   flask init-db                      -> creates all tables in Supabase
+#   flask init-storage                 -> creates the two storage buckets
+#   flask create-admin <username>      -> prompts for a password, creates an admin
+# ---------------------------------------------------------------------------
+@app.cli.command("init-db")
+def init_db_command():
+    """Create all tables (use this for a fresh Supabase database)."""
+    db.create_all()
+    click.echo("Tables created.")
+
+@app.cli.command("init-storage")
+def init_storage_command():
+    """Create the private 'evidence' bucket and the public 'news-images' bucket."""
+    buckets = [
+        (EVIDENCE_BUCKET, False),
+        (NEWS_BUCKET, True),
+    ]
+    limit = MAX_UPLOAD_MB * 1024 * 1024
+    for name, public in buckets:
+        r = _sb.post(f"{STORAGE_URL}/bucket",
+                     json={"id": name, "name": name, "public": public, "file_size_limit": limit},
+                     timeout=STORAGE_TIMEOUT)
+        if r.status_code in (200, 201):
+            click.echo(f"Created {'public' if public else 'private'} bucket '{name}'.")
+        elif "already exists" in r.text.lower() or r.status_code == 409:
+            click.echo(f"Bucket '{name}' already exists.")
+        else:
+            click.echo(f"Could not create '{name}' ({r.status_code}): {r.text[:200]}")
+
+@app.cli.command("create-admin")
+@click.argument("username")
+@click.password_option()
+def create_admin_command(username, password):
+    """Create an admin user."""
+    if len(password) < 10:
+        raise click.ClickException("Password must be at least 10 characters.")
+    if Admin.query.filter_by(username=username).first():
+        raise click.ClickException("That username already exists.")
+    db.session.add(Admin(username=username, password=generate_password_hash(password)))
+    db.session.commit()
+    click.echo(f"Admin '{username}' created.")
 
 
 # ---------------------------------------------------------------------------
@@ -204,7 +392,7 @@ def login_clear(key):
         _login_state.pop(key, None)
 
 
-# ---- Evidence uploads ------------------------------------------------------
+# ---- Evidence uploads (private Supabase bucket) ----------------------------
 ALLOWED_EVIDENCE = {"png", "jpg", "jpeg", "gif", "webp", "pdf", "doc", "docx",
                     "xls", "xlsx", "txt", "mp4"}
 
@@ -243,8 +431,8 @@ def _content_matches_extension(ext, head):
     return False
 
 def save_evidence(file_storage):
-    """Validate and store an upload. Returns the stored filename or None.
-    Raises ValueError with a user-friendly message if rejected."""
+    """Validate and upload to the private evidence bucket. Returns the stored
+    object name or None. Raises ValueError with a user-friendly message if rejected."""
     if not file_storage or not file_storage.filename:
         return None
     raw_name = file_storage.filename
@@ -256,14 +444,16 @@ def save_evidence(file_storage):
     file_storage.stream.seek(0)
     if not _content_matches_extension(ext, head):
         raise ValueError("The file looks damaged or does not match its type. Please upload it again.")
+    data = file_storage.stream.read()
+    if not data:
+        raise ValueError("That file is empty.")
     safe_stem = secure_filename(stem)[:60] or "evidence"
     stored = f"{uuid.uuid4().hex[:12]}_{safe_stem}.{ext}"
-    file_storage.save(os.path.join(UPLOAD_FOLDER, stored))
+    sb_upload(EVIDENCE_BUCKET, stored, data, EVIDENCE_MIME[ext])
     return stored
 
 def remove_evidence_file(name, exclude_complaint_id=None):
-    """Delete a stored evidence file, but only inside the upload folders, and
-    only if no other complaint still points at it."""
+    """Delete a stored evidence object, but only if no other complaint still points at it."""
     if not name:
         return
     safe = os.path.basename(name)
@@ -274,19 +464,113 @@ def remove_evidence_file(name, exclude_complaint_id=None):
         q = q.filter(Complaint.id != exclude_complaint_id)
     if q.count():
         return
-    for folder in (UPLOAD_FOLDER, LEGACY_UPLOAD_FOLDER):
-        path = os.path.join(folder, safe)
-        if os.path.isfile(path):
-            try:
-                os.remove(path)
-            except OSError:
-                pass
+    sb_delete(EVIDENCE_BUCKET, [safe])
 
 def _respond(ok, message, status=200, endpoint="complaints"):
     if is_xhr():
         return jsonify(ok=ok, error=None if ok else message), status
     flash(message, "success" if ok else "error")
     return redirect(url_for(endpoint))
+
+
+# ---- News images: validated, re-encoded, compressed, then uploaded --------
+# Everything the admin uploads is fully decoded and re-saved as a fresh JPEG.
+# A file that isn't a genuine, decodable image is rejected outright, and
+# nothing from the original bytes (EXIF, trailing data, scripts) survives.
+ALLOWED_NEWS_IMAGE_EXT = {"png", "jpg", "jpeg", "webp"}
+NEWS_IMAGE_MAX_DIMENSION = 1600     # longest side, in pixels, after resizing
+NEWS_IMAGE_MAX_PIXELS = 40_000_000  # guards against decompression-bomb uploads
+NEWS_IMAGE_JPEG_QUALITY = 78
+
+def save_news_image(file_storage):
+    """Validate, safely re-encode, compress and upload a news image.
+    Returns the stored object name, or None if no file was supplied.
+    Raises ValueError with a user-friendly message if the upload is rejected."""
+    if not file_storage or not file_storage.filename:
+        return None
+
+    ext = file_storage.filename.rsplit(".", 1)[-1].lower() if "." in file_storage.filename else ""
+    if ext not in ALLOWED_NEWS_IMAGE_EXT:
+        raise ValueError("Images must be PNG, JPG/JPEG or WEBP.")
+
+    old_limit = Image.MAX_IMAGE_PIXELS
+    Image.MAX_IMAGE_PIXELS = NEWS_IMAGE_MAX_PIXELS
+    try:
+        file_storage.stream.seek(0)
+        try:
+            probe = Image.open(file_storage.stream)
+            probe.verify()
+        except Exception:
+            raise ValueError("That file is not a valid image.")
+
+        file_storage.stream.seek(0)
+        try:
+            img = Image.open(file_storage.stream)
+            img.load()
+            img = ImageOps.exif_transpose(img)
+            if img.mode in ("RGBA", "LA", "P"):
+                rgba = img.convert("RGBA")
+                flat = Image.new("RGB", rgba.size, (255, 255, 255))
+                flat.paste(rgba, mask=rgba.split()[-1])
+                img = flat
+            else:
+                img = img.convert("RGB")
+            img.thumbnail((NEWS_IMAGE_MAX_DIMENSION, NEWS_IMAGE_MAX_DIMENSION), Image.LANCZOS)
+        except ValueError:
+            raise
+        except Exception:
+            raise ValueError("Could not process that image. Please try a different file.")
+
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=NEWS_IMAGE_JPEG_QUALITY, optimize=True)
+        stored = f"{uuid.uuid4().hex[:16]}.jpg"
+        sb_upload(NEWS_BUCKET, stored, buf.getvalue(), "image/jpeg",
+                  cache_control="max-age=31536000")
+        return stored
+    finally:
+        Image.MAX_IMAGE_PIXELS = old_limit
+
+def remove_news_image(name):
+    """Delete a news image from the public bucket."""
+    if not name:
+        return
+    safe = os.path.basename(name)
+    if safe != name:
+        return
+    sb_delete(NEWS_BUCKET, [safe])
+
+NEWS_MAX_IMAGES = 10  # comfortably covers "at least 5 photos" per post
+
+def save_news_images(file_storages):
+    """Validate + compress + upload a batch of images (see save_news_image).
+    Returns the stored names in order. If any file in the batch is rejected,
+    every file already uploaded from this same batch is removed before the
+    error is raised, so a failed upload never leaves orphans."""
+    saved = []
+    try:
+        for fs in file_storages:
+            if not fs or not fs.filename:
+                continue
+            name = save_news_image(fs)
+            if name:
+                saved.append(name)
+        return saved
+    except ValueError:
+        for name in saved:
+            remove_news_image(name)
+        raise
+
+
+# ---- Template filter: safe line-break rendering for admin-written text ----
+@app.template_filter("nl2br")
+def nl2br(value):
+    """Escape the text (never trust admin-authored HTML into the page), then
+    turn blank-line-separated paragraphs into <p> tags."""
+    if not value:
+        return ""
+    paragraphs = re.split(r"\n\s*\n", str(value).strip())
+    html = "".join(f"<p>{escape(p).replace(chr(10), Markup('<br>'))}</p>" for p in paragraphs if p.strip())
+    return Markup(html)
 
 
 # ---------------------------------------------------------------------------
@@ -297,13 +581,6 @@ def redirect_to_www():
     if request.host == "occpa.on.gov.ng":
         return redirect("https://www.occpa.on.gov.ng" + request.full_path, code=301)
 
-@app.before_request
-def protect_legacy_uploads():
-    """Old evidence lived in /static/uploads (public). Keep the files working
-    for the admin, but hide them from everyone else."""
-    if request.path.startswith("/static/uploads/") and "admin_id" not in session:
-        abort(404)
-
 @app.after_request
 def security_headers(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -312,8 +589,7 @@ def security_headers(resp):
     resp.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
     if request.is_secure:
         resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-    if (request.path.startswith("/admin") or request.path == "/export_excel") \
-            and not request.path.startswith("/admin/evidence/"):
+    if request.path.startswith("/admin") or request.path == "/export_excel":
         resp.headers["Cache-Control"] = "no-store"
     return resp
 
@@ -401,7 +677,9 @@ def change_password():
 # ---------------------------------------------------------------------------
 @app.route("/")
 def index():
-    return render_template("index.html")
+    latest_news = NewsPost.query.filter_by(published=True) \
+                                 .order_by(NewsPost.created_at.desc()).first()
+    return render_template("index.html", latest_news=latest_news)
 
 @app.route("/about")
 def about():
@@ -413,7 +691,9 @@ def services():
 
 @app.route("/news")
 def news():
-    return render_template("news.html")
+    news_posts = NewsPost.query.filter_by(published=True) \
+                                .order_by(NewsPost.created_at.desc()).all()
+    return render_template("news.html", news_posts=news_posts)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -467,11 +747,7 @@ def complaints():
             db.session.commit()
         except Exception:
             db.session.rollback()
-            if evidence_filename:
-                try:
-                    os.remove(os.path.join(UPLOAD_FOLDER, evidence_filename))
-                except OSError:
-                    pass
+            sb_delete(EVIDENCE_BUCKET, [evidence_filename])   # don't leave an orphan upload
             return _respond(False, "We could not save your complaint. Please try again.", 500)
 
         if is_xhr():
@@ -489,39 +765,36 @@ def complaints():
 def admin_dashboard():
     complaints_data = Complaint.query.order_by(Complaint.created_at.desc()).all()
     contacts_data = Contact.query.order_by(Contact.created_at.desc()).all()
-    return render_template("admin_dashboard.html", complaints=complaints_data, contacts=contacts_data)
+    news_data = NewsPost.query.order_by(NewsPost.created_at.desc()).all()
+    return render_template("admin_dashboard.html", complaints=complaints_data,
+                            contacts=contacts_data, news_posts=news_data)
 
 @app.route("/admin/evidence/<path:filename>")
 @login_required
 def admin_evidence(filename):
-    """Serve an uploaded file to a logged-in admin only. Images, PDFs and video
-    open in the browser; everything else downloads. ?download=1 forces a download."""
+    """Logged-in admins only. Redirects to a 5-minute signed Supabase link.
+    Images, PDFs and video open in the browser; everything else downloads.
+    ?download=1 forces a download. The URL stays the same as before, so the
+    dashboard template needs no change."""
     name = os.path.basename(filename)
     if not name or name != filename:
         abort(404)
-    folder = next((f for f in (UPLOAD_FOLDER, LEGACY_UPLOAD_FOLDER)
-                   if os.path.isfile(os.path.join(f, name))), None)
-    if folder is None:
+
+    # Only serve files that a complaint actually references
+    if not Complaint.query.filter(Complaint.evidence == name).first():
         abort(404)
 
     ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""
     inline = ext in INLINE_EVIDENCE and not request.args.get("download")
     shown_name = re.sub(r"^[0-9a-f]{12}_", "", name)
 
-    resp = send_from_directory(
-        folder, name,
-        mimetype=EVIDENCE_MIME.get(ext, "application/octet-stream"),
-        as_attachment=not inline,
-        download_name=shown_name,
-        conditional=True,
-    )
-    resp.headers["X-Content-Type-Options"] = "nosniff"
-    resp.headers["Cache-Control"] = "private, max-age=300"
-    if ext != "pdf":
-        # Uploaded content can never run scripts even if it were opened directly
-        resp.headers["Content-Security-Policy"] = (
-            "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'; sandbox"
-        )
+    url = sb_signed_url(EVIDENCE_BUCKET, name,
+                        download_name=None if inline else shown_name)
+    if not url:
+        abort(404)
+    resp = redirect(url)
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Referrer-Policy"] = "no-referrer"
     return resp
 
 @app.route("/admin/complaints/status/<int:id>", methods=["POST"])
@@ -561,6 +834,145 @@ def delete_contact(contact_id):
     db.session.delete(contact_obj)
     db.session.commit()
     flash("Contact deleted successfully", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+# ---------------------------------------------------------------------------
+# ADMIN: NEWS POSTS  (drives the /news page and the homepage flash update)
+# ---------------------------------------------------------------------------
+def _news_form_fields():
+    return (
+        clean(request.form.get("title"), 200),
+        clean(request.form.get("tag"), 60) or "Update",
+        clean(request.form.get("summary"), 500),
+        clean(request.form.get("body"), 8000),
+        clean(request.form.get("link"), 500),
+        request.form.get("published") == "on",
+    )
+
+@app.route("/admin/news/create", methods=["POST"])
+@login_required
+@csrf_protect
+def news_create():
+    title, tag, summary, body, link, published = _news_form_fields()
+
+    if not title or not summary:
+        flash("Title and summary are required.", "error")
+        return redirect(url_for("admin_dashboard"))
+    if link and not re.match(r"^https?://", link, re.I):
+        flash("The link must start with http:// or https://", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    files = [f for f in request.files.getlist("images") if f and f.filename][:NEWS_MAX_IMAGES]
+    try:
+        image_names = save_news_images(files)
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("admin_dashboard"))
+
+    try:
+        post = NewsPost(title=title, tag=tag, summary=summary, body=body,
+                         link=link or None, image=(image_names[0] if image_names else None),
+                         published=published)
+        db.session.add(post)
+        db.session.flush()  # assigns post.id, needed for the NewsImage rows below
+        for i, name in enumerate(image_names):
+            db.session.add(NewsImage(post_id=post.id, filename=name, position=i))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        for name in image_names:
+            remove_news_image(name)
+        flash("Could not save the post. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    flash("News post published." if published else "News post saved as a draft.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/news/edit/<int:post_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def news_edit(post_id):
+    post = NewsPost.query.get_or_404(post_id)
+    title, tag, summary, body, link, published = _news_form_fields()
+
+    if not title or not summary:
+        flash("Title and summary are required.", "error")
+        return redirect(url_for("admin_dashboard"))
+    if link and not re.match(r"^https?://", link, re.I):
+        flash("The link must start with http:// or https://", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    remove_ids = {int(i) for i in request.form.getlist("remove_image") if i.isdigit()}
+    existing = list(post.images)                       # already ordered by position
+    keep = [img for img in existing if img.id not in remove_ids]
+    to_delete = [img for img in existing if img.id in remove_ids]
+
+    room_left = max(0, NEWS_MAX_IMAGES - len(keep))
+    new_files = [f for f in request.files.getlist("images") if f and f.filename][:room_left]
+    try:
+        new_names = save_news_images(new_files)
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("admin_dashboard"))
+
+    delete_names = [img.filename for img in to_delete]
+    try:
+        post.title, post.tag, post.summary, post.body = title, tag, summary, body
+        post.link = link or None
+        post.published = published
+
+        for img in to_delete:
+            db.session.delete(img)
+        for i, img in enumerate(keep):
+            img.position = i
+        new_rows = []
+        for i, name in enumerate(new_names):
+            row = NewsImage(post_id=post.id, filename=name, position=len(keep) + i)
+            db.session.add(row)
+            new_rows.append(row)
+
+        final_order = keep + new_rows
+        post.image = final_order[0].filename if final_order else None
+
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        for name in new_names:
+            remove_news_image(name)
+        flash("Could not update the post. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    for name in delete_names:
+        remove_news_image(name)   # only after the row deletions are committed
+
+    flash("News post updated.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/news/toggle/<int:post_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def news_toggle(post_id):
+    post = NewsPost.query.get_or_404(post_id)
+    post.published = not post.published
+    db.session.commit()
+    if is_xhr():
+        return jsonify(ok=True, published=post.published)
+    flash("Post is now " + ("published" if post.published else "a draft") + ".", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/news/delete/<int:post_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def news_delete(post_id):
+    post = NewsPost.query.get_or_404(post_id)
+    image_names = [img.filename for img in post.images]
+    if post.image and post.image not in image_names:
+        image_names.append(post.image)
+    db.session.delete(post)               # cascades to NewsImage rows
+    db.session.commit()
+    sb_delete(NEWS_BUCKET, image_names)   # only after the row is gone
+    flash("News post deleted.", "success")
     return redirect(url_for("admin_dashboard"))
 
 def _excel_safe(value):

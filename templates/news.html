@@ -135,8 +135,13 @@ nav a.active { color: var(--navy); background: var(--navy-soft); }
    PAGE HERO
 =================================================================== */
 .page-hero {
-  background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 100%);
-  color: #fff; padding: 56px 7% 44px; position: relative; overflow: hidden;
+  /* Purple overlay keeps the text readable; the photo shows through underneath */
+  background-color: var(--navy-deep);
+  background-image:
+    linear-gradient(135deg, rgba(76,29,149,.93) 0%, rgba(109,40,217,.78) 55%, rgba(76,29,149,.68) 100%),
+    var(--hero-img, none);
+  background-size: cover; background-position: center 35%; background-repeat: no-repeat;
+  color: #fff; padding: 72px 7% 56px; position: relative; overflow: hidden;
 }
 .page-hero::after {
   content: ''; position: absolute; right: -120px; top: -120px;
@@ -250,6 +255,12 @@ nav a.active { color: var(--navy); background: var(--navy-soft); }
 .lead-facts dd { font-size: .95rem; font-weight: 600; color: var(--text-dark); line-height: 1.45; }
 .lead-source { margin-top: 18px; font-size: .8rem; color: var(--text-muted); }
 .lead-source a { color: var(--navy); font-weight: 700; }
+.lead-body { max-width: 56ch; margin: -8px 0 26px; font-size: .96rem; line-height: 1.7; opacity: .9; position: relative; z-index: 1; }
+.lead-body p { margin-bottom: 10px; }
+.lead-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; margin-top: 18px; }
+.lead-gallery a { display: block; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 1; }
+.lead-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s; }
+.lead-gallery a:hover img { transform: scale(1.08); }
 
 /* ===================================================================
    LATEST ACTIVITY — second loudest
@@ -490,7 +501,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   .logo img { height: 46px; }
   .logo-tagline { font-size: .62rem; }
 
-  .page-hero { padding: 34px 5% 28px; }
+  .page-hero { padding: 44px 5% 32px; background-position: center; }
   .page-hero h1 { font-size: 1.65rem; }
   .page-hero p { font-size: .92rem; }
   .hero-eyebrow { font-size: .7rem; }
@@ -642,7 +653,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
 <main id="main-content">
 
 <!-- PAGE HERO -->
-<section class="page-hero">
+<section class="page-hero" style="--hero-img: url('{{ url_for('static', filename='Slide/slide2.jpeg') }}')">
   <div class="page-hero-inner">
     <span class="hero-eyebrow">News &amp; Activities</span>
     <h1>News &amp; Recent Activities</h1>
@@ -655,6 +666,52 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   </div>
 </section>
 
+{% set n = news_posts|length %}
+{% if n >= 1 %}
+<!-- TOP STORY (newest post from the admin dashboard) -->
+{% set top = news_posts[0] %}
+<section class="top-story" id="top-story" aria-labelledby="lead-heading">
+  <div class="wrap">
+    <article class="lead" id="post-{{ top.id }}">
+      <div class="lead-main">
+        <figure class="lead-photo">
+          <img src="{{ news_img(top.image) if top.image else url_for('static', filename='Slide/slide2.jpeg') }}" alt="{{ top.title }}" loading="eager">
+        </figure>
+        <span class="lead-flag"><span class="dot"></span> Top story</span>
+        <span class="lead-date">{{ top.created_at.strftime('%d %B %Y') if top.created_at else '' }}</span>
+        <h2 id="lead-heading">{{ top.title }}</h2>
+        <p class="lead-deck">{{ top.summary }}</p>
+        {% if top.body %}<div class="lead-body">{{ top.body | truncate(420) | nl2br }}</div>{% endif %}
+        <div class="lead-actions">
+          {% if top.link %}
+          <a class="btn btn-gold" href="{{ top.link }}" target="_blank" rel="noopener noreferrer">Read the full report <i class="fas fa-arrow-up-right-from-square"></i></a>
+          {% endif %}
+          <a class="btn btn-ghost" href="/complaints"><i class="fas fa-pen-to-square"></i> File a complaint</a>
+        </div>
+      </div>
+      <aside class="lead-facts" aria-label="Key facts">
+        <h3>At a glance</h3>
+        <dl>
+          <div class="row"><dt>Published</dt><dd>{{ top.created_at.strftime('%d %B %Y') if top.created_at else '' }}</dd></div>
+          <div class="row"><dt>Category</dt><dd>{{ top.tag }}</dd></div>
+          {% if top.images|length > 1 %}<div class="row"><dt>Photos</dt><dd>{{ top.images|length }} in the gallery</dd></div>{% endif %}
+        </dl>
+        {% if top.images|length > 1 %}
+        <div class="lead-gallery">
+          {% for img in top.images %}
+          <a href="{{ news_img(img.filename) }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ news_img(img.filename) }}" alt="{{ top.title }} photo {{ loop.index }}" loading="lazy">
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if top.link %}<p class="lead-source"><a href="{{ top.link }}" target="_blank" rel="noopener noreferrer">Read the source</a></p>{% endif %}
+      </aside>
+    </article>
+  </div>
+</section>
+
+{% else %}
 <!-- TOP STORY -->
 <section class="top-story" id="top-story" aria-labelledby="lead-heading">
   <div class="wrap">
@@ -699,6 +756,70 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   </div>
 </section>
 
+{% endif %}
+
+{% if n >= 2 %}
+<!-- LATEST ACTIVITY (second newest post) -->
+{% set act = news_posts[1] %}
+<section class="latest-activity" id="latest-activity" aria-labelledby="activity-heading">
+  <div class="wrap">
+    <article class="activity-card" id="post-{{ act.id }}">
+      <div>
+        <span class="activity-tag"><i class="fas fa-bolt"></i> Latest activity &middot; {{ act.created_at.strftime('%d %B %Y') if act.created_at else '' }}</span>
+        <h2 id="activity-heading">{{ act.title }}</h2>
+        <p>{{ act.summary }}</p>
+        {% if act.body %}<div class="activity-body">{{ act.body | truncate(500) | nl2br }}</div>{% endif %}
+        <div class="targets" aria-label="Category"><span>{{ act.tag }}</span></div>
+      </div>
+      <div class="press">
+        {% if act.images %}
+        <h3>Photos</h3>
+        <div class="lead-gallery">
+          {% for img in act.images %}
+          <a href="{{ news_img(img.filename) }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ news_img(img.filename) }}" alt="{{ act.title }} photo {{ loop.index }}" loading="lazy">
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if act.link %}
+        <h3 style="margin-top:18px">Source</h3>
+        <ul><li><a href="{{ act.link }}" target="_blank" rel="noopener noreferrer">
+          <span class="outlet"><strong>Read the full story</strong><span>{{ act.title }}</span></span>
+          <i class="fas fa-arrow-up-right-from-square"></i></a></li></ul>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+</section>
+
+{% elif n == 1 %}
+<!-- LATEST ACTIVITY (previous top story, moved down by the newest post) -->
+<section class="latest-activity" id="latest-activity" aria-labelledby="activity-heading">
+  <div class="wrap">
+    <article class="activity-card">
+      <div>
+        <span class="activity-tag"><i class="fas fa-gavel"></i> Earlier top story &middot; 15 September 2026</span>
+        <h2 id="activity-heading">Ondo Assembly passes consumer protection agency bill into law</h2>
+        <p>The Ondo State House of Assembly has passed the bill establishing the Ondo State Competition and Consumer Protection Agency, after the third reading and a unanimous voice vote.</p>
+        <div class="targets" aria-label="Key points">
+          <span>Mediation &amp; reconciliation</span>
+          <span>Compensation for victims</span>
+          <span>Product registration &amp; monitoring</span>
+          <span>Banned-product lists</span>
+        </div>
+      </div>
+      <div class="press">
+        <h3>Source</h3>
+        <ul><li><a href="https://www.thehopenewspaper.com/ondo-assembly-passes-consumer-protection-agency-bill-into-law/" target="_blank" rel="noopener noreferrer">
+          <span class="outlet"><strong>The Hope Newspaper</strong><span>Ondo Assembly passes consumer protection agency bill into law</span></span>
+          <i class="fas fa-arrow-up-right-from-square"></i></a></li></ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+{% else %}
 <!-- LATEST ACTIVITY -->
 <section class="latest-activity" id="latest-activity" aria-labelledby="activity-heading">
   <div class="wrap">
@@ -757,6 +878,8 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
   </div>
 </section>
 
+{% endif %}
+
 <!-- ALL ACTIVITIES -->
 <section class="activities" id="activities" aria-labelledby="activities-heading">
   <div class="wrap">
@@ -767,6 +890,72 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
     </div>
 
     <div class="news-grid" id="newsGrid">
+
+      <!-- Posts added from the admin dashboard (newest first) -->
+      {% for post in news_posts[2:] %}
+      <article class="news-card" id="post-{{ post.id }}">
+        <div class="news-image">
+          {% if post.image %}
+          <img src="{{ news_img(post.image) }}" alt="{{ post.title }}" loading="lazy">
+          {% endif %}
+          <span class="news-tag">{{ post.tag }}</span>
+          <span class="news-date">{{ post.created_at.strftime('%d %b %Y') if post.created_at else '' }}</span>
+        </div>
+        <div class="news-content">
+          <h3>{{ post.title }}</h3>
+          <p class="preview">{{ post.summary }}</p>
+          {% if post.body %}<div class="more-text">{{ post.body | nl2br }}</div>{% endif %}
+          <div class="actions">
+            {% if post.body %}<button class="read-more" type="button" aria-expanded="false">Read more</button>{% endif %}
+            {% if post.images|length > 1 %}<button class="gallery-btn" type="button" aria-expanded="false">View gallery</button>{% endif %}
+            {% if post.link %}
+            <a href="{{ post.link }}" target="_blank" rel="noopener noreferrer" class="fb-watch-link">
+              <i class="fas fa-arrow-up-right-from-square"></i> Read full story
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% if post.images|length > 1 %}
+        <div class="gallery">
+          {% for img in post.images %}
+          <img src="{{ news_img(img.filename) }}" alt="{{ post.title }} photo {{ loop.index }}" loading="lazy">
+          {% endfor %}
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+
+      <!-- Stories moved down from Latest activity / Top story by newer posts -->
+      {% if n >= 1 %}
+      <article class="news-card" id="story-chairman-warning">
+        <div class="news-image">
+          <img src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.png') }}" alt="Oluyemi Fasipe, Executive Chairman" loading="lazy" style="object-position: top center">
+          <span class="news-tag">Enforcement</span><span class="news-date">22 Sep 2026</span>
+        </div>
+        <div class="news-content">
+          <h3>Agency puts fake, expired and substandard product dealers on notice</h3>
+          <p class="preview">Executive Chairman Oluyemi Fasipe warned producers and sellers of fake, adulterated and expired goods, and operators who manipulate petrol pumps, that they face sealed premises, removal of products and prosecution.</p>
+          <div class="actions">
+            <a href="https://punchng.com/ondo-to-prosecute-dealers-of-unregistered-substandard-products" target="_blank" rel="noopener noreferrer" class="fb-watch-link"><i class="fas fa-arrow-up-right-from-square"></i> Read in Punch</a>
+          </div>
+        </div>
+      </article>
+      {% endif %}
+      {% if n >= 2 %}
+      <article class="news-card" id="story-assembly-bill">
+        <div class="news-image">
+          <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="OCCPA consumer rights" loading="lazy">
+          <span class="news-tag">Top story</span><span class="news-date">15 Sep 2026</span>
+        </div>
+        <div class="news-content">
+          <h3>Ondo Assembly passes consumer protection agency bill into law</h3>
+          <p class="preview">The Ondo State House of Assembly has passed the bill establishing the Ondo State Competition and Consumer Protection Agency, after the third reading and a unanimous voice vote.</p>
+          <div class="actions">
+            <a href="https://www.thehopenewspaper.com/ondo-assembly-passes-consumer-protection-agency-bill-into-law/" target="_blank" rel="noopener noreferrer" class="fb-watch-link"><i class="fas fa-arrow-up-right-from-square"></i> Read the full report</a>
+          </div>
+        </div>
+      </article>
+      {% endif %}
 
       <!-- Chairman appointment / resumption (X posts) -->
       <article class="news-card">

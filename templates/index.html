@@ -411,6 +411,32 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
   transition: gap var(--transition-fast);
 }
 .news-link-card:hover .nl-arrow { gap: 16px; }
+/* Flash photo for the newest news post */
+.nl-photo {
+  position: relative; width: 100%; height: 190px; flex-shrink: 0; overflow: hidden;
+  border-radius: var(--radius-md); background: var(--navy-deep);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+}
+.nl-photo img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity .9s ease;
+}
+.nl-photo img.on { opacity: 1; }
+.nl-photo::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(30,10,60,.55) 100%);
+}
+.nl-flash {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--gold); color: var(--navy-deep);
+  padding: 5px 12px; border-radius: 50px;
+  font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+}
+.nl-flash i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy-deep); animation: nlPulse 1.6s ease-out infinite; }
+@keyframes nlPulse { 0% { box-shadow: 0 0 0 0 rgba(76,29,149,.55); } 100% { box-shadow: 0 0 0 9px rgba(76,29,149,0); } }
+.nl-count { position: absolute; right: 10px; bottom: 8px; z-index: 2; font-size: .7rem; font-weight: 700; color: #fff; background: rgba(0,0,0,.45); padding: 2px 9px; border-radius: 50px; }
+@media (prefers-reduced-motion: reduce) { .nl-photo img { transition: none; } .nl-flash i { animation: none; } }
 
 /* NEWS + GALLERY */
 .news-gallery-section { padding: 56px 7%; background: var(--paper); border-top: 1px solid var(--line); }
@@ -905,12 +931,21 @@ footer::before {
 <section class="news-gallery-section" id="newsGallery" aria-label="News and gallery">
   <div class="news-gallery-inner">
 
-    <a href="/news" target="_self" class="news-link-card">
+    <a href="{{ url_for('news') + ('#post-' ~ latest_news.id if latest_news else '') }}" target="_self" class="news-link-card">
+      {% set pics = (latest_news.images | map(attribute='filename') | list) if latest_news else [] %}
+      {% if latest_news and not pics and latest_news.image %}{% set pics = [latest_news.image] %}{% endif %}
+      {% if pics %}
+      <span class="nl-photo" id="nlPhoto" aria-hidden="true">
+        {% for f in pics %}<img src="{{ news_img(f) }}" alt="" class="{{ 'on' if loop.first else '' }}" {{ 'loading=lazy' if not loop.first else '' }}>{% endfor %}
+        <span class="nl-flash"><i></i> New update</span>
+        {% if pics|length > 1 %}<span class="nl-count">{{ pics|length }} photos</span>{% endif %}
+      </span>
+      {% endif %}
       <span class="nl-icon"><i class="fas fa-newspaper"></i></span>
       <span class="nl-text">
-        <span class="nl-tag">Latest</span>
+        <span class="nl-tag">{{ latest_news.tag if latest_news else 'Latest' }}</span>
         <strong>News &amp; Recent Activities</strong>
-        <span>Ondo Assembly passes Consumer Protection Agency bill into law</span>
+        <span>{{ latest_news.title if latest_news else 'Ondo Assembly passes Consumer Protection Agency bill into law' }}</span>
       </span>
       <span class="nl-arrow">View all updates <i class="fas fa-arrow-right"></i></span>
     </a>
@@ -1305,5 +1340,16 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 </script>
 
+<script>
+(function () {
+  var box = document.getElementById('nlPhoto'); if (!box) return;
+  var imgs = box.querySelectorAll('img'); if (imgs.length < 2) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var i = 0;
+  setInterval(function () {
+    imgs[i].classList.remove('on'); i = (i + 1) % imgs.length; imgs[i].classList.add('on');
+  }, 3500);
+})();
+</script>
 </body>
 </html>
