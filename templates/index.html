@@ -480,6 +480,16 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
   background: rgba(46,16,101,.65); color: #fff;
   font-family: var(--font-display); font-size: 1.5rem; font-weight: 600;
 }
+/* Video tiles (links added from the admin dashboard) */
+.gallery-ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--navy-deep), var(--navy)); color: rgba(255,255,255,.55); font-size: 2rem;
+}
+.gallery-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 2.4rem; text-shadow: 0 2px 12px rgba(0,0,0,.55); pointer-events: none;
+}
+.gallery-item:first-child .gallery-play { font-size: 3.4rem; }
 
 /* LIGHTBOX */
 .lightbox {
@@ -491,7 +501,11 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
   max-width: 90vw; max-height: 82vh; object-fit: contain;
   border-radius: var(--radius-md); box-shadow: var(--shadow-lg); background: #000;
 }
-.lightbox img[hidden], .lightbox video[hidden] { display: none; }
+.lightbox iframe {
+  width: min(90vw, 960px); aspect-ratio: 16 / 9; height: auto; max-height: 82vh;
+  border: 0; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); background: #000;
+}
+.lightbox img[hidden], .lightbox video[hidden], .lightbox iframe[hidden] { display: none; }
 .lb-close, .lb-nav {
   position: absolute; background: rgba(255,255,255,.12); color: #fff; border: 0;
   border-radius: 50%; cursor: pointer; width: 46px; height: 46px; font-size: 20px;
@@ -501,7 +515,7 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .lb-close { top: 20px; right: 20px; font-size: 28px; }
 .lb-prev { left: 20px; top: 50%; transform: translateY(-50%); }
 .lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
-.lb-count { position: absolute; bottom: 20px; color: #fff; font-size: .85rem; letter-spacing: .08em; }
+.lb-count { position: absolute; bottom: 20px; color: #fff; font-size: .85rem; letter-spacing: .08em; max-width: 90vw; text-align: center; }
 
 /* FOOTER */
 footer { background: var(--navy-deep); color: #C6CEDA; position: relative; overflow: hidden; }
@@ -668,6 +682,7 @@ footer::before {
   .news-gallery-section { padding: 36px 5%; }
   .gallery-panel { padding: 16px; }
   .gallery-grid { grid-auto-rows: 78px; gap: 8px; min-height: 164px; }
+  .gallery-play { font-size: 1.8rem; }
   .news-link-card { flex-direction: column; text-align: center; padding: 24px 20px; }
   .news-gallery-inner .news-link-card { align-items: center; }
   .nl-arrow { width: 100%; justify-content: center; }
@@ -770,71 +785,53 @@ footer::before {
 
 <main id="main-content">
 
-<!-- SLIDER -->
+<!-- SLIDER (static slides; the admin dashboard now manages the gallery instead) -->
 <section class="slider-container" aria-label="Featured slides">
   <div class="slider" id="slider">
 
-    {% if homepage_slides %}
-      {% for slide in homepage_slides %}
-      <div class="slide" role="group" aria-roledescription="slide"
-           aria-label="{{ loop.index }} of {{ homepage_slides|length }}">
-        <img src="{{ homepage_img(slide.filename) }}"
-             alt="OCCPA featured image {{ loop.index }}"
-             loading="{{ 'eager' if loop.first else 'lazy' }}">
-        <div class="vignette"></div>
-        <div class="slide-text">
-          <span class="slide-eyebrow">OCCPA Update</span>
-          <h2>Ondo State Competition &amp; Consumer Protection Agency</h2>
-          <p>Protecting consumers and promoting fair competition across Ondo State.</p>
-          <a href="/news" class="slide-cta">News &amp; Activities &rarr;</a>
-        </div>
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+      <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="eager">
+      <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Consumer Protection Bill</span>
+        <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
+        <p>Ondo Assembly passes Consumer Protection Agency bill into law</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
-      {% endfor %}
-    {% else %}
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
-        <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="eager">
-        <div class="vignette"></div>
-        <div class="slide-text">
-          <span class="slide-eyebrow">Consumer Protection Bill</span>
-          <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
-          <p>Ondo Assembly passes Consumer Protection Agency bill into law</p>
-          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-        </div>
-      </div>
+    </div>
 
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-        <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="Consumer Protection" loading="lazy">
-        <div class="vignette"></div>
-        <div class="slide-text">
-          <span class="slide-eyebrow">Our Mandate</span>
-          <h2>Consumer Protection</h2>
-          <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
-          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-        </div>
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
+      <img src="{{ url_for('static', filename='Slide/slide2.jpeg') }}" alt="Consumer Protection" loading="lazy">
+      <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Our Mandate</span>
+        <h2>Consumer Protection</h2>
+        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
+    </div>
 
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
-        <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
-        <div class="vignette"></div>
-        <div class="slide-text">
-          <span class="slide-eyebrow">Our Mandate</span>
-          <h2>Consumer Protection</h2>
-          <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
-          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-        </div>
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
+      <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy">
+      <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Our Mandate</span>
+        <h2>Consumer Protection</h2>
+        <p>Ondo Cracks Down on Fake Products, &amp; Pump Manipulation, Illegal Herbal Drinks.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
+    </div>
 
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
-        <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
-        <div class="vignette"></div>
-        <div class="slide-text">
-          <span class="slide-eyebrow">Updates</span>
-          <h2>OCCPA Management</h2>
-          <p>Ondo State Consumer Protection Agency strengthens management structure, Governor appoints new Chairman.</p>
-          <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
-        </div>
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="4 of 4">
+      <img src="{{ url_for('static', filename='Slide/gal10.jpeg') }}" alt="Agency Activities" loading="lazy">
+      <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Updates</span>
+        <h2>OCCPA Management</h2>
+        <p>Ondo State Consumer Protection Agency strengthens management structure, Governor appoints new Chairman.</p>
+        <a href="/news" class="slide-cta">Read Full Story &rarr;</a>
       </div>
-    {% endif %}
+    </div>
 
   </div>
   <button class="prev" onclick="prevSlide()" aria-label="Previous slide">&#10094;</button>
@@ -852,8 +849,8 @@ footer::before {
       <div class="leaders">
         <img
           class="leader-photo"
-          src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.png') }}"
-          alt="Honorable Oluyemi Fasipe, Executive Chairman of OSCCPA"
+          src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.jpg') }}"
+          alt="Mr. Oluyemi Fasipe, Executive Chairman of OSCCPA"
           loading="lazy"
         >
         <img
@@ -863,7 +860,7 @@ footer::before {
           loading="lazy"
         >
         <div class="leader-cap chairman">
-          <strong>Hon. Oluyemi Fasipe</strong>
+          <strong>Mr. Oluyemi Fasipe</strong>
           <span>Executive Chairman</span>
         </div>
         <div class="leader-cap">
@@ -1089,6 +1086,7 @@ footer::before {
   <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photo">&#10094;</button>
   <img id="lbImg" alt="">
   <video id="lbVideo" controls playsinline preload="none" hidden></video>
+  <iframe id="lbFrame" title="Video player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
   <button class="lb-nav lb-next" id="lbNext" aria-label="Next photo">&#10095;</button>
   <div class="lb-count" id="lbCount"></div>
 </div>
@@ -1213,10 +1211,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const PREVIEW = 5; // tiles shown on the page; the rest open in the lightbox
 
+  // Photos and video links added from Admin Dashboard > Gallery (newest first).
+  // Each: {src, type: photo|video, provider: youtube|vimeo|facebook|file, thumb, label, feat}
+  const ADMIN_ITEMS = {{ gallery_items | tojson }};
+
   // [file in static/gallery, type, featured?]
-  // The first PREVIEW items are the tiles. "featured" items (landscape event
-  // photos only) rotate through the big tile, so nothing important is cropped.
-  const items = [
+  // "featured" items rotate through the big tile (landscape event photos only,
+  // so nothing important is cropped). Admin-added photos are featured too.
+  const STATIC_ITEMS = [
     ["3.jpeg", "photo", 1],
     ["a1.jpeg", "photo", 1],
     ["m1.jpeg", "photo", 1],
@@ -1246,40 +1248,81 @@ document.addEventListener("DOMContentLoaded", function () {
     ["gal22.jpg", "poster"],
     ["gal23.jpg", "poster"],
     ["chairman.mp4", "video"]
-  ].map(([f, t, feat]) => ({ src: encodeURI(base + f), type: t, feat: !!feat }));
+  ].map(([f, t, feat]) => ({
+    src: encodeURI(base + f), type: t, feat: !!feat,
+    provider: t === "video" ? "file" : "", thumb: "", label: ""
+  }));
+
+  const items = ADMIN_ITEMS.map(a => ({
+    src: a.src, type: a.type, feat: !!a.feat,
+    provider: a.provider || "", thumb: a.thumb || "", label: a.label || ""
+  })).concat(STATIC_ITEMS);
 
   const LABEL = { photo: "Photo", poster: "Consumer poster", video: "Video" };
   const pool = items.filter(i => i.feat);
   let started = false, timer = null, poolIdx = 0, lbIndex = 0;
 
+  function placeholder() {
+    const ph = document.createElement("span");
+    ph.className = "gallery-ph";
+    ph.innerHTML = '<i class="fas fa-film"></i>';
+    return ph;
+  }
+
   function build() {
     started = true;
-    for (let i = 0; i < PREVIEW; i++) {
+
+    // The big first tile always shows a (rotating) photo; the other tiles
+    // follow in order, so videos show up as tiles too.
+    const first = pool.length ? items.indexOf(pool[0]) : -1;
+    const rest = items.map((_, i) => i).filter(i => i !== first);
+    const tiles = first >= 0 ? [first].concat(rest.slice(0, PREVIEW - 1)) : rest.slice(0, PREVIEW);
+
+    tiles.forEach((idx, k) => {
+      const it = items[idx];
       const btn = document.createElement("button");
       btn.className = "gallery-item";
-      btn.setAttribute("aria-label", "Open photo " + (i + 1));
-      const img = document.createElement("img");
-      img.alt = "Agency activity photo " + (i + 1);
-      img.decoding = "async";
-      img.src = items[i].src;
-      img.onerror = () => btn.remove(); // never leave a broken tile
-      btn.appendChild(img);
-      if (i === PREVIEW - 1 && items.length > PREVIEW) {
+      if (k === 0 && first >= 0) btn.dataset.big = "1";
+
+      if (it.type === "video") {
+        btn.setAttribute("aria-label", it.label ? "Play video: " + it.label : "Play video");
+        if (it.thumb) {
+          const img = document.createElement("img");
+          img.alt = it.label || "Video thumbnail";
+          img.decoding = "async";
+          img.src = it.thumb;
+          img.onerror = () => { img.remove(); btn.prepend(placeholder()); };
+          btn.appendChild(img);
+        } else {
+          btn.appendChild(placeholder());
+        }
+        btn.insertAdjacentHTML("beforeend", '<span class="gallery-play"><i class="fas fa-circle-play"></i></span>');
+      } else {
+        btn.setAttribute("aria-label", "Open photo " + (k + 1));
+        const img = document.createElement("img");
+        img.alt = it.label || ("Agency activity photo " + (k + 1));
+        img.decoding = "async";
+        img.src = it.src;
+        img.onerror = () => btn.remove(); // never leave a broken tile
+        btn.appendChild(img);
+      }
+
+      if (k === tiles.length - 1 && items.length > tiles.length) {
         btn.insertAdjacentHTML("beforeend",
-          '<span class="gallery-more">+' + (items.length - PREVIEW) + '</span>');
+          '<span class="gallery-more">+' + (items.length - tiles.length) + '</span>');
       }
       btn.addEventListener("click", () => {
         // the big tile opens whichever photo it is showing right now
-        openLightbox(i === 0 ? items.indexOf(pool[poolIdx]) : i);
+        openLightbox(btn.dataset.big ? items.indexOf(pool[poolIdx]) : idx);
       });
       grid.appendChild(btn);
-      setTimeout(() => btn.classList.add("in"), reduceMotion ? 0 : i * 110); // staggered reveal
-    }
+      setTimeout(() => btn.classList.add("in"), reduceMotion ? 0 : k * 110); // staggered reveal
+    });
     startRotate();
   }
 
   function rotate() {
-    const img = grid.querySelector(".gallery-item img");
+    const img = grid.querySelector(".gallery-item[data-big] img");
     if (!img || pool.length < 2) return;
     const next = (poolIdx + 1) % pool.length;
     const pre = new Image();
@@ -1303,28 +1346,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { threshold: 0.25 }).observe(section);
 
-  // Lightbox (photos, posters and video)
+  // Lightbox (photos, posters, video files and embedded video links)
   const lb = document.getElementById("lightbox");
   const lbImg = document.getElementById("lbImg");
   const lbVideo = document.getElementById("lbVideo");
+  const lbFrame = document.getElementById("lbFrame");
   const lbCount = document.getElementById("lbCount");
 
   function stopVideo() {
     lbVideo.pause();
     lbVideo.removeAttribute("src");
     lbVideo.load();
+    lbFrame.removeAttribute("src");   // also stops YouTube / Vimeo / Facebook playback
   }
   function showLb() {
     const it = items[lbIndex];
     stopVideo();
     if (it.type === "video") {
-      lbImg.hidden = true; lbVideo.hidden = false; lbVideo.src = it.src;
+      lbImg.hidden = true;
+      if (it.provider === "file") {
+        lbFrame.hidden = true; lbVideo.hidden = false; lbVideo.src = it.src;
+      } else {
+        lbVideo.hidden = true; lbFrame.hidden = false; lbFrame.src = it.src;
+      }
     } else {
-      lbVideo.hidden = true; lbImg.hidden = false;
-      lbImg.alt = LABEL[it.type] + " " + (lbIndex + 1);
+      lbVideo.hidden = true; lbFrame.hidden = true; lbImg.hidden = false;
+      lbImg.alt = it.label || (LABEL[it.type] + " " + (lbIndex + 1));
       lbImg.src = it.src;
     }
-    lbCount.textContent = LABEL[it.type] + "  ·  " + (lbIndex + 1) + " / " + items.length;
+    lbCount.textContent = (it.label ? it.label + "  ·  " : "") + LABEL[it.type] + "  ·  " + (lbIndex + 1) + " / " + items.length;
   }
   function openLightbox(i) {
     lbIndex = i; showLb(); lb.hidden = false;

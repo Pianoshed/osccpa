@@ -122,24 +122,39 @@ table.data tbody tr:hover{background:#FBF9FE}
 .s-resolved{background-color:#D8F0E1;color:#1E6B3F}
 .badge{display:inline-block;border-radius:20px;padding:4px 12px;font-size:.76rem;font-weight:700}
 
-/* HOMEPAGE SLIDER TAB */
-.homepage-hint{font-size:.82rem;color:var(--muted);margin:-4px 0 14px}
-.homepage-manager{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
-.homepage-upload-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow-sm)}
-.homepage-upload-card h3{font-size:1.1rem;margin-bottom:4px;color:var(--navy-deep)}
-.homepage-upload-card p{font-size:.82rem;color:var(--muted);margin-bottom:12px}
-.homepage-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.homepage-upload-row input[type="file"]{font-size:.84rem;max-width:100%}
-.homepage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-.homepage-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
-.homepage-card img{display:block;width:100%;height:150px;object-fit:cover;background:var(--navy-soft)}
-.homepage-card-body{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.homepage-card-body strong{font-size:.8rem;color:var(--muted)}
+/* GALLERY UPDATES TAB */
+.gallery-hint{font-size:.82rem;color:var(--muted);margin:-4px 0 14px}
+.gallery-manager{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.gallery-forms{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.gallery-upload-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow-sm)}
+.gallery-upload-card h3{font-size:1.1rem;margin-bottom:4px;color:var(--navy-deep)}
+.gallery-upload-card>p{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+.gallery-upload-card .form-group{margin-bottom:12px}
+.upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.upload-row input[type="file"]{font-size:.84rem;max-width:100%}
+.gallery-grid-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.gallery-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.gallery-card .gthumb{position:relative;height:150px;background:var(--navy-soft)}
+.gallery-card .gthumb img{display:block;width:100%;height:100%;object-fit:cover}
+.gallery-card .gph{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--navy-deep);color:#fff;font-size:2.2rem}
+.gallery-card .gkind{position:absolute;top:8px;left:8px;display:inline-flex;align-items:center;gap:6px;background:rgba(36,27,51,.78);color:#fff;
+  border-radius:20px;padding:3px 10px;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.gallery-card .gplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;
+  text-shadow:0 2px 10px rgba(0,0,0,.55);pointer-events:none}
+.gallery-card-body{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gallery-card-body .gtxt{min-width:0}
+.gallery-card-body strong{display:block;font-size:.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gallery-card-body a.glink{font-size:.72rem;color:var(--navy);font-weight:600;text-decoration:none}
+.gallery-card-body a.glink:hover{text-decoration:underline}
+.gallery-card-body form{flex-shrink:0}
+@media(max-width:860px){
+  .gallery-forms{grid-template-columns:1fr}
+}
 @media(max-width:600px){
-  .homepage-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .homepage-card img{height:110px}
-  .homepage-upload-row{display:grid}
-  .homepage-upload-row input[type="file"],.homepage-upload-row .btn{width:100%;min-height:42px}
+  .gallery-grid-admin{grid-template-columns:1fr 1fr;gap:10px}
+  .gallery-card .gthumb{height:110px}
+  .upload-row{display:grid}
+  .upload-row input[type="file"],.upload-row .btn{width:100%;min-height:42px}
 }
 
 /* NEWS TAB */
@@ -152,7 +167,7 @@ table.data tbody tr:hover{background:#FBF9FE}
 .status-pill.is-draft{background-color:#FFF3CD;color:#7A5A00}
 .status-pill:hover{filter:brightness(.96)}
 
-/* FORMS (inside modals) */
+/* FORMS (inside modals and cards) */
 .form-group{margin-bottom:16px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-group label{display:block;font-size:.8rem;font-weight:700;margin-bottom:6px}
@@ -342,7 +357,7 @@ table.data tbody tr:hover{background:#FBF9FE}
 
   <div class="page-head">
     <h2>Overview</h2>
-    <p>Review complaints, update their status, and read messages from the contact form.</p>
+    <p>Review complaints, update their status, read contact messages, post news and manage the homepage gallery.</p>
   </div>
 
   <section class="stats" aria-label="Summary">
@@ -374,8 +389,8 @@ table.data tbody tr:hover{background:#FBF9FE}
       <button type="button" class="tab-btn" data-tab="newsTab" role="tab" aria-selected="false">
         <i class="fa-solid fa-newspaper"></i> News <span class="count-pill">{{ news_posts|length }}</span>
       </button>
-      <button type="button" class="tab-btn" data-tab="homepageTab" role="tab" aria-selected="false">
-        <i class="fa-solid fa-images"></i> Homepage <span class="count-pill">{{ homepage_slides|length }}</span>
+      <button type="button" class="tab-btn" data-tab="galleryTab" role="tab" aria-selected="false">
+        <i class="fa-solid fa-images"></i> Gallery <span class="count-pill">{{ gallery_items|length }}</span>
       </button>
     </div>
     <a class="btn" href="{{ url_for('export_excel') }}"><i class="fa-solid fa-file-excel"></i> Download all data (Excel)</a>
@@ -566,6 +581,97 @@ table.data tbody tr:hover{background:#FBF9FE}
     </div>
   </section>
 
+  <!-- ========== GALLERY UPDATES ========== -->
+  <section class="tab-content" id="galleryTab" role="tabpanel">
+    <p class="gallery-hint">
+      Everything added here appears in the <strong>&ldquo;Agency in Action&rdquo; gallery</strong> on the homepage, newest first,
+      ahead of the existing photos. These are <strong>separate from News photos</strong>.
+    </p>
+
+    <div class="gallery-manager">
+      <div class="gallery-forms">
+
+        <div class="gallery-upload-card">
+          <h3><i class="fa-solid fa-image"></i> Add photos</h3>
+          <p>Upload up to 10 photos at a time. PNG, JPG or WEBP &mdash; they are resized and compressed automatically.</p>
+          <form method="POST" enctype="multipart/form-data" action="{{ url_for('gallery_upload') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="upload-row">
+              <input type="file" name="gallery_images" multiple
+                     accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                     aria-label="Choose gallery photos">
+              <button type="submit" class="btn primary">
+                <i class="fa-solid fa-upload"></i> Upload photos
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="gallery-upload-card">
+          <h3><i class="fa-solid fa-circle-play"></i> Add a video link</h3>
+          <p>Paste a YouTube, Vimeo or Facebook video link (or a direct .mp4 link). It plays inside the gallery.</p>
+          <form method="POST" action="{{ url_for('gallery_add_video') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+              <label for="gvUrl">Video link *</label>
+              <input type="url" id="gvUrl" name="video_url" maxlength="500" required placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+              <label for="gvCaption">Title (optional)</label>
+              <input type="text" id="gvCaption" name="caption" maxlength="150" placeholder="e.g. Market enforcement exercise">
+            </div>
+            <button type="submit" class="btn primary"><i class="fa-solid fa-plus"></i> Add video</button>
+          </form>
+        </div>
+
+      </div>
+
+      {% if gallery_items %}
+      <div class="gallery-grid-admin">
+        {% for g in gallery_items %}
+        <div class="gallery-card">
+          <div class="gthumb">
+            {% if g.kind == 'photo' %}
+              <img src="{{ g.image }}" alt="Gallery photo {{ loop.index }}" loading="lazy">
+              <span class="gkind"><i class="fa-solid fa-image"></i> Photo</span>
+            {% else %}
+              {% if g.thumb %}
+                <img src="{{ g.thumb }}" alt="" loading="lazy">
+              {% else %}
+                <div class="gph"><i class="fa-solid fa-film"></i></div>
+              {% endif %}
+              <span class="gplay"><i class="fa-solid fa-circle-play"></i></span>
+              <span class="gkind"><i class="fa-solid fa-video"></i> {{ g.provider if g.provider != 'file' else 'Video' }}</span>
+            {% endif %}
+          </div>
+          <div class="gallery-card-body">
+            <div class="gtxt">
+              {% if g.kind == 'video' %}
+                <strong>{{ g.caption or 'Video' }}</strong>
+                <a class="glink" href="{{ g.url }}" target="_blank" rel="noopener noreferrer">Open link</a>
+              {% else %}
+                <strong>{{ g.caption or ('Photo ' ~ loop.index) }}</strong>
+              {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('gallery_delete', item_id=g.id) }}" class="js-confirm"
+                  data-title="Delete gallery {{ 'video' if g.kind == 'video' else 'photo' }}?"
+                  data-confirm="This removes it from the homepage gallery. This cannot be undone.">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-sm danger" aria-label="Delete"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty">
+        <i class="fa-regular fa-images"></i>
+        <span>Nothing added yet. The homepage gallery is showing its existing photos.</span>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
 </main>
 
 <!-- COMPLAINT MODAL -->
@@ -668,56 +774,6 @@ table.data tbody tr:hover{background:#FBF9FE}
   </div>
 </div>
 
-<!-- ========== HOMEPAGE SLIDER ========== -->
-<section class="tab-content" id="homepageTab" role="tabpanel">
-  <p class="homepage-hint">
-    Upload images for the homepage slider. These images are <strong>separate from News photos</strong>.
-    The current static slider remains available automatically when no homepage images are uploaded.
-  </p>
-
-  <div class="homepage-manager">
-    <div class="homepage-upload-card">
-      <h3><i class="fa-solid fa-images"></i> Homepage Slider Images</h3>
-      <p>Upload up to 10 images. New images are added to the end of the slider in upload order.</p>
-      <form method="POST" enctype="multipart/form-data" action="{{ url_for('homepage_slides_upload') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="homepage-upload-row">
-          <input type="file" name="homepage_images" multiple
-                 accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
-                 aria-label="Choose homepage slider images">
-          <button type="submit" class="btn primary">
-            <i class="fa-solid fa-upload"></i> Upload to Homepage
-          </button>
-        </div>
-      </form>
-    </div>
-
-    {% if homepage_slides %}
-    <div class="homepage-grid">
-      {% for slide in homepage_slides %}
-      <div class="homepage-card">
-        <img src="{{ homepage_img(slide.filename) }}" alt="Homepage slide {{ loop.index }}" loading="lazy">
-        <div class="homepage-card-body">
-          <strong>Slide {{ loop.index }}</strong>
-          <form method="POST" action="{{ url_for('homepage_slide_delete', slide_id=slide.id) }}" class="js-confirm"
-                data-title="Delete homepage image?"
-                data-confirm="This will remove Slide {{ loop.index }} from the homepage slider.">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn-sm danger"><i class="fa-solid fa-trash"></i> Delete</button>
-          </form>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty">
-      <i class="fa-regular fa-images"></i>
-      <span>No homepage images have been uploaded yet. The existing static slider will continue to show.</span>
-    </div>
-    {% endif %}
-  </div>
-</section>
-
 <!-- CONFIRM MODAL -->
 <div class="modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfText" hidden>
   <div class="modal-card small">
@@ -764,11 +820,6 @@ const NEWS_POSTS = [
   'image': news_img(n.image) if n.image else '',
   'images': n.gallery
 } | tojson }}{{ ',' if not loop.last }}
-{%- endfor %}
-];
-const HOMEPAGE_SLIDES = [
-{%- for s in homepage_slides %}
-{{ {'id': s.id, 'image': homepage_img(s.filename), 'position': s.position} | tojson }}{{ ',' if not loop.last }}
 {%- endfor %}
 ];
 {% with msgs = get_flashed_messages(with_categories=true) %}

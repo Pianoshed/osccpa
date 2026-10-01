@@ -14,7 +14,7 @@ import threading
 import click
 import requests
 import pandas as pd
-from urllib.parse import quote
+from urllib.parse import quote, urlparse, parse_qs
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import (Flask, Response, render_template, request, redirect, send_file,
@@ -24,7 +24,7 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from markupsafe import Markup, escape
-# Pillow is used to safely re-encode/compress news images (pip install Pillow)
+# Pillow is used to safely re-encode/compress uploaded images (pip install Pillow)
 from PIL import Image, ImageOps
 
 app = Flask(__name__)
@@ -100,9 +100,10 @@ migrate = Migrate(app, db)
 # SUPABASE STORAGE
 #   SUPABASE_URL          https://<project-ref>.supabase.co
 #   SUPABASE_SERVICE_KEY  the service_role / secret key (SERVER ONLY, never in templates or JS)
-# Two buckets (create with `flask init-storage`):
-#   evidence     -> PRIVATE. Only reachable through short-lived signed links for a logged-in admin.
-#   news-images  -> PUBLIC.  Cover/gallery photos shown on the site.
+# Three buckets (create with `flask init-storage`):
+#   evidence       -> PRIVATE. Only reachable through short-lived signed links for a logged-in admin.
+#   news-images    -> PUBLIC.  Cover/gallery photos for news posts.
+#   gallery-images -> PUBLIC.  Photos shown in the homepage "Agency in Action" gallery.
 # ---------------------------------------------------------------------------
 SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "").rstrip("/")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or ""
@@ -112,7 +113,7 @@ if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
 STORAGE_URL = f"{SUPABASE_URL}/storage/v1"
 EVIDENCE_BUCKET = os.environ.get("EVIDENCE_BUCKET", "evidence")
 NEWS_BUCKET = os.environ.get("NEWS_BUCKET", "news-images")
-HOMEPAGE_BUCKET = os.environ.get("HOMEPAGE_BUCKET", "homepage-images")
+GALLERY_BUCKET = os.environ.get("GALLERY_BUCKET", "gallery-images")
 SIGNED_URL_SECONDS = 300
 STORAGE_TIMEOUT = 60
 
@@ -189,20 +190,20 @@ def news_img_url(name):
         return ""
     return f"{STORAGE_URL}/object/public/{NEWS_BUCKET}/{quote(name)}"
 
-def homepage_img_url(name):
-    """Public URL of a homepage slider image (bucket is public)."""
+def gallery_img_url(name):
+    """Public URL of a homepage gallery photo (bucket is public)."""
     if not name:
         return ""
-    return f"{STORAGE_URL}/object/public/{HOMEPAGE_BUCKET}/{quote(name)}"
+    return f"{STORAGE_URL}/object/public/{GALLERY_BUCKET}/{quote(name)}"
 
 
 @app.context_processor
 def inject_storage_helpers():
-    return {"news_img": news_img_url, "homepage_img": homepage_img_url}
+    return {"news_img": news_img_url, "gallery_img": gallery_img_url}
 
 
 # ---------------------------------------------------------------------------
-# MODELS (unchanged)
+# MODELS
 # ---------------------------------------------------------------------------
 class Admin(db.Model):
     __tablename__ = 'admins'
@@ -235,11 +236,26 @@ class Complaint(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class HomepageSlide(db.Model):
-    """Images used only by the public homepage slider."""
+    """LEGACY: the old admin-managed homepage slider. No longer used by the site
+    (the slider is static again). Kept only so the existing table is not dropped
+    by a migration. You can delete this class and the table once you're sure
+    you don't need the old rows."""
     __tablename__ = 'homepage_slides'
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), nullable=False)
     position = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class GalleryItem(db.Model):
+    """One entry in the homepage 'Agency in Action' gallery: either an uploaded
+    photo (kind='photo', filename in the gallery-images bucket) or a video
+    saved as a link (kind='video', video_url)."""
+    __tablename__ = 'gallery_items'
+    id = db.Column(db.Integer, primary_key=True)
+    kind = db.Column(db.String(10), nullable=False, default="photo")   # 'photo' | 'video'
+    filename = db.Column(db.String(255))                               # photos only
+    video_url = db.Column(db.String(500))                              # videos only
+    caption = db.Column(db.String(150))                                # optional title
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class NewsPost(db.Model):
@@ -273,7 +289,7 @@ class NewsImage(db.Model):
 # ---------------------------------------------------------------------------
 # CLI: fresh database setup
 #   flask init-db                      -> creates all tables in Supabase
-#   flask init-storage                 -> creates the two storage buckets
+#   flask init-storage                 -> creates the storage buckets (safe to re-run)
 #   flask create-admin <username>      -> prompts for a password, creates an admin
 # ---------------------------------------------------------------------------
 @app.cli.command("init-db")
@@ -284,11 +300,11 @@ def init_db_command():
 
 @app.cli.command("init-storage")
 def init_storage_command():
-    """Create the private 'evidence' bucket and the public 'news-images' bucket."""
+    """Create the private 'evidence' bucket and the public 'news-images' and 'gallery-images' buckets."""
     buckets = [
         (EVIDENCE_BUCKET, False),
         (NEWS_BUCKET, True),
-        (HOMEPAGE_BUCKET, True),
+        (GALLERY_BUCKET, True),
     ]
     limit = MAX_UPLOAD_MB * 1024 * 1024
     for name, public in buckets:
@@ -489,7 +505,7 @@ def _respond(ok, message, status=200, endpoint="complaints"):
     return redirect(url_for(endpoint))
 
 
-# ---- News images: validated, re-encoded, compressed, then uploaded --------
+# ---- Public images (news + gallery): validated, re-encoded, compressed, uploaded
 # Everything the admin uploads is fully decoded and re-saved as a fresh JPEG.
 # A file that isn't a genuine, decodable image is rejected outright, and
 # nothing from the original bytes (EXIF, trailing data, scripts) survives.
@@ -498,16 +514,12 @@ NEWS_IMAGE_MAX_DIMENSION = 1600     # longest side, in pixels, after resizing
 NEWS_IMAGE_MAX_PIXELS = 40_000_000  # guards against decompression-bomb uploads
 NEWS_IMAGE_JPEG_QUALITY = 78
 
-def save_news_image(file_storage):
-    """Validate, safely re-encode, compress and upload a news image.
-    Returns the stored object name, or None if no file was supplied.
+def _prepare_jpeg(file_storage, label):
+    """Validate an uploaded image, re-encode it as a compressed JPEG and return the bytes.
     Raises ValueError with a user-friendly message if the upload is rejected."""
-    if not file_storage or not file_storage.filename:
-        return None
-
     ext = file_storage.filename.rsplit(".", 1)[-1].lower() if "." in file_storage.filename else ""
     if ext not in ALLOWED_NEWS_IMAGE_EXT:
-        raise ValueError("Images must be PNG, JPG/JPEG or WEBP.")
+        raise ValueError(f"{label} must be PNG, JPG/JPEG or WEBP.")
 
     old_limit = Image.MAX_IMAGE_PIXELS
     Image.MAX_IMAGE_PIXELS = NEWS_IMAGE_MAX_PIXELS
@@ -539,69 +551,37 @@ def save_news_image(file_storage):
 
         buf = io.BytesIO()
         img.save(buf, "JPEG", quality=NEWS_IMAGE_JPEG_QUALITY, optimize=True)
-        stored = f"{uuid.uuid4().hex[:16]}.jpg"
-        sb_upload(NEWS_BUCKET, stored, buf.getvalue(), "image/jpeg",
-                  cache_control="max-age=31536000")
-        return stored
+        return buf.getvalue()
     finally:
         Image.MAX_IMAGE_PIXELS = old_limit
 
-def save_homepage_image(file_storage):
-    """Validate, resize, compress and upload one homepage slider image."""
+def save_news_image(file_storage):
+    """Validate, safely re-encode, compress and upload a news image.
+    Returns the stored object name, or None if no file was supplied."""
     if not file_storage or not file_storage.filename:
         return None
+    data = _prepare_jpeg(file_storage, "Images")
+    stored = f"{uuid.uuid4().hex[:16]}.jpg"
+    sb_upload(NEWS_BUCKET, stored, data, "image/jpeg", cache_control="max-age=31536000")
+    return stored
 
-    ext = file_storage.filename.rsplit(".", 1)[-1].lower() if "." in file_storage.filename else ""
-    if ext not in ALLOWED_NEWS_IMAGE_EXT:
-        raise ValueError("Homepage images must be PNG, JPG/JPEG or WEBP.")
+def save_gallery_image(file_storage):
+    """Validate, resize, compress and upload one homepage gallery photo."""
+    if not file_storage or not file_storage.filename:
+        return None
+    data = _prepare_jpeg(file_storage, "Gallery photos")
+    stored = f"{uuid.uuid4().hex[:16]}.jpg"
+    sb_upload(GALLERY_BUCKET, stored, data, "image/jpeg", cache_control="max-age=31536000")
+    return stored
 
-    old_limit = Image.MAX_IMAGE_PIXELS
-    Image.MAX_IMAGE_PIXELS = NEWS_IMAGE_MAX_PIXELS
-    try:
-        file_storage.stream.seek(0)
-        try:
-            probe = Image.open(file_storage.stream)
-            probe.verify()
-        except Exception:
-            raise ValueError("That homepage file is not a valid image.")
-
-        file_storage.stream.seek(0)
-        try:
-            img = Image.open(file_storage.stream)
-            img.load()
-            img = ImageOps.exif_transpose(img)
-            if img.mode in ("RGBA", "LA", "P"):
-                rgba = img.convert("RGBA")
-                flat = Image.new("RGB", rgba.size, (255, 255, 255))
-                flat.paste(rgba, mask=rgba.split()[-1])
-                img = flat
-            else:
-                img = img.convert("RGB")
-            img.thumbnail((NEWS_IMAGE_MAX_DIMENSION, NEWS_IMAGE_MAX_DIMENSION), Image.LANCZOS)
-        except ValueError:
-            raise
-        except Exception:
-            raise ValueError("Could not process that homepage image. Please try a different file.")
-
-        buf = io.BytesIO()
-        img.save(buf, "JPEG", quality=NEWS_IMAGE_JPEG_QUALITY, optimize=True)
-        stored = f"{uuid.uuid4().hex[:16]}.jpg"
-        sb_upload(HOMEPAGE_BUCKET, stored, buf.getvalue(), "image/jpeg",
-                  cache_control="max-age=31536000")
-        return stored
-    finally:
-        Image.MAX_IMAGE_PIXELS = old_limit
-
-
-def remove_homepage_image(name):
-    """Delete a homepage slider image from the public bucket."""
+def remove_gallery_image(name):
+    """Delete a gallery photo from the public bucket."""
     if not name:
         return
     safe = os.path.basename(name)
     if safe != name:
         return
-    sb_delete(HOMEPAGE_BUCKET, [safe])
-
+    sb_delete(GALLERY_BUCKET, [safe])
 
 def remove_news_image(name):
     """Delete a news image from the public bucket."""
@@ -613,6 +593,7 @@ def remove_news_image(name):
     sb_delete(NEWS_BUCKET, [safe])
 
 NEWS_MAX_IMAGES = 10  # comfortably covers "at least 5 photos" per post
+GALLERY_MAX_UPLOAD = 10  # photos per upload action
 
 def save_news_images(file_storages):
     """Validate + compress + upload a batch of images (see save_news_image).
@@ -632,6 +613,97 @@ def save_news_images(file_storages):
         for name in saved:
             remove_news_image(name)
         raise
+
+
+# ---- Gallery videos saved as links -----------------------------------------
+VIDEO_FILE_EXT = (".mp4", ".webm", ".mov", ".m4v", ".ogv")
+VIDEO_LINK_ERROR = ("That video link isn't supported. Use a YouTube, Vimeo or Facebook video link, "
+                    "or a direct link ending in .mp4 / .webm.")
+_YT_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+
+def parse_video_url(url):
+    """Work out how to show a pasted video link.
+    Returns {'provider', 'embed', 'thumb'} or None if the link isn't supported.
+    provider: 'youtube' | 'vimeo' | 'facebook' | 'file'
+    embed:    the URL to put in an <iframe> (or a <video> tag when provider == 'file')
+    thumb:    a preview image URL, or '' when none is available."""
+    try:
+        u = urlparse((url or "").strip())
+    except ValueError:
+        return None
+    if u.scheme not in ("http", "https") or not u.hostname:
+        return None
+    host = u.hostname.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = u.path or ""
+    parts = [p for p in path.split("/") if p]
+
+    # YouTube
+    vid = None
+    if host in ("youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com"):
+        if path == "/watch":
+            vid = (parse_qs(u.query).get("v") or [None])[0]
+        elif len(parts) >= 2 and parts[0] in ("shorts", "embed", "live", "v"):
+            vid = parts[1]
+    elif host == "youtu.be" and parts:
+        vid = parts[0]
+    if vid is not None:
+        if not _YT_ID.match(vid):
+            return None
+        return {"provider": "youtube",
+                "embed": f"https://www.youtube-nocookie.com/embed/{vid}?rel=0",
+                "thumb": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg"}
+
+    # Vimeo
+    if host in ("vimeo.com", "player.vimeo.com"):
+        ids = re.findall(r"/(\d{5,})", path)
+        if ids:
+            return {"provider": "vimeo", "embed": f"https://player.vimeo.com/video/{ids[0]}", "thumb": ""}
+        return None
+
+    # Facebook
+    if host in ("facebook.com", "m.facebook.com", "web.facebook.com", "fb.watch"):
+        if not parts:
+            return None
+        return {"provider": "facebook",
+                "embed": "https://www.facebook.com/plugins/video.php?href="
+                         + quote(u.geturl(), safe="") + "&show_text=false&width=560",
+                "thumb": ""}
+
+    # Direct video file
+    if path.lower().endswith(VIDEO_FILE_EXT):
+        return {"provider": "file", "embed": u.geturl(), "thumb": ""}
+
+    return None
+
+def gallery_dict(g):
+    """Plain dict for one GalleryItem (used by the admin dashboard and the homepage)."""
+    base = {"id": g.id, "kind": g.kind, "caption": g.caption or ""}
+    if g.kind == "video":
+        info = parse_video_url(g.video_url) or {}
+        base.update(url=g.video_url or "", image="", provider=info.get("provider", "link"),
+                    embed=info.get("embed", ""), thumb=info.get("thumb", ""))
+    else:
+        base.update(url="", image=gallery_img_url(g.filename), provider="", embed="", thumb="")
+    return base
+
+def gallery_rows():
+    """All gallery items, newest first."""
+    return [gallery_dict(g) for g in GalleryItem.query.order_by(GalleryItem.id.desc()).all()]
+
+def gallery_for_homepage():
+    """Items in the shape the homepage gallery script expects."""
+    out = []
+    for g in gallery_rows():
+        if g["kind"] == "video":
+            if g["embed"]:
+                out.append({"src": g["embed"], "type": "video", "provider": g["provider"],
+                            "thumb": g["thumb"], "label": g["caption"], "feat": False})
+        elif g["image"]:
+            out.append({"src": g["image"], "type": "photo", "provider": "", "thumb": "",
+                        "label": g["caption"], "feat": True})
+    return out
 
 
 # ---- Template filter: safe line-break rendering for admin-written text ----
@@ -752,11 +824,8 @@ def change_password():
 def index():
     latest_news = NewsPost.query.filter_by(published=True) \
                                  .order_by(NewsPost.created_at.desc()).first()
-    homepage_slides = HomepageSlide.query.order_by(
-        HomepageSlide.position.asc(), HomepageSlide.id.asc()
-    ).all()
     return render_template("index.html", latest_news=latest_news,
-                           homepage_slides=homepage_slides)
+                           gallery_items=gallery_for_homepage())
 
 @app.route("/about")
 def about():
@@ -843,10 +912,9 @@ def admin_dashboard():
     complaints_data = Complaint.query.order_by(Complaint.created_at.desc()).all()
     contacts_data = Contact.query.order_by(Contact.created_at.desc()).all()
     news_data = NewsPost.query.order_by(NewsPost.created_at.desc()).all()
-    homepage_data = HomepageSlide.query.order_by(HomepageSlide.position.asc(), HomepageSlide.id.asc()).all()
     return render_template("admin_dashboard.html", complaints=complaints_data,
                             contacts=contacts_data, news_posts=news_data,
-                            homepage_slides=homepage_data)
+                            gallery_items=gallery_rows())
 
 @app.route("/admin/evidence/<path:filename>")
 @login_required
@@ -917,76 +985,77 @@ def delete_contact(contact_id):
 
 
 # ---------------------------------------------------------------------------
-# ADMIN: HOMEPAGE SLIDER
+# ADMIN: GALLERY UPDATES (photos + video links for the homepage gallery)
 # ---------------------------------------------------------------------------
-@app.route("/admin/homepage-slides/upload", methods=["POST"])
+@app.route("/admin/gallery/upload", methods=["POST"])
 @login_required
 @csrf_protect
-def homepage_slides_upload():
-    files = [f for f in request.files.getlist("homepage_images")
-             if f and f.filename][:10]
-
+def gallery_upload():
+    files = [f for f in request.files.getlist("gallery_images")
+             if f and f.filename][:GALLERY_MAX_UPLOAD]
     if not files:
-        flash("Choose at least one homepage image.", "error")
+        flash("Choose at least one photo.", "error")
         return redirect(url_for("admin_dashboard"))
 
-    existing_count = HomepageSlide.query.count()
-    if existing_count >= 10:
-        flash("The homepage slider already has 10 images. Delete an old image before adding another.", "error")
-        return redirect(url_for("admin_dashboard"))
-
-    room = 10 - existing_count
-    files = files[:room]
     saved = []
     try:
         for file_storage in files:
-            name = save_homepage_image(file_storage)
+            name = save_gallery_image(file_storage)
             if name:
                 saved.append(name)
-
-        start_position = db.session.query(db.func.max(HomepageSlide.position)).scalar()
-        start_position = (start_position + 1) if start_position is not None else 0
-
-        for offset, name in enumerate(saved):
-            db.session.add(HomepageSlide(filename=name, position=start_position + offset))
+        for name in reversed(saved):      # so the first chosen photo ends up first on the site
+            db.session.add(GalleryItem(kind="photo", filename=name))
         db.session.commit()
     except ValueError as e:
         db.session.rollback()
         for name in saved:
-            remove_homepage_image(name)
+            remove_gallery_image(name)
         flash(str(e), "error")
         return redirect(url_for("admin_dashboard"))
     except Exception:
         db.session.rollback()
         for name in saved:
-            remove_homepage_image(name)
-        flash("Could not save the homepage images. Please try again.", "error")
+            remove_gallery_image(name)
+        flash("Could not save the gallery photos. Please try again.", "error")
         return redirect(url_for("admin_dashboard"))
 
-    flash(f"{len(saved)} homepage image(s) uploaded successfully.", "success")
+    flash(f"{len(saved)} photo(s) added to the gallery.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
-@app.route("/admin/homepage-slides/delete/<int:slide_id>", methods=["POST"])
+@app.route("/admin/gallery/video", methods=["POST"])
 @login_required
 @csrf_protect
-def homepage_slide_delete(slide_id):
-    slide = HomepageSlide.query.get_or_404(slide_id)
-    name = slide.filename
-    db.session.delete(slide)
+def gallery_add_video():
+    url = clean(request.form.get("video_url"), 500)
+    caption = clean(request.form.get("caption"), 150)
+    if not url:
+        flash("Paste a video link first.", "error")
+        return redirect(url_for("admin_dashboard"))
+    if not parse_video_url(url):
+        flash(VIDEO_LINK_ERROR, "error")
+        return redirect(url_for("admin_dashboard"))
+    try:
+        db.session.add(GalleryItem(kind="video", video_url=url, caption=caption or None))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        flash("Could not save the video link. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+    flash("Video added to the gallery.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/gallery/delete/<int:item_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def gallery_delete(item_id):
+    item = GalleryItem.query.get_or_404(item_id)
+    name = item.filename if item.kind == "photo" else None
+    db.session.delete(item)
     db.session.commit()
-
-    remove_homepage_image(name)
-
-    # Keep the remaining slides numbered from zero.
-    remaining = HomepageSlide.query.order_by(
-        HomepageSlide.position.asc(), HomepageSlide.id.asc()
-    ).all()
-    for pos, item in enumerate(remaining):
-        item.position = pos
-    db.session.commit()
-
-    flash("Homepage image deleted.", "success")
+    remove_gallery_image(name)            # only after the row is gone
+    flash("Gallery item deleted.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
