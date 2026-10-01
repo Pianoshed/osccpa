@@ -41,10 +41,10 @@
 <div class="wrap">
   <div class="card">
     <form class="search" method="GET" action="{{ url_for('verify_business') }}" target="_self">
-      <input type="text" name="id" value="{{ q }}" maxlength="40" placeholder="e.g. OSCCPA-2026-K7M3QX" aria-label="Business registration ID" autocomplete="off" required>
+      <input type="text" name="id" value="{{ q }}" maxlength="40" placeholder="e.g. ODCCPA-2026-K7M3QX" aria-label="Business registration ID" autocomplete="off" required>
       <button type="submit" class="btn"><i class="fas fa-magnifying-glass"></i> Verify</button>
     </form>
-    <p class="hint">The ID looks like <strong>OSCCPA-2026-XXXXXX</strong>. Spaces and capital letters don't matter.</p>
+    <p class="hint">The ID looks like <strong>ODCCPA-2026-XXXXXX</strong>. Spaces and capital letters don't matter.</p>
 
     {% if searched %}
       {% if biz and biz.status == 'Approved' %}
