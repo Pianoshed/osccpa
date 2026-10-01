@@ -806,6 +806,51 @@ html, body { max-width: 100%; overflow-x: hidden; }
 }
 @media (max-width: 480px) { .page-hero h1, .hero-inner h1 { font-size: 1.35rem !important; } }
 /* ===== END MOBILE ===== */
+
+/* ===== IMAGE FIX: show full / ~3/4 of photos, keep mobile tight ===== */
+
+/* Top story banner: ratio-based height instead of fixed 240px / 126px */
+.lead-photo {
+  height: auto;
+  aspect-ratio: 4 / 3;
+  max-height: 420px;
+}
+.lead-photo img {
+  object-position: center top;   /* heads/tops never get cut */
+}
+/* lighter fade so the picture itself stays visible */
+.lead-photo::after {
+  background: linear-gradient(180deg, rgba(76,29,149,0) 60%, rgba(76,29,149,.9) 100%);
+}
+
+/* Latest activity portrait (chairman) */
+.quote-photo {
+  width: 124px;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Archive cards: bias crop toward the top */
+.news-image > img { object-position: center 25%; }
+
+/* Mobile: still compact, but tall enough to show ~3/4+ of the photo */
+@media (max-width: 768px) {
+  .lead-photo {
+    aspect-ratio: 4 / 3;
+    max-height: 260px;
+    height: auto;
+    margin: -16px -15px 12px;
+  }
+  .quote-photo { width: 96px; }
+  .news-image > img, .news-image > video { height: 170px; }
+}
+@media (max-width: 480px) {
+  .lead-photo { max-height: 240px; height: auto; }
+  .quote-photo { width: 88px; }
+}
+/* ===== END IMAGE FIX ===== */
 </style>
 </head>
 
