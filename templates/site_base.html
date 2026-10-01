@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}ODCCPA{% endblock %} | Ondo State Competition &amp; Consumer Protection Agency</title>
+<title>{% block title %}OSCCPA{% endblock %} | Ondo State Competition &amp; Consumer Protection Agency</title>
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,30 +19,10 @@
   --shadow-sm:0 2px 8px rgba(11,42,74,.08); --shadow-md:0 6px 20px rgba(11,42,74,.10);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.6;padding-top:84px;overflow-x:hidden}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.5;padding-top:58px;overflow-x:hidden}
 h1,h2,h3{font-family:var(--font-display);font-weight:600}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-
-/* header */
-.hdr{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:10px 6%;background:var(--paper);border-bottom:3px solid var(--gold);box-shadow:0 2px 14px rgba(11,42,74,.08)}
-.hdr-brand{display:flex;align-items:center;gap:14px;text-decoration:none;min-width:0}
-.hdr-brand img{height:52px;width:auto}
-.hdr-brand span{font-family:var(--font-display);font-weight:600;color:var(--navy);font-size:1.1rem;line-height:1.25}
-.hdr nav ul{display:flex;gap:4px;list-style:none}
-.hdr nav a{display:block;padding:9px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
-.hdr nav a:hover,.hdr nav a.on{background:var(--navy-soft);color:var(--navy)}
-.menu-btn{display:none;width:44px;height:44px;border:0;border-radius:10px;background:var(--navy-soft);color:var(--navy);font-size:1.2rem;cursor:pointer}
-@media(max-width:1000px){
-  body{padding-top:70px}
-  .hdr-brand span{font-size:.92rem}.hdr-brand img{height:40px}
-  .menu-btn{display:block}
-  .hdr nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 14px 30px rgba(11,42,74,.16)}
-  .hdr nav.open{display:block}
-  .hdr nav ul{flex-direction:column;gap:0}
-  .hdr nav a{padding:15px 6%;border-bottom:1px solid var(--line);border-radius:0}
-}
 
 /* page */
 .hero{background:linear-gradient(120deg,var(--navy-deep),var(--navy));color:#fff;padding:46px 6% 52px}
@@ -68,29 +48,106 @@ a{color:inherit}
 .ftr-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .ftr a{color:#E9D5FF;text-decoration:none}.ftr a:hover{text-decoration:underline}
 .ftr p+p{margin-top:4px}
+
+/* tighter page chrome */
+.hero{padding:30px 6% 40px !important}
+.hero h1{font-size:1.9rem !important;margin-bottom:6px !important}
+.hero p{font-size:.95rem}
+.eyebrow{font-size:.68rem !important;margin-bottom:8px !important}
+.wrap{margin-top:-22px !important;margin-bottom:40px !important}
+.card{padding:22px !important}
+.btn{padding:10px 20px !important;font-size:.9rem !important}
+.ftr{padding:24px 6% 20px !important;font-size:.82rem !important}
+
+/* ===== SHARED COMPACT NAV + TIGHT TYPOGRAPHY (identical on every page) ===== */
+@media (min-width: 769px) { html { font-size: 14px; } }
+body { line-height: 1.5; padding-top: 58px; }
+.main-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 4%; background: #fff; border-bottom: 3px solid #A855F7; box-shadow: 0 2px 10px rgba(11,42,74,.08); }
+.main-header .header-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 0 1 auto; }
+.main-header .logo a { display: flex; align-items: center; }
+.main-header .logo img { height: 38px; width: auto; }
+.main-header .logo-tagline, .main-header .header-divider, .main-header .header-text p { display: none; }
+.main-header .header-text { flex: 0 1 auto; min-width: 0; }
+.main-header .header-text h2 { font-size: .92rem; line-height: 1.2; font-weight: 600; letter-spacing: 0; color: #6D28D9; }
+.main-header nav { display: block; }
+.main-header nav ul { display: flex; align-items: center; gap: 2px; list-style: none; }
+.main-header nav a { display: inline-flex; align-items: center; padding: 6px 10px; font-size: .88rem; font-weight: 600; line-height: 1.2; border-radius: 6px; white-space: nowrap; text-decoration: none; color: var(--text-dark, var(--text, #241B33)); background: transparent; transition: background .2s, color .2s; }
+.main-header nav a:hover, .main-header nav a:focus, .main-header nav a.active, .main-header nav a[aria-current="page"] { color: #6D28D9; background: #F1EBFC; outline: none; }
+.main-header nav a.nav-cta { background: #6D28D9; color: #fff; }
+.main-header nav a.nav-cta:hover, .main-header nav a.nav-cta.active { background: #7C3AED; color: #fff; }
+.nav-cta em { font-style: normal; font-size: .56rem; font-weight: 800; letter-spacing: .06em; background: #FDE68A; color: #4C1D95; padding: 1px 5px; border-radius: 8px; margin-left: 5px; }
+.main-header .mobile-menu-toggle { display: none; width: 38px; height: 38px; background: #F1EBFC; border: 0; border-radius: 8px; cursor: pointer; position: relative; flex-shrink: 0; align-items: center; justify-content: center; }
+.main-header .mobile-menu-toggle span { position: absolute; left: 50%; width: 18px; height: 2px; background: #6D28D9; border-radius: 2px; transform: translateX(-50%); transition: .3s ease; }
+.main-header .mobile-menu-toggle span:nth-child(1) { top: 12px; }
+.main-header .mobile-menu-toggle span:nth-child(2) { top: 18px; }
+.main-header .mobile-menu-toggle span:nth-child(3) { top: 24px; }
+.main-header .mobile-menu-toggle.active span:nth-child(1) { transform: translate(-50%, 6px) rotate(45deg); }
+.main-header .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+.main-header .mobile-menu-toggle.active span:nth-child(3) { transform: translate(-50%, -6px) rotate(-45deg); }
+.main-header .mobile-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; width: 100%; flex-direction: column; max-height: none; background: #fff; border-top: 1px solid #E9E1F7; box-shadow: 0 12px 26px rgba(11,42,74,.16); overflow: hidden; }
+.main-header .mobile-menu.open { display: flex; }
+.main-header .mobile-menu a { display: flex; align-items: center; padding: 11px 5%; font-size: .92rem; font-weight: 600; text-decoration: none; color: var(--text-dark, var(--text, #241B33)); border-bottom: 1px solid #E9E1F7; }
+.main-header .mobile-menu a:hover, .main-header .mobile-menu a.active, .main-header .mobile-menu a[aria-current="page"] { background: #F1EBFC; color: #6D28D9; }
+.main-header .mobile-menu a.nav-cta { background: #6D28D9; color: #fff; }
+@media (max-width: 1100px) {
+  .main-header nav { display: none; }
+  .main-header .mobile-menu-toggle { display: flex; }
+}
+@media (min-width: 1101px) { .main-header .mobile-menu { display: none !important; } }
+@media (max-width: 768px) {
+  body { padding-top: 54px; }
+  .main-header { padding: 7px 4%; }
+  .main-header .logo img { height: 34px; }
+  .main-header .header-text h2 { font-size: .76rem; }
+}
+@media (max-width: 380px) { .main-header .header-text h2 { font-size: .68rem; } }
+/* tighter page sections */
+.page-hero { padding-top: 44px !important; padding-bottom: 40px !important; }
+.page-hero h1 { font-size: clamp(1.6rem, 3.4vw, 2.3rem) !important; margin-bottom: 8px !important; }
+.page-hero p { font-size: .98rem !important; line-height: 1.55 !important; }
+.section { padding-top: 46px !important; padding-bottom: 46px !important; }
+.news-gallery-section, .registry { padding-top: 40px !important; padding-bottom: 40px !important; }
+/* ===== END SHARED ===== */
 </style>
 {% block head %}{% endblock %}
 </head>
 <body>
 
-<header class="hdr">
-  <a class="hdr-brand" href="/" target="_self" aria-label="ODCCPA home">
-    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="ODCCPA logo">
-    <span>Ondo State Competition &amp; Consumer Protection Agency</span>
-  </a>
-  <nav id="nav" aria-label="Main navigation">
+<header class="main-header">
+  {% set p = request.path %}
+  <div class="header-left">
+    <div class="logo">
+      <a href="/" aria-label="OSCCPA Home">
+        <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo" loading="eager">
+      </a>
+    </div>
+    <div class="header-text"><h2>Ondo State Competition &amp; Consumer Protection Agency</h2></div>
+  </div>
+  <nav aria-label="Main navigation">
     <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/news">News &amp; Activities</a></li>
-      <li><a href="/services">Services</a></li>
-      <li><a href="/complaints">Complaints</a></li>
-      <li><a href="/register-business" class="{{ 'on' if request.endpoint == 'register_business' }}">Register Business</a></li>
-      <li><a href="/verify" class="{{ 'on' if request.endpoint == 'verify_business' }}">Verify</a></li>
-      <li><a href="/contact">Contact</a></li>
+      <li><a href="/" class="{{ 'active' if p == '/' }}" {{ 'aria-current="page"'|safe if p == '/' }}>Home</a></li>
+      <li><a href="/about" class="{{ 'active' if p == '/about' }}" {{ 'aria-current="page"'|safe if p == '/about' }}>About</a></li>
+      <li><a href="/news" class="{{ 'active' if p == '/news' }}" {{ 'aria-current="page"'|safe if p == '/news' }}>News &amp; Activities</a></li>
+      <li><a href="/services" class="{{ 'active' if p == '/services' }}" {{ 'aria-current="page"'|safe if p == '/services' }}>Services</a></li>
+      <li><a href="/complaints" class="{{ 'active' if p == '/complaints' }}" {{ 'aria-current="page"'|safe if p == '/complaints' }}>Complaints</a></li>
+      <li><a href="/register-business" class="nav-cta {{ 'active' if p.startswith('/register-business') }}" {{ 'aria-current="page"'|safe if p.startswith('/register-business') }}>Register Business <em>NEW</em></a></li>
+      <li><a href="/verify" class="{{ 'active' if p.startswith('/verify') }}" {{ 'aria-current="page"'|safe if p.startswith('/verify') }}>Verify</a></li>
+      <li><a href="/contact" class="{{ 'active' if p == '/contact' }}" {{ 'aria-current="page"'|safe if p == '/contact' }}>Contact</a></li>
     </ul>
   </nav>
-  <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav"><i class="fas fa-bars"></i></button>
+  <button class="mobile-menu-toggle" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/" class="{{ 'active' if p == '/' }}" {{ 'aria-current="page"'|safe if p == '/' }}>Home</a>
+    <a href="/about" class="{{ 'active' if p == '/about' }}" {{ 'aria-current="page"'|safe if p == '/about' }}>About</a>
+    <a href="/news" class="{{ 'active' if p == '/news' }}" {{ 'aria-current="page"'|safe if p == '/news' }}>News &amp; Activities</a>
+    <a href="/services" class="{{ 'active' if p == '/services' }}" {{ 'aria-current="page"'|safe if p == '/services' }}>Services</a>
+    <a href="/complaints" class="{{ 'active' if p == '/complaints' }}" {{ 'aria-current="page"'|safe if p == '/complaints' }}>Complaints</a>
+    <a href="/register-business" class="nav-cta {{ 'active' if p.startswith('/register-business') }}" {{ 'aria-current="page"'|safe if p.startswith('/register-business') }}>Register Business <em>NEW</em></a>
+    <a href="/verify" class="{{ 'active' if p.startswith('/verify') }}" {{ 'aria-current="page"'|safe if p.startswith('/verify') }}>Verify</a>
+    <a href="/contact" class="{{ 'active' if p == '/contact' }}" {{ 'aria-current="page"'|safe if p == '/contact' }}>Contact</a>
+  </div>
 </header>
 
 {% block hero %}{% endblock %}
@@ -116,10 +173,16 @@ a{color:inherit}
 </footer>
 
 <script>
-document.getElementById('menuBtn').addEventListener('click', function () {
-  var open = document.getElementById('nav').classList.toggle('open');
-  this.setAttribute('aria-expanded', open);
-});
+(function () {
+  var btn = document.getElementById('menuBtn'), menu = document.getElementById('mobileMenu');
+  function close() { menu.classList.remove('open'); btn.classList.remove('active'); btn.setAttribute('aria-expanded', 'false'); }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = menu.classList.toggle('open'); btn.classList.toggle('active', open); btn.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', function (e) { if (!menu.contains(e.target)) close(); });
+  window.addEventListener('resize', function () { if (window.innerWidth > 1100) close(); });
+})();
 </script>
 </body>
 </html>
