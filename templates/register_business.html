@@ -1,0 +1,125 @@
+{% extends "site_base.html" %}
+{% block title %}Register Your Business{% endblock %}
+
+{% block head %}
+<style>
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.full{grid-column:1/-1}
+.field label{display:block;font-size:.82rem;font-weight:700;margin-bottom:6px}
+.field label .req{color:var(--bad)}
+.field label .opt{font-weight:500;color:var(--muted)}
+.field input[type=text],.field input[type=email],.field input[type=tel],.field select,.field textarea{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--cream);
+  font-family:var(--font-body);font-size:.95rem;color:var(--text);transition:border-color .2s,box-shadow .2s,background .2s}
+.field textarea{resize:vertical;min-height:100px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 4px rgba(109,40,217,.12)}
+.hint{font-size:.76rem;color:var(--muted);margin-top:5px}
+.sect{font-family:var(--font-display);font-size:1.15rem;color:var(--navy-deep);margin:6px 0 -4px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.check input{margin-top:4px;width:18px;height:18px;flex-shrink:0}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.after{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:6px}
+.after small{color:var(--muted)}
+.after a{color:var(--navy);font-weight:700}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:1.7rem}.card{padding:20px}.field input,.field select,.field textarea{font-size:16px}.btn{width:100%}}
+</style>
+{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <div class="hero-in">
+    <span class="eyebrow"><i class="fas fa-store"></i> Business Registry</span>
+    <h1>Register your business in Ondo State</h1>
+    <p>Fill in the form and get your registration ID and downloadable certificate instantly. No waiting for approval. Customers can verify your ID on this website.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <form class="card" id="regForm" method="POST" action="{{ url_for('register_business') }}" novalidate>
+    <div class="grid">
+
+      <h2 class="sect full">Business owner</h2>
+      <div class="field">
+        <label for="owner_name">Full name of owner <span class="req">*</span></label>
+        <input type="text" id="owner_name" name="owner_name" maxlength="150" required autocomplete="name" value="{{ form.get('owner_name', '') }}">
+      </div>
+      <div class="field">
+        <label for="phone">Phone number <span class="req">*</span></label>
+        <input type="tel" id="phone" name="phone" maxlength="50" required autocomplete="tel" placeholder="080..." value="{{ form.get('phone', '') }}">
+      </div>
+      <div class="field full">
+        <label for="email">Email address <span class="req">*</span></label>
+        <input type="email" id="email" name="email" maxlength="150" required autocomplete="email" value="{{ form.get('email', '') }}">
+        <p class="hint">Used to recover your certificate if you lose your ID. Your ID is shown immediately after you submit.</p>
+      </div>
+
+      <h2 class="sect full">Business details</h2>
+      <div class="field full">
+        <label for="business_name">Name of business <span class="req">*</span></label>
+        <input type="text" id="business_name" name="business_name" maxlength="200" required value="{{ form.get('business_name', '') }}">
+      </div>
+      <div class="field full">
+        <label for="address">Business address <span class="req">*</span></label>
+        <input type="text" id="address" name="address" maxlength="300" required autocomplete="street-address" placeholder="Street, town / city" value="{{ form.get('address', '') }}">
+      </div>
+      <div class="field">
+        <label for="lga">Local Government Area <span class="req">*</span></label>
+        <select id="lga" name="lga" required>
+          <option value="">Select LGA</option>
+          {% for l in lgas %}<option value="{{ l }}" {{ 'selected' if form.get('lga') == l }}>{{ l }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="sector">Type of business <span class="opt">(optional)</span></label>
+        <select id="sector" name="sector">
+          <option value="">Select type</option>
+          {% for s in sectors %}<option value="{{ s }}" {{ 'selected' if form.get('sector') == s }}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+
+      <h2 class="sect full">Registration numbers</h2>
+      <div class="field">
+        <label for="cac_number">CAC registration number <span class="req">*</span></label>
+        <input type="text" id="cac_number" name="cac_number" maxlength="40" required placeholder="e.g. RC1234567 or BN1234567" value="{{ form.get('cac_number', '') }}">
+      </div>
+      <div class="field">
+        <label for="nafdac_number">NAFDAC registration number <span class="opt">(if applicable)</span></label>
+        <input type="text" id="nafdac_number" name="nafdac_number" maxlength="40" placeholder="Only for food, drug, cosmetics etc." value="{{ form.get('nafdac_number', '') }}">
+      </div>
+
+      <div class="field full">
+        <label for="other_info">Other important information <span class="opt">(optional)</span></label>
+        <textarea id="other_info" name="other_info" maxlength="3000" placeholder="Products or services offered, number of branches, website or social media page, etc.">{{ form.get('other_info', '') }}</textarea>
+      </div>
+
+      <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+      <label class="check full">
+        <input type="checkbox" name="consent" {{ 'checked' if form.get('consent') }}>
+        <span>I confirm that the information above is true and complete. I understand the agency may verify it and reject or suspend a registration that is found to be false.</span>
+      </label>
+
+      <div class="full after">
+        <button type="submit" class="btn"><i class="fas fa-bolt"></i> Register &amp; get my ID</button>
+        <small>Already registered? <a href="/verify">Verify an ID</a></small>
+      </div>
+    </div>
+  </form>
+</div>
+<script>
+(function () {
+  var f = document.getElementById('regForm'); if (!f) return;
+  var cac = document.getElementById('cac_number'), naf = document.getElementById('nafdac_number');
+  [cac, naf].forEach(function (el) { if (el) el.addEventListener('input', function () { var p = el.selectionStart; el.value = el.value.toUpperCase(); try { el.setSelectionRange(p, p); } catch (e) {} }); });
+  f.addEventListener('submit', function (e) {
+    var b = f.querySelector('button[type=submit]');
+    if (b.dataset.busy) { e.preventDefault(); return; }       // stops double-taps creating errors
+    b.dataset.busy = '1'; b.style.opacity = '.75';
+    b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+  });
+  window.addEventListener('pageshow', function () { var b = f.querySelector('button[type=submit]'); if (b && b.dataset.busy) { delete b.dataset.busy; b.style.opacity = ''; b.innerHTML = '<i class="fas fa-bolt"></i> Register &amp; get my ID'; } });
+})();
+</script>
+{% endblock %}

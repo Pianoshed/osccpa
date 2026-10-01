@@ -100,6 +100,7 @@ table.data tbody tr:hover{background:#FBF9FE}
 .muted{color:var(--muted)}
 .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .actions form{display:inline}
+.cac-b{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:12px;margin-top:4px}.cac-b.ok{background:#D8F0E1;color:#1E6B3F}.cac-b.no{background:#FFF3CD;color:#7A5A00}
 .btn-sm{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:var(--paper);
   font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;text-decoration:none;transition:background .2s,border-color .2s}
 .btn-sm:hover{background:var(--navy-soft);border-color:#D3C5EE}
@@ -121,6 +122,11 @@ table.data tbody tr:hover{background:#FBF9FE}
 .s-in-progress{background-color:#DBEAFE;color:#1D4ED8}
 .s-resolved{background-color:#D8F0E1;color:#1E6B3F}
 .badge{display:inline-block;border-radius:20px;padding:4px 12px;font-size:.76rem;font-weight:700}
+
+/* BUSINESSES */
+.s-approved{background-color:#D8F0E1;color:#1E6B3F}
+.s-rejected{background-color:#FEE4E2;color:#B42318}
+.s-suspended{background-color:#FFF3CD;color:#7A5A00}
 
 /* GALLERY UPDATES TAB */
 .gallery-hint{font-size:.82rem;color:var(--muted);margin:-4px 0 14px}
@@ -391,6 +397,9 @@ table.data tbody tr:hover{background:#FBF9FE}
       </button>
       <button type="button" class="tab-btn" data-tab="galleryTab" role="tab" aria-selected="false">
         <i class="fa-solid fa-images"></i> Gallery <span class="count-pill">{{ gallery_items|length }}</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="businessesTab" role="tab" aria-selected="false">
+        <i class="fa-solid fa-store"></i> Businesses <span class="count-pill">{{ businesses|length }}</span>
       </button>
     </div>
     <a class="btn" href="{{ url_for('export_excel') }}"><i class="fa-solid fa-file-excel"></i> Download all data (Excel)</a>
@@ -672,6 +681,76 @@ table.data tbody tr:hover{background:#FBF9FE}
     </div>
   </section>
 
+  <!-- ========== BUSINESSES ========== -->
+  <section class="tab-content" id="businessesTab" role="tabpanel">
+    <div class="filters">
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="bSearch" placeholder="Search business, owner, CAC, ID..." aria-label="Search businesses"></div>
+      <select id="bStatus" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        <option>Pending</option><option>Approved</option><option>Rejected</option><option>Suspended</option>
+      </select>
+      <select id="bCac" aria-label="Filter by CAC check">
+        <option value="">All CAC checks</option>
+        <option value="no">CAC not yet checked</option>
+        <option value="yes">CAC verified</option>
+      </select>
+      <button type="button" class="btn" id="bClear">Clear filters</button>
+      <span class="result-count" id="bCount"></span>
+    </div>
+    <p class="news-hint">Businesses register on <strong>/register-business</strong> and receive their ID <strong>instantly</strong>, with no approval step. Use <strong>Suspended</strong> to revoke a registration that turns out to be false (the ID then shows as suspended on <strong>/verify</strong>), or <strong>Rejected</strong> to hide it. &ldquo;Email ID to owner&rdquo; in a record is optional.<br><strong>CAC check (free):</strong> open <a href="https://search.cac.gov.ng/home" target="_blank" rel="noopener">search.cac.gov.ng</a>, search the CAC number, confirm the name and that it is active, then mark the business <strong>CAC verified</strong>. The mark then appears on its certificate and the public Verify page.</p>
+
+    <div class="table-box">
+      <table class="data" id="businessesTable">
+        <thead>
+          <tr><th>Ref</th><th>Submitted</th><th>Business</th><th>CAC / NAFDAC</th><th>Registration ID</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for b in businesses %}
+          {% set bts = b.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.created_at else '' %}
+          <tr data-id="{{ b.id }}">
+            <td data-label="Ref"><span class="ref">#{{ b.id }}</span></td>
+            <td data-label="Submitted"><time class="js-time" datetime="{{ bts }}">{{ b.created_at.strftime('%d %b %Y, %H:%M') ~ ' UTC' if b.created_at else '—' }}</time></td>
+            <td data-label="Business"><span><strong>{{ b.business_name }}</strong><span class="sub">{{ b.owner_name }} &middot; {{ b.lga }}</span></span></td>
+            <td data-label="CAC / NAFDAC"><span>{{ b.cac_number }}{% if b.nafdac_number %}<span class="sub">NAFDAC: {{ b.nafdac_number }}</span>{% endif %}<span class="cac-b {{ 'ok' if b.cac_verified else 'no' }}">{{ 'CAC verified' if b.cac_verified else 'CAC not checked' }}</span></span></td>
+            <td data-label="Registration ID">{% if b.reg_id %}<span class="ref">{{ b.reg_id }}</span>{% else %}<span class="muted">Not issued</span>{% endif %}</td>
+            <td data-label="Status">
+              <form class="b-status-form" method="POST" action="{{ url_for('business_set_status', biz_id=b.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" class="status-select s-{{ b.status | lower }}" aria-label="Status for business #{{ b.id }}">
+                  {% for opt in ['Pending', 'Approved', 'Rejected', 'Suspended'] %}
+                  <option value="{{ opt }}" {{ 'selected' if opt == b.status }}>{{ opt }}</option>
+                  {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn-sm">Save</button></noscript>
+              </form>
+            </td>
+            <td data-label="Actions">
+              <div class="actions">
+                <button type="button" class="btn-sm" data-view="{{ b.id }}"><i class="fa-solid fa-eye"></i> View</button>
+                {% if not b.cac_verified %}
+                <form method="POST" action="{{ url_for('business_set_cac', biz_id=b.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="verified" value="1">
+                  <button type="submit" class="btn-sm" title="Mark CAC verified after checking search.cac.gov.ng"><i class="fa-solid fa-circle-check"></i> CAC ok</button>
+                </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('business_delete', biz_id=b.id) }}" class="js-confirm"
+                      data-title="Delete business record?"
+                      data-confirm="This permanently deletes &quot;{{ b.business_name }}&quot;{{ ' and its registration ID, which will no longer verify' if b.reg_id }}. This cannot be undone.">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-sm danger"><i class="fa-solid fa-trash"></i> Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="empty" id="bEmpty" hidden><i class="fa-regular fa-folder-open"></i><span id="bEmptyText"></span></div>
+    </div>
+  </section>
+
 </main>
 
 <!-- COMPLAINT MODAL -->
@@ -774,6 +853,32 @@ table.data tbody tr:hover{background:#FBF9FE}
   </div>
 </div>
 
+<!-- BUSINESS MODAL -->
+<div class="modal" id="businessModal" role="dialog" aria-modal="true" aria-labelledby="bmTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><p class="eyebrow" id="bmRef"></p><h3 id="bmTitle"></h3></div>
+      <button type="button" class="x" data-close aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <dl class="fields" id="bmFields"></dl>
+      <h4>Other information</h4>
+      <div class="prose" id="bmOther"></div>
+    </div>
+    <div class="modal-foot">
+      <a class="btn" id="bmCacLink" href="https://search.cac.gov.ng/home" target="_blank" rel="noopener"><i class="fa-solid fa-magnifying-glass"></i> Open CAC search</a>
+      <button type="button" class="btn" id="bmCopyCac"><i class="fa-solid fa-copy"></i> Copy CAC no.</button>
+      <form method="POST" id="bmCacForm" style="display:contents">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="verified" id="bmCacVal" value="1">
+        <button type="submit" class="btn" id="bmCacBtn"><i class="fa-solid fa-circle-check"></i> <span id="bmCacLbl">Mark CAC verified</span></button>
+      </form>
+      <a class="btn primary" id="bmReply" href="#"><i class="fa-solid fa-envelope"></i> <span id="bmReplyLbl">Email owner</span></a>
+      <button type="button" class="btn" data-close>Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div class="modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfText" hidden>
   <div class="modal-card small">
@@ -819,6 +924,18 @@ const NEWS_POSTS = [
   'link': n.link, 'published': n.published,
   'image': news_img(n.image) if n.image else '',
   'images': n.gallery
+} | tojson }}{{ ',' if not loop.last }}
+{%- endfor %}
+];
+const BUSINESSES = [
+{%- for b in businesses %}
+{{ {
+  'id': b.id, 'name': b.business_name, 'owner': b.owner_name, 'address': b.address, 'lga': b.lga,
+  'phone': b.phone, 'email': b.email, 'cac': b.cac_number, 'nafdac': b.nafdac_number, 'sector': b.sector,
+  'other': b.other_info, 'status': b.status, 'regId': b.reg_id or '',
+  'cacOk': b.cac_verified, 'cacBy': b.cac_verified_by or '', 'cacAt': b.cac_verified_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.cac_verified_at else '',
+  'ts': b.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.created_at else '',
+  'issued': b.issued_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.issued_at else ''
 } | tojson }}{{ ',' if not loop.last }}
 {%- endfor %}
 ];
@@ -1155,6 +1272,74 @@ const FLASHES = {{ msgs | tojson }};
     }
     if (search) search.addEventListener('input', apply);
     if (clearBtn) clearBtn.addEventListener('click', () => { search.value = ''; apply(); });
+    apply();
+  })();
+
+  /* ---------- businesses ---------- */
+  const bMap = new Map(BUSINESSES.map(b => [String(b.id), b]));
+
+  // changing the status select saves straight away (approving issues the ID)
+  $$('.b-status-form select').forEach(sel => sel.addEventListener('change', () => sel.closest('form').submit()));
+
+  function openBusiness(id) {
+    const b = bMap.get(String(id)); if (!b) return;
+    $('#bmRef').textContent = 'Application #' + b.id;
+    $('#bmTitle').textContent = b.name;
+    fillFields($('#bmFields'), [
+      ['Owner', b.owner], ['Status', b.status],
+      ['Registration ID', b.regId || 'Not issued yet'], ['Registered on', b.issued ? fmtDateTime(b.issued) : '—'],
+      ['CAC number', b.cac], ['CAC check', b.cacOk ? 'Verified' + (b.cacBy ? ' by ' + b.cacBy : '') + (b.cacAt ? ' on ' + fmtDateTime(b.cacAt) : '') : 'Not yet checked'], ['NAFDAC number', b.nafdac || 'Not provided'],
+      ['Email', b.email, 'mail'], ['Phone', b.phone, 'tel'],
+      ['Local Government Area', b.lga], ['Type of business', b.sector || '—'],
+      ['Address', b.address], ['Submitted', fmtDateTime(b.ts)]
+    ]);
+    $('#bmOther').textContent = b.other || '—';
+    $('#bmCacForm').action = '/admin/businesses/cac/' + b.id;
+    $('#bmCacVal').value = b.cacOk ? '0' : '1';
+    $('#bmCacLbl').textContent = b.cacOk ? 'Remove CAC verified' : 'Mark CAC verified';
+    $('#bmCopyCac').onclick = () => {
+      if (navigator.clipboard) navigator.clipboard.writeText(b.cac || '').then(() => toast('CAC number copied', 'success'), () => toast('Could not copy', 'error'));
+    };
+    const a = $('#bmReply');
+    if (b.email) {
+      let subject, body;
+      if (b.regId && b.status === 'Approved') {
+        subject = 'Your OSCCPA business registration ID';
+        body = 'Dear ' + b.owner + ',\n\nYour business "' + b.name + '" is now registered with the Ondo State Competition & Consumer Protection Agency.\n\nRegistration ID: ' + b.regId +
+               '\nCustomers can verify it at: ' + location.origin + '/verify?id=' + b.regId + '\n\nRegards,\nOSCCPA';
+        $('#bmReplyLbl').textContent = 'Email ID to owner';
+      } else {
+        subject = 'Your OSCCPA business registration (application #' + b.id + ')';
+        body = 'Dear ' + b.owner + ',\n\nRegarding your business registration application #' + b.id + ' for "' + b.name + '"...\n\nRegards,\nOSCCPA';
+        $('#bmReplyLbl').textContent = 'Email owner';
+      }
+      a.href = 'mailto:' + b.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      a.hidden = false;
+    } else a.hidden = true;
+    openModal($('#businessModal'));
+  }
+  $('#businessesTable').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) openBusiness(b.dataset.view); });
+
+  (function () {
+    const rows = $$('#businessesTable tbody tr');
+    const search = $('#bSearch'), status = $('#bStatus'), cacSel = $('#bCac'), count = $('#bCount');
+    const empty = $('#bEmpty'), emptyText = $('#bEmptyText');
+    function apply() {
+      const q = search.value.trim().toLowerCase(), st = status.value;
+      let shown = 0;
+      rows.forEach(r => {
+        const b = bMap.get(r.dataset.id);
+        const text = [b.name, b.owner, b.cac, b.nafdac, b.regId, b.email, b.phone, b.lga].join(' ').toLowerCase() + ' #' + b.id;
+        const cs = cacSel.value;
+        const hit = (!q || text.includes(q)) && (!st || b.status === st) && (!cs || (cs === 'yes') === !!b.cacOk);
+        r.hidden = !hit; if (hit) shown++;
+      });
+      count.textContent = rows.length ? 'Showing ' + shown + ' of ' + rows.length : '';
+      empty.hidden = shown > 0;
+      emptyText.textContent = rows.length ? 'Nothing matches your filters.' : 'No business applications yet.';
+    }
+    search.addEventListener('input', apply); status.addEventListener('change', apply); cacSel.addEventListener('change', apply);
+    $('#bClear').addEventListener('click', () => { search.value = ''; status.value = ''; cacSel.value = ''; apply(); });
     apply();
   })();
 

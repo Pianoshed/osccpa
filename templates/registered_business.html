@@ -1,0 +1,119 @@
+{% extends "site_base.html" %}
+{% block title %}Registration Successful{% endblock %}
+
+{% block head %}
+<style>
+.hero{padding-bottom:64px;text-align:center}
+.hero-in{display:flex;flex-direction:column;align-items:center}
+.tick{width:74px;height:74px;border-radius:50%;background:#fff;color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:14px;animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.hero h1{font-size:2rem}
+.hero p{margin:0 auto}
+.idbox{background:var(--navy-soft);border:2px dashed var(--navy);border-radius:14px;padding:18px 14px;text-align:center}
+.idbox small{display:block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.idbox code{display:block;font-family:'Courier New',monospace;font-weight:700;font-size:1.75rem;color:var(--navy-deep);letter-spacing:.04em;word-break:break-all;user-select:all}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.row .btn{width:100%;padding:14px 10px}
+.btn.big{grid-column:1/-1;font-size:1.05rem;padding:16px;animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,.45)}50%{box-shadow:0 0 0 10px rgba(109,40,217,0)}}
+.btn.wa{background:#25D366;color:#fff}
+.btn.wa:hover{background:#1DA851}
+.cert{margin-top:24px;border:3px solid var(--navy);border-radius:10px;padding:5px;background:#fff}
+.cert-in{border:1px solid var(--gold);border-radius:6px;padding:22px 16px;text-align:center}
+.cert-in .ag{font-size:.64rem;font-weight:700;letter-spacing:.06em;color:var(--navy);text-transform:uppercase}
+.cert-in h2{font-family:var(--font-display);color:var(--navy-deep);font-size:1.25rem;margin:8px 0 12px;letter-spacing:.02em}
+.cert-in .sm{font-size:.78rem;color:var(--muted)}
+.cert-in .bn{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin:6px 0;word-break:break-word}
+.cert-in .cid{display:inline-block;margin:12px 0 4px;padding:8px 14px;border:1.5px solid var(--navy);border-radius:8px;background:var(--navy-soft);font-family:'Courier New',monospace;font-weight:700;color:var(--navy-deep);font-size:.95rem}
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.sig{border-top:1px solid var(--muted);padding-top:6px}
+.sig b{display:block;font-size:.76rem;line-height:1.3}
+.sig span{font-size:.68rem;color:var(--muted)}
+.steps{margin-top:22px;padding:16px 18px;background:var(--cream);border-radius:12px;font-size:.88rem;color:var(--muted)}
+.steps li{margin-left:18px;margin-bottom:4px}
+.steps strong{color:var(--text)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:var(--navy-deep);color:#fff;padding:11px 20px;border-radius:30px;font-weight:600;font-size:.9rem;opacity:0;pointer-events:none;transition:.3s;z-index:300}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;border-radius:2px;z-index:200;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+@media(max-width:700px){.hero h1{font-size:1.6rem}.card{padding:18px}.idbox code{font-size:1.35rem}.btn{font-size:.92rem}}
+@media(prefers-reduced-motion:reduce){.btn.big,.tick{animation:none}.confetti{display:none}}
+</style>
+{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <div class="hero-in">
+    <div class="tick"><i class="fas fa-check"></i></div>
+    <h1>You are registered!</h1>
+    <p>{{ biz.business_name }} is now in the OSCCPA business registry. Save your ID and download your certificate below.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="card">
+    <div class="idbox">
+      <small>Your registration ID</small>
+      <code id="rid">{{ biz.reg_id }}</code>
+    </div>
+
+    <div class="row">
+      <a class="btn big" href="{{ url_for('business_certificate', reg_id=biz.reg_id) }}" download><i class="fas fa-download"></i> Download certificate (PDF)</a>
+      <button type="button" class="btn light" id="copyBtn"><i class="fas fa-copy"></i> Copy ID</button>
+      <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Share</a>
+    </div>
+
+    <div class="cert" aria-label="Certificate preview">
+      <div class="cert-in">
+        <div class="ag">Ondo State Competition &amp; Consumer Protection Agency</div>
+        <h2>CERTIFICATE OF REGISTRATION</h2>
+        <div class="sm">This is to certify that</div>
+        <div class="bn">{{ biz.business_name }}</div>
+        <div class="sm">is registered with the agency under ID</div>
+        <div class="cid">{{ biz.reg_id }}</div>
+        <div class="sm">{{ biz.lga }} LGA{% if biz.sector %} &middot; {{ biz.sector }}{% endif %}{% if biz.issued_at %} &middot; {{ biz.issued_at.strftime('%d %B %Y') }}{% endif %}</div>
+        <div class="sigs">
+          <div class="sig"><b>{{ chairman[0] }}</b><span>{{ chairman[1] }}</span></div>
+          <div class="sig"><b>{{ secretary[0] }}</b><span>{{ secretary[1] }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="steps">
+      <li><strong>Keep your ID safe.</strong> Take a screenshot or download the PDF now.</li>
+      <li>Customers can confirm it any time on the <a href="{{ url_for('verify_business', reg_id=biz.reg_id) }}"><strong>Verify page</strong></a> or by scanning the QR code on the certificate.</li>
+      <li>The agency will check your CAC number against the CAC register. Once confirmed, a <strong>CAC verified</strong> mark appears on your certificate (download it again) and on the Verify page. New CAC registrations can take a few days to show up in the CAC database.</li>
+      <li>Lost your ID? Register again with the same CAC number and email to get this page back.</li>
+    </ul>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var id = "{{ biz.reg_id }}", vurl = "{{ verify_url }}", name = {{ biz.business_name|tojson }};
+  try { localStorage.setItem('osccpaRegistered', '1'); } catch (e) {}
+
+  function toast(t) { var el = document.getElementById('toast'); el.textContent = t; el.classList.add('on'); setTimeout(function () { el.classList.remove('on'); }, 2200); }
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(id).then(function () { toast('ID copied'); }, function () { toast('Press and hold the ID to copy'); });
+    } else { var r = document.createRange(); r.selectNode(document.getElementById('rid')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('ID selected - tap Copy'); }
+  });
+  var msg = name + ' is registered with the Ondo State Competition & Consumer Protection Agency. Registration ID: ' + id + '. Verify: ' + vurl;
+  document.getElementById('waBtn').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+
+  if (!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    var cols = ['#6D28D9', '#A855F7', '#F59E0B', '#22C55E', '#EC4899'];
+    for (var i = 0; i < 36; i++) {
+      var p = document.createElement('i'); p.className = 'confetti';
+      p.style.left = Math.random() * 100 + 'vw'; p.style.background = cols[i % cols.length];
+      p.style.animationDuration = (2.2 + Math.random() * 2) + 's'; p.style.animationDelay = (Math.random() * .6) + 's';
+      document.body.appendChild(p); setTimeout(function (n) { n.remove(); }.bind(null, p), 5200);
+    }
+  }
+})();
+</script>
+{% endblock %}

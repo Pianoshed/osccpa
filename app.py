@@ -9,6 +9,7 @@ import re
 import math
 import time
 import uuid
+import unicodedata
 import secrets
 import threading
 import click
@@ -257,6 +258,31 @@ class GalleryItem(db.Model):
     video_url = db.Column(db.String(500))                              # videos only
     caption = db.Column(db.String(150))                                # optional title
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Business(db.Model):
+    """A business registered with the agency through the public form.
+    The reg_id (verifiable ID) is issued INSTANTLY on submission (status 'Approved'),
+    so no admin approval is needed. Admins can still Suspend / Reject / delete later."""
+    __tablename__ = 'businesses'
+    id = db.Column(db.Integer, primary_key=True)
+    reg_id = db.Column(db.String(40), unique=True, index=True)       # e.g. OSCCPA-2026-K7M3QX
+    owner_name = db.Column(db.String(150), nullable=False)
+    business_name = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.String(300), nullable=False)
+    lga = db.Column(db.String(100))
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(150))
+    cac_number = db.Column(db.String(40))
+    nafdac_number = db.Column(db.String(40))                          # optional
+    sector = db.Column(db.String(100))                                # optional
+    other_info = db.Column(db.Text)                                   # optional
+    status = db.Column(db.String(20), default="Pending", nullable=False)  # Pending | Approved | Rejected | Suspended
+    issued_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Set by an admin after checking the CAC number on https://search.cac.gov.ng (free manual check)
+    cac_verified = db.Column(db.Boolean, default=False, nullable=False, server_default=db.false())
+    cac_verified_at = db.Column(db.DateTime)
+    cac_verified_by = db.Column(db.String(150))
 
 class NewsPost(db.Model):
     __tablename__ = 'news_posts'
@@ -904,6 +930,321 @@ def complaints():
 
 
 # ---------------------------------------------------------------------------
+# BUSINESS REGISTRY: public registration form + public ID verification
+# ---------------------------------------------------------------------------
+ONDO_LGAS = ["Akoko North-East", "Akoko North-West", "Akoko South-East", "Akoko South-West",
+             "Akure North", "Akure South", "Ese-Odo", "Idanre", "Ifedore", "Ilaje",
+             "Ile-Oluji/Okeigbo", "Irele", "Odigbo", "Okitipupa", "Ondo East", "Ondo West",
+             "Ose", "Owo"]
+BUSINESS_SECTORS = ["Retail / Trading", "Food & Beverage", "Pharmacy / Health", "Manufacturing",
+                    "Hospitality", "Fuel / Petroleum", "Electronics / Telecom", "Agriculture",
+                    "Professional Services", "Other"]
+BUSINESS_STATUSES = ("Pending", "Approved", "Rejected", "Suspended")
+ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"      # no 0/O/1/I so IDs are easy to read out
+CAC_RE = re.compile(r"^[A-Z]{0,3}-?\d{3,10}$")           # RC123456, BN1234567, IT12345 ...
+NAFDAC_RE = re.compile(r"^[A-Z0-9][A-Z0-9/\- ]{3,29}$")
+
+# Names printed on the certificate (override with env vars if the office-holders change)
+CHAIRMAN_NAME = os.environ.get("CHAIRMAN_NAME", "Hon. Oluyemi Fasipe")
+CHAIRMAN_TITLE = os.environ.get("CHAIRMAN_TITLE", "Executive Chairman")
+SECRETARY_NAME = os.environ.get("SECRETARY_NAME", "Hajia Modelelayo Kudirat Ola")
+SECRETARY_TITLE = os.environ.get("SECRETARY_TITLE", "Administrative Secretary")
+# Optional signature images (transparent PNG). If a file is missing the line is left blank.
+CHAIRMAN_SIG = os.path.join(basedir, "static", "signatures", "chairman.png")
+SECRETARY_SIG = os.path.join(basedir, "static", "signatures", "secretary.png")
+
+# Many phones share one mobile-network IP (CGNAT), so keep these generous.
+REGISTER_LIMIT = (60, 3600)      # submissions per IP per hour
+VERIFY_LIMIT = (90, 60)          # lookups per IP per minute
+CERT_LIMIT = (60, 60)            # certificate downloads per IP per minute
+
+_rate_hits = {}
+_rate_lock = threading.Lock()
+
+def rate_limited(bucket, limit, window):
+    """True if this IP has made `limit` calls to `bucket` in the last `window` seconds."""
+    key = f"{bucket}|{client_ip()}"
+    now = time.time()
+    with _rate_lock:
+        if len(_rate_hits) > 5000:
+            for k in [k for k, v in _rate_hits.items() if not v or now - v[-1] > 3600]:
+                _rate_hits.pop(k, None)
+        hits = [t for t in _rate_hits.get(key, []) if now - t < window]
+        if len(hits) >= limit:
+            _rate_hits[key] = hits
+            return True
+        hits.append(now)
+        _rate_hits[key] = hits
+    return False
+
+def new_business_id():
+    """Random, unguessable ID such as OSCCPA-2026-K7M3QX (unique in the database)."""
+    for _ in range(20):
+        code = "".join(secrets.choice(ID_ALPHABET) for _ in range(6))
+        rid = f"OSCCPA-{datetime.utcnow().year}-{code}"
+        if not Business.query.filter_by(reg_id=rid).first():
+            return rid
+    raise RuntimeError("Could not generate a unique business ID")
+
+def _business_form_error(f):
+    if not (f["owner_name"] and f["business_name"] and f["address"] and f["lga"]
+            and f["phone"] and f["email"] and f["cac_number"]):
+        return "Please fill in all the required fields."
+    if f["lga"] not in ONDO_LGAS:
+        return "Please choose a Local Government Area from the list."
+    if not EMAIL_RE.match(f["email"]):
+        return "Please enter a valid email address."
+    if len(re.sub(r"\D", "", f["phone"])) < 7:
+        return "Please enter a valid phone number."
+    if not CAC_RE.match(f["cac_number"]):
+        return "That CAC registration number doesn't look right. Example: RC1234567 or BN1234567."
+    if f["nafdac_number"] and not NAFDAC_RE.match(f["nafdac_number"]):
+        return "That NAFDAC number doesn't look right. Leave it blank if it doesn't apply to you."
+    if not f["consent"]:
+        return "Please confirm that the information you gave is true."
+    return None
+
+@app.route("/register-business", methods=["GET", "POST"])
+def register_business():
+    form = {}
+    if request.method == "POST":
+        if request.form.get("website"):                    # honeypot: real people never fill this
+            return redirect(url_for("register_business"))
+        form = {
+            "owner_name": clean(request.form.get("owner_name"), 150),
+            "business_name": clean(request.form.get("business_name"), 200),
+            "address": clean(request.form.get("address"), 300),
+            "lga": clean(request.form.get("lga"), 100),
+            "phone": clean(request.form.get("phone"), 50),
+            "email": clean(request.form.get("email"), 150),
+            "cac_number": re.sub(r"\s+", "", clean(request.form.get("cac_number"), 40)).upper(),
+            "nafdac_number": clean(request.form.get("nafdac_number"), 40).upper(),
+            "sector": clean(request.form.get("sector"), 100),
+            "other_info": clean(request.form.get("other_info"), 3000),
+            "consent": request.form.get("consent") == "on",
+        }
+        if form["sector"] not in BUSINESS_SECTORS:
+            form["sector"] = ""
+
+        if rate_limited("register", *REGISTER_LIMIT):
+            flash("Too many submissions from your connection. Please try again later.", "error")
+            return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                                   sectors=BUSINESS_SECTORS), 429
+        error = _business_form_error(form)
+        if not error:
+            dup = Business.query.filter(Business.cac_number == form["cac_number"],
+                                        Business.status != "Rejected").first()
+            if dup:
+                # Same CAC + same email = the owner came back (lost ID / double tap): show the certificate again.
+                if (dup.email or "").lower() == form["email"].lower() and dup.status == "Approved" and dup.reg_id:
+                    flash("This business is already registered. Here is your certificate.", "success")
+                    return redirect(url_for("registered_business", reg_id=dup.reg_id))
+                error = ("A business with that CAC number has already been registered. "
+                         "If this is a mistake, please contact the agency.")
+        if error:
+            flash(error, "error")
+            return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                                   sectors=BUSINESS_SECTORS), 400
+
+        biz = Business(owner_name=form["owner_name"], business_name=form["business_name"],
+                       address=form["address"], lga=form["lga"], phone=form["phone"],
+                       email=form["email"], cac_number=form["cac_number"],
+                       nafdac_number=form["nafdac_number"] or None, sector=form["sector"] or None,
+                       other_info=form["other_info"] or None, status="Approved")
+        try:
+            biz.reg_id = new_business_id()               # instant: no admin approval needed
+            biz.issued_at = datetime.utcnow()
+            db.session.add(biz)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash("We could not save your application. Please try again.", "error")
+            return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                                   sectors=BUSINESS_SECTORS), 500
+        return redirect(url_for("registered_business", reg_id=biz.reg_id))
+    return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                           sectors=BUSINESS_SECTORS)
+
+def _pdf_text(value):
+    """The built-in PDF fonts only cover Latin-1, so drop accents/dots (e.g. Yoruba marks)."""
+    return unicodedata.normalize("NFKD", value or "").encode("latin-1", "ignore").decode("latin-1")
+
+def build_certificate_pdf(biz, verify_url):
+    """Render the registration certificate and return the PDF bytes."""
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.colors import HexColor
+    from reportlab.lib.utils import simpleSplit
+    from reportlab.pdfgen import canvas
+    from reportlab.graphics.barcode import qr
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.graphics import renderPDF
+
+    W, H = landscape(A4)
+    purple, deep, light = HexColor("#6D28D9"), HexColor("#4C1D95"), HexColor("#F1EBFC")
+    accent, muted, dark = HexColor("#A855F7"), HexColor("#665D77"), HexColor("#241B33")
+    name = _pdf_text(biz.business_name)
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=(W, H))
+    c.setTitle(f"OSCCPA Certificate of Registration - {biz.reg_id}")
+    c.setAuthor("Ondo State Competition & Consumer Protection Agency")
+
+    # borders
+    c.setStrokeColor(purple); c.setLineWidth(5); c.rect(16, 16, W - 32, H - 32)
+    c.setStrokeColor(accent); c.setLineWidth(1); c.rect(26, 26, W - 52, H - 52)
+
+    # logo + agency
+    logo = os.path.join(basedir, "static", "logo", "osccpa_logo.png")
+    if os.path.exists(logo):
+        try:
+            c.drawImage(logo, W / 2 - 60, H - 118, 120, 68, preserveAspectRatio=True, mask="auto", anchor="c")
+        except Exception:
+            pass
+    c.setFillColor(purple); c.setFont("Helvetica-Bold", 13)
+    c.drawCentredString(W / 2, H - 136, "ONDO STATE COMPETITION & CONSUMER PROTECTION AGENCY")
+
+    # title
+    c.setFillColor(deep); c.setFont("Times-Bold", 30)
+    c.drawCentredString(W / 2, H - 178, "CERTIFICATE OF REGISTRATION")
+    c.setStrokeColor(accent); c.setLineWidth(2); c.line(W / 2 - 60, H - 190, W / 2 + 60, H - 190)
+    c.setFillColor(muted); c.setFont("Helvetica", 12)
+    c.drawCentredString(W / 2, H - 214, "This is to certify that")
+
+    # business name (shrinks / wraps to fit)
+    size = 30
+    while True:
+        lines = simpleSplit(name, "Times-Bold", size, 640)
+        if len(lines) <= 2 or size <= 18:
+            break
+        size -= 2
+    lines = lines[:2]
+    if len(simpleSplit(name, "Times-Bold", size, 640)) > 2:
+        lines[-1] = lines[-1][:-1].rstrip() + "..."
+    y = H - 250
+    c.setFillColor(dark); c.setFont("Times-Bold", size)
+    for ln in lines:
+        c.drawCentredString(W / 2, y, ln)
+        y -= size + 6
+
+    # short message
+    y -= 6
+    c.setFillColor(muted); c.setFont("Helvetica", 12)
+    msg = ("has been registered in the business registry of the Ondo State Competition & Consumer "
+           "Protection Agency (OSCCPA) and is issued the registration ID below.")
+    for ln in simpleSplit(msg, "Helvetica", 12, 600):
+        c.drawCentredString(W / 2, y, ln)
+        y -= 17
+
+    # ID box
+    y -= 8
+    box_w, box_h = 380, 62
+    c.setFillColor(light); c.setStrokeColor(purple); c.setLineWidth(1.5)
+    c.roundRect(W / 2 - box_w / 2, y - box_h, box_w, box_h, 10, fill=1, stroke=1)
+    c.setFillColor(muted); c.setFont("Helvetica-Bold", 8.5)
+    c.drawCentredString(W / 2, y - 18, "REGISTRATION ID")
+    c.setFillColor(deep); c.setFont("Courier-Bold", 26)
+    c.drawCentredString(W / 2, y - 48, biz.reg_id)
+    y -= box_h + 20
+
+    # details line
+    bits = []
+    if biz.lga:
+        bits.append(_pdf_text(biz.lga) + " Local Government Area")
+    if biz.sector:
+        bits.append(_pdf_text(biz.sector))
+    if biz.issued_at:
+        bits.append("Issued " + biz.issued_at.strftime("%d %B %Y"))
+    c.setFillColor(dark); c.setFont("Helvetica", 11)
+    c.drawCentredString(W / 2, y, "   |   ".join(bits))
+    if biz.cac_verified:
+        c.setFillColor(HexColor("#D8F0E1")); c.setStrokeColor(HexColor("#1E6B3F")); c.setLineWidth(1)
+        c.roundRect(W / 2 - 78, y - 36, 156, 22, 11, fill=1, stroke=1)
+        c.setFillColor(HexColor("#1E6B3F")); c.setFont("Helvetica-Bold", 9)
+        c.drawCentredString(W / 2, y - 29, "CAC NUMBER VERIFIED")
+
+    # signatures (Executive Chairman + Administrative Secretary)
+    def signer(cx, sig_path, person, title):
+        line_y = 122
+        if os.path.exists(sig_path):
+            try:
+                c.drawImage(sig_path, cx - 55, line_y + 2, 110, 36, preserveAspectRatio=True, mask="auto", anchor="s")
+            except Exception:
+                pass
+        c.setStrokeColor(muted); c.setLineWidth(0.8); c.line(cx - 90, line_y, cx + 90, line_y)
+        c.setFillColor(dark); c.setFont("Helvetica-Bold", 10.5)
+        c.drawCentredString(cx, line_y - 14, _pdf_text(person))
+        c.setFillColor(muted); c.setFont("Helvetica", 9)
+        c.drawCentredString(cx, line_y - 26, _pdf_text(title))
+    signer(W / 2 - 150, CHAIRMAN_SIG, CHAIRMAN_NAME, CHAIRMAN_TITLE)
+    signer(W / 2 + 150, SECRETARY_SIG, SECRETARY_NAME, SECRETARY_TITLE)
+
+    # QR code + verify text (bottom left)
+    widget = qr.QrCodeWidget(verify_url)
+    b = widget.getBounds()
+    qr_size = 66
+    d = Drawing(qr_size, qr_size, transform=[qr_size / (b[2] - b[0]), 0, 0, qr_size / (b[3] - b[1]), 0, 0])
+    d.add(widget)
+    renderPDF.draw(d, c, 52, 40)
+    c.setFillColor(deep); c.setFont("Helvetica-Bold", 8.5)
+    c.drawString(124, 90, "Scan to verify")
+    c.setFillColor(muted); c.setFont("Helvetica", 6.5)
+    yy = 80
+    for ln in simpleSplit(verify_url, "Helvetica", 6.5, 150):
+        c.drawString(124, yy, ln); yy -= 8.5
+
+    # note (bottom right)
+    c.setFillColor(muted); c.setFont("Helvetica", 7)
+    note = ("Issued electronically. Details were supplied by the business and are not an endorsement "
+            "of its goods or services. Verify this certificate at the address shown or with the ID above.")
+    yy = 66
+    for ln in simpleSplit(note, "Helvetica", 7, 260):
+        c.drawRightString(W - 52, yy, ln); yy -= 9
+
+    c.showPage()
+    c.save()
+    return buf.getvalue()
+
+@app.route("/registered/<reg_id>")
+def registered_business(reg_id):
+    """Shown right after registering: the ID, a certificate preview and the PDF download."""
+    rid = re.sub(r"\s+", "", clean(reg_id, 40)).upper()
+    biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
+    return render_template("registered_business.html", biz=biz,
+                           verify_url=url_for("verify_business", reg_id=biz.reg_id, _external=True),
+                           chairman=(CHAIRMAN_NAME, CHAIRMAN_TITLE),
+                           secretary=(SECRETARY_NAME, SECRETARY_TITLE))
+
+@app.route("/certificate/<reg_id>.pdf")
+def business_certificate(reg_id):
+    if rate_limited("certificate", *CERT_LIMIT):
+        abort(429)
+    rid = re.sub(r"\s+", "", clean(reg_id, 40)).upper()
+    biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
+    try:
+        pdf = build_certificate_pdf(biz, url_for("verify_business", reg_id=biz.reg_id, _external=True))
+    except ImportError:
+        app.logger.error("reportlab is not installed (add 'reportlab' to requirements.txt)")
+        abort(503)
+    resp = send_file(io.BytesIO(pdf), mimetype="application/pdf", as_attachment=True,
+                     download_name=f"OSCCPA-Certificate-{biz.reg_id}.pdf")
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+@app.route("/verify")
+@app.route("/verify/<reg_id>")
+def verify_business(reg_id=None):
+    q = re.sub(r"\s+", "", clean(reg_id or request.args.get("id"), 40)).upper()
+    biz = None
+    if q:
+        if rate_limited("verify", *VERIFY_LIMIT):
+            flash("Too many lookups. Please wait a minute and try again.", "error")
+            return render_template("verify_business.html", q=q, searched=False, biz=None), 429
+        found = Business.query.filter_by(reg_id=q).first()
+        # Pending / rejected applications are never shown publicly
+        biz = found if found and found.status in ("Approved", "Suspended") else None
+    return render_template("verify_business.html", q=q, searched=bool(q), biz=biz)
+
+
+# ---------------------------------------------------------------------------
 # ADMIN DASHBOARD
 # ---------------------------------------------------------------------------
 @app.route("/admin/dashboard")
@@ -914,7 +1255,8 @@ def admin_dashboard():
     news_data = NewsPost.query.order_by(NewsPost.created_at.desc()).all()
     return render_template("admin_dashboard.html", complaints=complaints_data,
                             contacts=contacts_data, news_posts=news_data,
-                            gallery_items=gallery_rows())
+                            gallery_items=gallery_rows(),
+                            businesses=Business.query.order_by(Business.created_at.desc()).all())
 
 @app.route("/admin/evidence/<path:filename>")
 @login_required
@@ -1056,6 +1398,59 @@ def gallery_delete(item_id):
     db.session.commit()
     remove_gallery_image(name)            # only after the row is gone
     flash("Gallery item deleted.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+# ---------------------------------------------------------------------------
+# ADMIN: BUSINESS REGISTRY (review applications, issue / suspend IDs)
+# ---------------------------------------------------------------------------
+@app.route("/admin/businesses/status/<int:biz_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def business_set_status(biz_id):
+    biz = Business.query.get_or_404(biz_id)
+    new_status = request.form.get("status")
+    if new_status not in BUSINESS_STATUSES:
+        flash("Invalid status.", "error")
+        return redirect(url_for("admin_dashboard"))
+    try:
+        if new_status == "Approved" and not biz.reg_id:      # the ID is issued once and never changes
+            biz.reg_id = new_business_id()
+            biz.issued_at = datetime.utcnow()
+        biz.status = new_status
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        flash("Could not update the business. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+    if new_status == "Approved":
+        flash(f"{biz.business_name} approved. Registration ID: {biz.reg_id}", "success")
+    else:
+        flash(f"{biz.business_name} marked {new_status}.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/businesses/cac/<int:biz_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def business_set_cac(biz_id):
+    """Admin ticks (or un-ticks) 'CAC verified' after checking the number on search.cac.gov.ng."""
+    biz = Business.query.get_or_404(biz_id)
+    verified = request.form.get("verified") == "1"
+    biz.cac_verified = verified
+    biz.cac_verified_at = datetime.utcnow() if verified else None
+    biz.cac_verified_by = session.get("admin_user") if verified else None
+    db.session.commit()
+    flash(f"{biz.business_name}: CAC number marked " + ("verified." if verified else "not verified."), "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/businesses/delete/<int:biz_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def business_delete(biz_id):
+    biz = Business.query.get_or_404(biz_id)
+    db.session.delete(biz)
+    db.session.commit()
+    flash("Business record deleted.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
@@ -1209,8 +1604,9 @@ def _excel_safe(value):
 def export_excel():
     df_complaints = pd.read_sql(db.select(Complaint), db.engine)
     df_contacts = pd.read_sql(db.select(Contact), db.engine)
+    df_businesses = pd.read_sql(db.select(Business), db.engine)
 
-    for df in (df_complaints, df_contacts):
+    for df in (df_complaints, df_contacts, df_businesses):
         for col in df.select_dtypes(include="object").columns:
             df[col] = df[col].map(_excel_safe)
 
@@ -1218,6 +1614,7 @@ def export_excel():
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df_complaints.to_excel(writer, index=False, sheet_name='Complaints')
         df_contacts.to_excel(writer, index=False, sheet_name='Contacts')
+        df_businesses.to_excel(writer, index=False, sheet_name='Businesses')
     output.seek(0)
 
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -1236,6 +1633,8 @@ def sitemap():
         f"{base_url}/news",
         f"{base_url}/complaints",
         f"{base_url}/contact",
+        f"{base_url}/register-business",
+        f"{base_url}/verify",
     ]
 
     lastmod = datetime.now().date().isoformat()

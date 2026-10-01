@@ -491,6 +491,20 @@ nav a:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 }
 .gallery-item:first-child .gallery-play { font-size: 3.4rem; }
 
+/* BUSINESS REGISTRY BAND */
+.registry { padding: 56px 7%; background: var(--cream); border-top: 1px solid var(--line); }
+.registry-in { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.registry-card {
+  display: flex; align-items: center; gap: 20px; padding: 26px 28px; text-decoration: none;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.registry-card:hover, .registry-card:focus-visible { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--gold); outline: none; }
+.registry-card .ri { width: 54px; height: 54px; flex-shrink: 0; border-radius: 50%; background: var(--navy); color: var(--gold-soft); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.registry-card h3 { font-size: 1.25rem; color: var(--text-dark); margin-bottom: 4px; }
+.registry-card p { font-size: .9rem; color: var(--text-muted); line-height: 1.5; }
+@media (max-width: 768px) { .registry { padding: 36px 5%; } .registry-in { grid-template-columns: 1fr; } .registry-card { padding: 20px; } }
+
 /* LIGHTBOX */
 .lightbox {
   position: fixed; inset: 0; z-index: 3000; background: rgba(36,27,51,.94);
@@ -734,6 +748,56 @@ footer::before {
     scroll-behavior: auto !important;
   }
 }
+
+/* ===== BUSINESS REGISTRY: nav badge, promo band, popup ===== */
+nav a.nav-cta, .mobile-menu a.nav-cta { background: var(--navy); color: #fff; position: relative; }
+nav a.nav-cta:hover, nav a.nav-cta:focus { background: var(--navy-mid); color: #fff; }
+.mobile-menu a.nav-cta { background: var(--navy); color: #fff; }
+.nav-cta em { font-style: normal; font-size: .58rem; font-weight: 800; letter-spacing: .08em; background: #FDE68A; color: #4C1D95; padding: 2px 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; animation: ctaBlink 1.8s ease-in-out infinite; }
+@keyframes ctaBlink { 50% { transform: scale(1.12); } }
+
+.registry { padding: 64px 7%; background: linear-gradient(120deg, var(--navy-deep), var(--navy)); position: relative; overflow: hidden; }
+.registry::before, .registry::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.07); animation: floaty 9s ease-in-out infinite; }
+.registry::before { width: 280px; height: 280px; top: -90px; right: -60px; }
+.registry::after { width: 200px; height: 200px; bottom: -80px; left: -50px; animation-delay: -4s; }
+@keyframes floaty { 50% { transform: translateY(18px) scale(1.06); } }
+.registry-in { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; display: block; }
+.reg-promo { text-align: center; color: #fff; }
+.reg-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 30px; background: #FDE68A; color: #4C1D95; font-weight: 800; font-size: .78rem; letter-spacing: .04em; animation: badgePulse 2.2s ease-in-out infinite; }
+@keyframes badgePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(253,230,138,.6); } 50% { box-shadow: 0 0 0 12px rgba(253,230,138,0); } }
+.reg-promo h2 { font-size: 2rem; line-height: 1.25; margin: 18px auto 24px; max-width: 24ch; }
+.reg-steps { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.reg-steps li { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; font-weight: 600; font-size: .92rem; }
+.reg-steps b { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--navy-deep); display: flex; align-items: center; justify-content: center; }
+.reg-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.reg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 15px 30px; border-radius: 10px; background: #fff; color: var(--navy-deep); font-weight: 800; text-decoration: none; transition: transform var(--transition-fast); }
+.reg-btn:hover, .reg-btn:focus-visible { transform: translateY(-3px); outline: none; }
+.reg-btn.ghost { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.6); }
+@media (max-width: 768px) { .registry { padding: 44px 5%; } .reg-promo h2 { font-size: 1.45rem; } .reg-steps { grid-template-columns: 1fr; } .reg-steps li { flex-direction: row; justify-content: flex-start; padding: 12px 16px; } .reg-btn { width: 100%; } }
+
+.rp-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(36,27,51,.72); display: flex; align-items: center; justify-content: center; padding: 18px; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+.rp-overlay.show { opacity: 1; visibility: visible; }
+.rp-box { position: relative; width: 100%; max-width: 440px; background: #fff; border-radius: 22px; overflow: hidden; text-align: center; box-shadow: 0 30px 70px rgba(0,0,0,.4); transform: translateY(40px) scale(.92); transition: transform .45s cubic-bezier(.2,1.3,.4,1); }
+.rp-overlay.show .rp-box { transform: none; }
+.rp-top { background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid)); color: #fff; padding: 30px 22px 26px; position: relative; overflow: hidden; }
+.rp-top::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); transform: translateX(-100%); animation: shine 3.2s ease-in-out infinite; }
+@keyframes shine { 60%, 100% { transform: translateX(100%); } }
+.rp-icon { width: 68px; height: 68px; margin: 0 auto 12px; border-radius: 50%; background: #fff; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; animation: ring 1.8s ease-out infinite; }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(253,230,138,.8); } 100% { box-shadow: 0 0 0 22px rgba(253,230,138,0); } }
+.rp-tag { display: inline-block; background: #FDE68A; color: #4C1D95; font-size: .7rem; font-weight: 800; letter-spacing: .08em; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; }
+.rp-top h3 { font-size: 1.45rem; line-height: 1.25; }
+.rp-body { padding: 20px 22px 24px; }
+.rp-body p { color: var(--text-muted); font-size: .94rem; margin-bottom: 16px; }
+.rp-list { list-style: none; display: flex; justify-content: center; gap: 14px; margin-bottom: 18px; font-size: .78rem; font-weight: 700; color: var(--navy-deep); flex-wrap: wrap; }
+.rp-list i { color: var(--success); margin-right: 4px; }
+.rp-go { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 15px; border-radius: 12px; background: var(--navy); color: #fff; font-weight: 800; text-decoration: none; font-size: 1.02rem; animation: glowBtn 2.4s ease-in-out infinite; }
+@keyframes glowBtn { 0%,100% { box-shadow: 0 0 0 0 rgba(109,40,217,.5); } 50% { box-shadow: 0 0 0 10px rgba(109,40,217,0); } }
+.rp-sec { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: .85rem; }
+.rp-sec a, .rp-sec button { color: var(--navy); font-weight: 700; background: none; border: 0; cursor: pointer; font-family: inherit; font-size: inherit; padding: 8px 4px; text-decoration: underline; }
+.rp-close { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(255,255,255,.2); color: #fff; font-size: 1.1rem; cursor: pointer; }
+.rp-close:hover, .rp-close:focus-visible { background: rgba(255,255,255,.4); outline: none; }
+@media (max-width: 600px) { .rp-overlay { align-items: flex-end; padding: 0; } .rp-box { max-width: none; border-radius: 22px 22px 0 0; padding-bottom: env(safe-area-inset-bottom); transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { .rp-top::after, .rp-icon, .rp-go, .reg-badge, .nav-cta em, .registry::before, .registry::after { animation: none; } .rp-box { transition: none; } }
 </style>
 <base target="_blank">
 </head>
@@ -765,6 +829,7 @@ footer::before {
       <li><a href="/news">News &amp; Activities</a></li>
       <li><a href="/services">Services</a></li>
       <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/register-business" target="_self" class="nav-cta">Register Business <em>NEW</em></a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
   </nav>
@@ -779,6 +844,7 @@ footer::before {
     <a href="/news" role="menuitem">News &amp; Activities</a>
     <a href="/services" role="menuitem">Services</a>
     <a href="/complaints" role="menuitem">Complaints</a>
+    <a href="/register-business" role="menuitem" target="_self" class="nav-cta">Register Business <em>NEW</em></a>
     <a href="/contact" role="menuitem">Contact</a>
   </div>
 </header>
@@ -849,8 +915,8 @@ footer::before {
       <div class="leaders">
         <img
           class="leader-photo"
-          src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.jpeg') }}"
-          alt="Mr. Oluyemi Fasipe, Executive Chairman of OSCCPA"
+          src="{{ url_for('static', filename='exec/chairman-oluyemi-fasipe.png') }}"
+          alt="Honorable Oluyemi Fasipe, Executive Chairman of OSCCPA"
           loading="lazy"
         >
         <img
@@ -860,7 +926,7 @@ footer::before {
           loading="lazy"
         >
         <div class="leader-cap chairman">
-          <strong>Mr. Oluyemi Fasipe</strong>
+          <strong>Hon. Oluyemi Fasipe</strong>
           <span>Executive Chairman</span>
         </div>
         <div class="leader-cap">
@@ -977,6 +1043,25 @@ footer::before {
   </div>
 </section>
 
+<!-- BUSINESS REGISTRY -->
+<section class="registry" id="registry" aria-labelledby="reg-heading">
+  <div class="registry-in">
+    <div class="reg-promo">
+      <span class="reg-badge"><i class="fas fa-bolt"></i> Instant &middot; Free &middot; No approval wait</span>
+      <h2 id="reg-heading">Register your business and get your official ID in under 2 minutes</h2>
+      <ol class="reg-steps">
+        <li><b>1</b><span>Fill the short form</span></li>
+        <li><b>2</b><span>Get your ID instantly</span></li>
+        <li><b>3</b><span>Download your certificate</span></li>
+      </ol>
+      <div class="reg-actions">
+        <a class="reg-btn" href="/register-business" target="_self"><i class="fas fa-store"></i> Register now</a>
+        <a class="reg-btn ghost" href="/verify" target="_self"><i class="fas fa-shield-halved"></i> Verify a business</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- FOOTER -->
@@ -1021,6 +1106,8 @@ footer::before {
         <h4>Our Services</h4>
         <ul>
           <li><a href="/complaints">File a Complaint</a></li>
+          <li><a href="/register-business" target="_self">Register Your Business</a></li>
+          <li><a href="/verify" target="_self">Verify a Business</a></li>
           <li><a href="/services">Consumer Advocacy</a></li>
           <li><a href="/services">Market Surveillance</a></li>
           <li><a href="/services">Business Compliance</a></li>
@@ -1417,6 +1504,63 @@ document.addEventListener("DOMContentLoaded", function () {
   setInterval(function () {
     imgs[i].classList.remove('on'); i = (i + 1) % imgs.length; imgs[i].classList.add('on');
   }, 3500);
+})();
+</script>
+
+<!-- BUSINESS REGISTRATION POPUP -->
+<div class="rp-overlay" id="regPopup" role="dialog" aria-modal="true" aria-labelledby="rpTitle" aria-hidden="true">
+  <div class="rp-box">
+    <button type="button" class="rp-close" id="rpClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
+    <div class="rp-top">
+      <div class="rp-icon"><i class="fas fa-store"></i></div>
+      <span class="rp-tag">NOW OPEN &middot; INSTANT</span>
+      <h3 id="rpTitle">Register your business with OSCCPA</h3>
+    </div>
+    <div class="rp-body">
+      <p>Get your official registration ID and a downloadable certificate the moment you submit. No waiting for approval.</p>
+      <ul class="rp-list">
+        <li><i class="fas fa-circle-check"></i>Instant ID</li>
+        <li><i class="fas fa-circle-check"></i>PDF certificate</li>
+        <li><i class="fas fa-circle-check"></i>Phone friendly</li>
+      </ul>
+      <a class="rp-go" href="/register-business" target="_self"><i class="fas fa-bolt"></i> Register now</a>
+      <div class="rp-sec"><a href="/verify" target="_self">Verify a business</a><button type="button" id="rpLater">Maybe later</button></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var pop = document.getElementById('regPopup'); if (!pop) return;
+  var last = null;
+  function get(k, store) { try { return window[store].getItem(k); } catch (e) { return null; } }
+  function set(k, v, store) { try { window[store].setItem(k, v); } catch (e) {} }
+  if (get('osccpaRegistered', 'localStorage') || get('osccpaPopupSeen', 'sessionStorage')) return;
+
+  function open() {
+    if (document.querySelector('.lightbox:not([hidden])')) return;
+    last = document.activeElement;
+    pop.classList.add('show'); pop.setAttribute('aria-hidden', 'false');
+    set('osccpaPopupSeen', '1', 'sessionStorage');
+    setTimeout(function () { var g = pop.querySelector('.rp-go'); if (g) g.focus({ preventScroll: true }); }, 350);
+  }
+  function close() {
+    pop.classList.remove('show'); pop.setAttribute('aria-hidden', 'true');
+    if (last && last.focus) last.focus({ preventScroll: true });
+  }
+  document.getElementById('rpClose').addEventListener('click', close);
+  document.getElementById('rpLater').addEventListener('click', close);
+  pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (!pop.classList.contains('show')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {                                   // keep focus inside the popup
+      var f = pop.querySelectorAll('a[href],button'); if (!f.length) return;
+      var a = f[0], z = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
+      else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
+    }
+  });
+  setTimeout(open, 3500);
 })();
 </script>
 </body>

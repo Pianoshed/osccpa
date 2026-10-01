@@ -1,0 +1,88 @@
+{% extends "site_base.html" %}
+{% block title %}Verify a Business{% endblock %}
+
+{% block head %}
+<style>
+.search{display:flex;gap:10px}
+.search input{flex:1;min-width:0;padding:14px 16px;border:1.5px solid var(--line);border-radius:8px;background:var(--cream);
+  font-family:var(--font-body);font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+.search input:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 4px rgba(109,40,217,.12)}
+.hint{font-size:.8rem;color:var(--muted);margin-top:10px}
+.result{margin-top:24px;border-radius:14px;padding:22px;border:1px solid}
+.result .top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.result .ico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.result h2{font-size:1.25rem;line-height:1.25}
+.result.ok{background:#F2FBF5;border-color:#B5E0C5}.result.ok .ico{background:var(--ok);color:#fff}.result.ok h2{color:var(--ok)}
+.result.warn{background:#FFFBEB;border-color:#F3DC8A}.result.warn .ico{background:#D99A00;color:#fff}.result.warn h2{color:var(--warn)}
+.result.bad{background:var(--bad-soft);border-color:#FDA29B}.result.bad .ico{background:var(--bad);color:#fff}.result.bad h2{color:var(--bad)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-top:6px}
+.facts dt{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts dd{font-weight:600;word-break:break-word}
+.facts .wide{grid-column:1/-1}
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.78rem;font-weight:700}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.note{margin-top:14px;font-size:.84rem;color:var(--muted)}
+.cta{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+@media(max-width:700px){.hero h1{font-size:1.7rem}.card{padding:20px}.search{flex-direction:column}.search input{font-size:16px}.btn{width:100%}.facts{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <div class="hero-in">
+    <span class="eyebrow"><i class="fas fa-shield-halved"></i> Business Registry</span>
+    <h1>Verify a registered business</h1>
+    <p>Enter the registration ID shown by a business to confirm it is registered with the Ondo State Competition &amp; Consumer Protection Agency.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="card">
+    <form class="search" method="GET" action="{{ url_for('verify_business') }}" target="_self">
+      <input type="text" name="id" value="{{ q }}" maxlength="40" placeholder="e.g. OSCCPA-2026-K7M3QX" aria-label="Business registration ID" autocomplete="off" required>
+      <button type="submit" class="btn"><i class="fas fa-magnifying-glass"></i> Verify</button>
+    </form>
+    <p class="hint">The ID looks like <strong>OSCCPA-2026-XXXXXX</strong>. Spaces and capital letters don't matter.</p>
+
+    {% if searched %}
+      {% if biz and biz.status == 'Approved' %}
+      <section class="result ok" aria-live="polite">
+        <div class="top"><span class="ico"><i class="fas fa-check"></i></span><h2>Verified registered business</h2></div>
+        <dl class="facts">
+          <div class="wide"><dt>Business name</dt><dd>{{ biz.business_name }}</dd></div>
+          <div><dt>Registration ID</dt><dd>{{ biz.reg_id }}</dd></div>
+          <div><dt>Status</dt><dd><span class="badge ok">Active</span></dd></div>
+          <div><dt>Local Government Area</dt><dd>{{ biz.lga or '—' }}</dd></div>
+          <div><dt>Type of business</dt><dd>{{ biz.sector or '—' }}</dd></div>
+          <div><dt>Registered on</dt><dd>{{ biz.issued_at.strftime('%d %B %Y') if biz.issued_at else '—' }}</dd></div>
+          <div class="wide"><dt>CAC registration</dt><dd>{% if biz.cac_verified %}<span class="badge ok"><i class="fas fa-circle-check"></i> CAC number verified by the agency</span>{% else %}<span class="badge warn">CAC number not yet confirmed by the agency</span>{% endif %}</dd></div>
+        </dl>
+        <p class="note">Business details are supplied by the owner when they register. Only basic details are shown publicly. If something about this business looks wrong, please <a href="/complaints">file a complaint</a>.</p>
+      </section>
+      {% elif biz %}
+      <section class="result warn" aria-live="polite">
+        <div class="top"><span class="ico"><i class="fas fa-triangle-exclamation"></i></span><h2>Registration suspended</h2></div>
+        <dl class="facts">
+          <div class="wide"><dt>Business name</dt><dd>{{ biz.business_name }}</dd></div>
+          <div><dt>Registration ID</dt><dd>{{ biz.reg_id }}</dd></div>
+          <div><dt>Status</dt><dd><span class="badge warn">Suspended</span></dd></div>
+        </dl>
+        <p class="note">This ID is not currently valid. Please contact the agency for more information.</p>
+      </section>
+      {% else %}
+      <section class="result bad" aria-live="polite">
+        <div class="top"><span class="ico"><i class="fas fa-xmark"></i></span><h2>No registered business found</h2></div>
+        <p>We could not find a registered business with the ID <strong>{{ q }}</strong>. Check the ID and try again. If it is correct, treat the business with caution and <a href="/complaints">report it</a>.</p>
+      </section>
+      {% endif %}
+    {% endif %}
+
+    <div class="cta">
+      <span>Own a business in Ondo State?</span>
+      <a class="btn light" href="/register-business" target="_self"><i class="fas fa-store"></i> Register your business</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
