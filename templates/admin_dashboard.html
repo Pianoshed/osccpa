@@ -346,35 +346,142 @@ body { line-height: 1.5; }
 .brand img { height: 36px !important; }
 .brand h1 { font-size: 1rem !important; }
 .brand p { font-size: .7rem !important; }
+
+/* ===== REDESIGN: sidebar app shell ===== */
+:root{--bg:#F5F3FA;--sbw:252px;--r:16px}
+body{background:var(--bg)}
+.app{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.sb{position:sticky;top:0;height:100vh;width:var(--sbw);flex:none;display:flex;flex-direction:column;padding:16px 12px;color:#E4DAF8;
+  background:linear-gradient(180deg,#2E1065 0%,#4C1D95 100%);overflow-y:auto;overflow-x:hidden;transition:width .25s ease,transform .28s ease;z-index:1200}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:4px 6px 16px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:12px}
+.sb-brand img{height:36px;width:auto;background:#fff;border-radius:9px;padding:3px;flex:none}
+.sb-brand strong{display:block;color:#fff;font-family:var(--font-display);font-size:1.05rem;line-height:1.1}
+.sb-brand span{font-size:.7rem;color:#C9B8F0}
+.sb-x{display:none;margin-left:auto;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:50%;font-size:1.3rem;cursor:pointer}
+.sb-nav{display:flex;flex-direction:column;gap:4px}
+.sb-label{font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#A58BDB;padding:10px 10px 4px}
+.sb .sb-link,.sb .sb-collapse{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:11px;background:transparent;
+  color:#E4DAF8;font-size:.9rem;font-weight:600;text-decoration:none;cursor:pointer;text-align:left;flex:none;justify-content:flex-start;white-space:nowrap;transition:background .2s,color .2s}
+.sb .sb-link i,.sb .sb-collapse i{width:20px;text-align:center;font-size:1rem;display:inline-block}
+.sb .sb-link:hover,.sb .sb-collapse:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb .sb-link.active{background:#fff;color:var(--navy-deep);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.sb .sb-link .count-pill{margin-left:auto;background:rgba(255,255,255,.16);color:#fff;font-size:.72rem}
+.sb .sb-link.active .count-pill{background:var(--navy-soft);color:var(--navy)}
+.sb-foot{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:2px}
+.sb-user{display:flex;align-items:center;gap:10px;margin:10px 0 4px;padding:10px;border-radius:12px;background:rgba(255,255,255,.08)}
+.sb-user .av{width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.sb-user strong{display:block;color:#fff;font-size:.84rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
+.sb-user span{font-size:.7rem;color:#C9B8F0}
+.sb-out{margin-left:auto;color:#fff;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:9px;text-decoration:none;flex:none}
+.sb-out:hover{background:rgba(255,255,255,.14)}
+.sb-collapse i{transition:transform .25s}
+.app.collapsed{--sbw:76px}
+.app.collapsed .sb-t,.app.collapsed .sb .count-pill{display:none}
+.app.collapsed .sb-brand{justify-content:center;padding-left:0;padding-right:0}
+.app.collapsed .sb .sb-link,.app.collapsed .sb .sb-collapse{justify-content:center;padding:12px 0}
+.app.collapsed .sb-user{justify-content:center;flex-direction:column;padding:8px 0}
+.app.collapsed .sb-out{margin:0}
+.app.collapsed .sb-collapse i{transform:rotate(180deg)}
+.sb-overlay{display:none}
+
+.tb{position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:14px;padding:12px 28px;background:rgba(245,243,250,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.tb-menu{display:none;width:40px;height:40px;border:0;border-radius:11px;background:var(--paper);color:var(--navy);font-size:1.05rem;box-shadow:var(--shadow-sm);cursor:pointer;flex:none}
+.tb-title{min-width:0;flex:1}
+.tb-title h2{font-size:1.35rem;line-height:1.2}
+.tb-title p{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-actions{display:flex;gap:8px;flex:none}
+.tb .btn{border-radius:10px}
+.main .wrap{max-width:1400px;width:100%;padding:22px 28px 48px}
+
+.stats{gap:12px}
+.stat{border-radius:var(--r);padding:16px 18px 16px 22px}
+.stat-num{font-size:1.9rem}
+.table-box,.gallery-upload-card,.gallery-card{border-radius:var(--r)}
+.filters input,.filters select{border-radius:10px}
+.modal-card{border-radius:20px}
+
+/* tablet + mobile: off-canvas drawer */
+@media(max-width:1024px){
+  .sb{position:fixed;left:0;top:0;bottom:0;width:min(84vw,300px);transform:translateX(-102%);box-shadow:var(--shadow-lg)}
+  .app.collapsed{--sbw:min(84vw,300px)}
+  .app.collapsed .sb-t,.app.collapsed .sb .count-pill{display:revert}
+  .app.collapsed .sb .sb-link,.app.collapsed .sb .sb-collapse{justify-content:flex-start;padding:11px 12px}
+  .sb-collapse{display:none!important}
+  .sb-x{display:block}
+  body.sb-open .sb{transform:none}
+  .sb-overlay{display:block;position:fixed;inset:0;background:rgba(20,10,40,.5);opacity:0;visibility:hidden;transition:opacity .25s;z-index:1100}
+  body.sb-open .sb-overlay{opacity:1;visibility:visible}
+  body.sb-open{overflow:hidden}
+  .tb{padding:10px 4%;padding-top:calc(10px + env(safe-area-inset-top,0px))}
+  .tb-menu{display:block}
+  .tb-title h2{font-size:1.15rem}
+  .main .wrap{padding:14px 4% calc(92px + env(safe-area-inset-bottom,0px))}
+}
+/* phones: bottom tab bar */
+.bn{display:none}
+@media(max-width:768px){
+  .tb-actions .lbl{display:none}
+  .tb-actions .btn{width:40px;height:40px;padding:0}
+  .tb-title p{display:none}
+  .stats{display:flex;overflow-x:auto;gap:10px;margin:0 -4% 14px;padding:2px 4% 6px;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .stats::-webkit-scrollbar{display:none}
+  .stat,.stat.contacts{flex:0 0 138px;grid-column:auto;scroll-snap-align:start}
+  .bn{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:900;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 20px rgba(11,42,74,.08)}
+  .bn .tab-btn{flex:1;flex-direction:column;justify-content:center;gap:3px;padding:7px 2px;border-radius:12px;font-size:.66rem;color:var(--muted);background:transparent}
+  .bn .tab-btn i{display:block;font-size:1.1rem}
+  .bn .tab-btn.active{background:var(--navy-soft);color:var(--navy)}
+  .toasts{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .modal-card,.modal-card.small{max-height:94dvh}
+}
+@media(prefers-reduced-motion:reduce){.sb,.sb-overlay{transition:none}}
 </style>
 </head>
 
 <body>
 
-<header class="topbar">
-  <div class="brand">
+<div class="app" id="app">
+<aside class="sb" id="sidebar" aria-label="Admin navigation">
+  <div class="sb-brand">
     <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo">
-    <div>
-      <h1>Admin Dashboard</h1>
-      <p>Ondo State Competition &amp; Consumer Protection Agency</p>
-    </div>
+    <div class="sb-t"><strong>OSCCPA</strong><span>Admin dashboard</span></div>
+    <button type="button" class="sb-x" id="sbClose" aria-label="Close menu">&times;</button>
   </div>
-  <div class="top-actions">
-    <span class="who">Signed in as <strong>{{ session.admin_user }}</strong></span>
-    <a class="btn" href="/" target="_blank" rel="noopener" aria-label="View site"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="lbl">View site</span></a>
-    <a class="btn" href="/admin/change-password" aria-label="Change password"><i class="fa-solid fa-key"></i> <span class="lbl">Change password</span></a>
-    <a class="btn primary" href="/admin/logout" aria-label="Logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="lbl">Logout</span></a>
+  <nav class="sb-nav" role="tablist" aria-label="Sections">
+    <p class="sb-label sb-t">Manage</p>
+    <button type="button" class="tab-btn sb-link active" data-tab="complaintsTab" role="tab" aria-selected="true" title="Complaints"><i class="fa-solid fa-triangle-exclamation"></i><span class="sb-t">Complaints</span><span class="count-pill">{{ complaints|length }}</span></button>
+    <button type="button" class="tab-btn sb-link" data-tab="contactsTab" role="tab" aria-selected="false" title="Contacts"><i class="fa-solid fa-envelope"></i><span class="sb-t">Contacts</span><span class="count-pill">{{ contacts|length }}</span></button>
+    <button type="button" class="tab-btn sb-link" data-tab="newsTab" role="tab" aria-selected="false" title="News"><i class="fa-solid fa-newspaper"></i><span class="sb-t">News</span><span class="count-pill">{{ news_posts|length }}</span></button>
+    <button type="button" class="tab-btn sb-link" data-tab="galleryTab" role="tab" aria-selected="false" title="Gallery"><i class="fa-solid fa-images"></i><span class="sb-t">Gallery</span><span class="count-pill">{{ gallery_items|length }}</span></button>
+    <button type="button" class="tab-btn sb-link" data-tab="businessesTab" role="tab" aria-selected="false" title="Businesses"><i class="fa-solid fa-store"></i><span class="sb-t">Businesses</span><span class="count-pill">{{ businesses|length }}</span></button>
+  </nav>
+  <div class="sb-foot">
+    <p class="sb-label sb-t">Tools</p>
+    <a class="sb-link" href="{{ url_for('export_excel') }}" title="Download Excel"><i class="fa-solid fa-file-excel"></i><span class="sb-t">Download Excel</span></a>
+    <a class="sb-link" href="/" target="_blank" rel="noopener" title="View site"><i class="fa-solid fa-arrow-up-right-from-square"></i><span class="sb-t">View site</span></a>
+    <a class="sb-link" href="/admin/change-password" title="Change password"><i class="fa-solid fa-key"></i><span class="sb-t">Change password</span></a>
+    <div class="sb-user">
+      <span class="av">{{ (session.admin_user or 'A')[:1] | upper }}</span>
+      <div class="sb-t"><strong>{{ session.admin_user }}</strong><span>Signed in</span></div>
+      <a class="sb-out" href="/admin/logout" aria-label="Logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+    <button type="button" class="sb-collapse" id="sbCollapse" aria-label="Collapse sidebar"><i class="fa-solid fa-angles-left"></i><span class="sb-t">Collapse</span></button>
+  </div>
+</aside>
+<div class="sb-overlay" id="sbOverlay"></div>
+
+<div class="main">
+<header class="tb">
+  <button type="button" class="tb-menu" id="sbOpen" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  <div class="tb-title"><h2 id="pageTitle">Complaints</h2><p id="pageSub">Review, search and update complaint status</p></div>
+  <div class="tb-actions">
+    <a class="btn" href="{{ url_for('export_excel') }}" aria-label="Download Excel"><i class="fa-solid fa-file-excel"></i><span class="lbl">Excel</span></a>
+    <a class="btn primary" href="/admin/logout" aria-label="Logout"><i class="fa-solid fa-right-from-bracket"></i><span class="lbl">Logout</span></a>
   </div>
 </header>
-
 <main class="wrap">
-
-  <div class="page-head">
-    <h2>Overview</h2>
-    <p>Review complaints, update their status, read contact messages, post news and manage the homepage gallery.</p>
-  </div>
-
-  <section class="stats" aria-label="Summary">
+<section class="stats" aria-label="Summary">
     <button type="button" class="stat" data-filter="">
       <span class="stat-num" id="statTotal">{{ complaints|length }}</span><span class="stat-label">All complaints</span>
     </button>
@@ -391,27 +498,6 @@ body { line-height: 1.5; }
       <span class="stat-num">{{ contacts|length }}</span><span class="stat-label">Contact messages</span>
     </button>
   </section>
-
-  <div class="toolbar">
-    <div class="tabs" role="tablist">
-      <button type="button" class="tab-btn active" data-tab="complaintsTab" role="tab" aria-selected="true">
-        <i class="fa-solid fa-triangle-exclamation"></i> Complaints <span class="count-pill">{{ complaints|length }}</span>
-      </button>
-      <button type="button" class="tab-btn" data-tab="contactsTab" role="tab" aria-selected="false">
-        <i class="fa-solid fa-envelope"></i> Contacts <span class="count-pill">{{ contacts|length }}</span>
-      </button>
-      <button type="button" class="tab-btn" data-tab="newsTab" role="tab" aria-selected="false">
-        <i class="fa-solid fa-newspaper"></i> News <span class="count-pill">{{ news_posts|length }}</span>
-      </button>
-      <button type="button" class="tab-btn" data-tab="galleryTab" role="tab" aria-selected="false">
-        <i class="fa-solid fa-images"></i> Gallery <span class="count-pill">{{ gallery_items|length }}</span>
-      </button>
-      <button type="button" class="tab-btn" data-tab="businessesTab" role="tab" aria-selected="false">
-        <i class="fa-solid fa-store"></i> Businesses <span class="count-pill">{{ businesses|length }}</span>
-      </button>
-    </div>
-    <a class="btn" href="{{ url_for('export_excel') }}"><i class="fa-solid fa-file-excel"></i> Download all data (Excel)</a>
-  </div>
 
   <!-- ========== COMPLAINTS ========== -->
   <section class="tab-content active" id="complaintsTab" role="tabpanel">
@@ -760,6 +846,16 @@ body { line-height: 1.5; }
   </section>
 
 </main>
+</div>
+</div>
+
+<nav class="bn" role="tablist" aria-label="Sections">
+  <button type="button" class="tab-btn active" data-tab="complaintsTab" role="tab" aria-selected="true"><i class="fa-solid fa-triangle-exclamation"></i><span>Complaints</span></button>
+  <button type="button" class="tab-btn" data-tab="contactsTab" role="tab" aria-selected="false"><i class="fa-solid fa-envelope"></i><span>Contacts</span></button>
+  <button type="button" class="tab-btn" data-tab="newsTab" role="tab" aria-selected="false"><i class="fa-solid fa-newspaper"></i><span>News</span></button>
+  <button type="button" class="tab-btn" data-tab="galleryTab" role="tab" aria-selected="false"><i class="fa-solid fa-images"></i><span>Gallery</span></button>
+  <button type="button" class="tab-btn" data-tab="businessesTab" role="tab" aria-selected="false"><i class="fa-solid fa-store"></i><span>Business</span></button>
+</nav>
 
 <!-- COMPLAINT MODAL -->
 <div class="modal" id="complaintModal" role="dialog" aria-modal="true" aria-labelledby="cmTitle" hidden>
@@ -954,6 +1050,36 @@ const FLASHES = {{ msgs | tojson }};
 
 <script>
 (function () {
+  var B = document.body, T = {
+    complaintsTab: ['Complaints', 'Review, search and update complaint status'],
+    contactsTab: ['Contacts', 'Messages sent through the contact form'],
+    newsTab: ['News', 'Publish and edit News & Activities posts'],
+    galleryTab: ['Gallery', 'Photos and videos for the homepage gallery'],
+    businessesTab: ['Businesses', 'Registered businesses, CAC checks and status']
+  };
+  var app = document.getElementById('app');
+  function open() { B.classList.add('sb-open'); }
+  function close() { B.classList.remove('sb-open'); }
+  document.getElementById('sbOpen').addEventListener('click', open);
+  document.getElementById('sbClose').addEventListener('click', close);
+  document.getElementById('sbOverlay').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  try { if (localStorage.getItem('sbCollapsed') === '1') app.classList.add('collapsed'); } catch (e) {}
+  document.getElementById('sbCollapse').addEventListener('click', function () {
+    var c = app.classList.toggle('collapsed');
+    try { localStorage.setItem('sbCollapsed', c ? '1' : '0'); } catch (e) {}
+  });
+  window.__onTab = function (id) {
+    var t = T[id]; if (!t) return;
+    document.getElementById('pageTitle').textContent = t[0];
+    document.getElementById('pageSub').textContent = t[1];
+    var st = document.querySelector('.stats'); if (st) st.hidden = id !== 'complaintsTab';
+    close(); window.scrollTo({ top: 0 });
+  };
+})();
+</script>
+<script>
+(function () {
   'use strict';
   const $  = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
@@ -990,6 +1116,7 @@ const FLASHES = {{ msgs | tojson }};
     tabBtns.forEach(b => { const on = b.dataset.tab === id; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
     $$('.tab-content').forEach(p => p.classList.toggle('active', p.id === id));
     try { sessionStorage.setItem('adminTab', id); } catch (e) {}
+    if (window.__onTab) window.__onTab(id);
   }
   tabBtns.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
   try { const t = sessionStorage.getItem('adminTab'); if (t && document.getElementById(t)) showTab(t); } catch (e) {}
