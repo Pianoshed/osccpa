@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard | OSCCPA</title>
+<title>Admin Dashboard | ODCCPA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
@@ -444,8 +444,8 @@ body{background:var(--bg)}
 <div class="app" id="app">
 <aside class="sb" id="sidebar" aria-label="Admin navigation">
   <div class="sb-brand">
-    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo">
-    <div class="sb-t"><strong>OSCCPA</strong><span>Admin dashboard</span></div>
+    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="ODCCPA logo">
+    <div class="sb-t"><strong>ODCCPA</strong><span>Admin dashboard</span></div>
     <button type="button" class="sb-x" id="sbClose" aria-label="Close menu">&times;</button>
   </div>
   <nav class="sb-nav" role="tablist" aria-label="Sections">
@@ -1439,13 +1439,13 @@ const FLASHES = {{ msgs | tojson }};
     if (b.email) {
       let subject, body;
       if (b.regId && b.status === 'Approved') {
-        subject = 'Your OSCCPA business registration ID';
+        subject = 'Your ODCCPA business registration ID';
         body = 'Dear ' + b.owner + ',\n\nYour business "' + b.name + '" is now registered with the Ondo State Competition & Consumer Protection Agency.\n\nRegistration ID: ' + b.regId +
-               '\nCustomers can verify it at: ' + location.origin + '/verify?id=' + b.regId + '\n\nRegards,\nOSCCPA';
+               '\nCustomers can verify it at: ' + location.origin + '/verify?id=' + b.regId + '\n\nRegards,\nODCCPA';
         $('#bmReplyLbl').textContent = 'Email ID to owner';
       } else {
-        subject = 'Your OSCCPA business registration (application #' + b.id + ')';
-        body = 'Dear ' + b.owner + ',\n\nRegarding your business registration application #' + b.id + ' for "' + b.name + '"...\n\nRegards,\nOSCCPA';
+        subject = 'Your ODCCPA business registration (application #' + b.id + ')';
+        body = 'Dear ' + b.owner + ',\n\nRegarding your business registration application #' + b.id + ' for "' + b.name + '"...\n\nRegards,\nODCCPA';
         $('#bmReplyLbl').textContent = 'Email owner';
       }
       a.href = 'mailto:' + b.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
