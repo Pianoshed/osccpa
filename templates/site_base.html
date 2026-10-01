@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}OSCCPA{% endblock %} | Ondo State Competition &amp; Consumer Protection Agency</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo/osccpa_logo.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --navy:#6D28D9; --navy-deep:#4C1D95; --navy-mid:#7C3AED; --navy-soft:#F1EBFC;
+  --gold:#A855F7; --gold-dark:#7C3AED; --cream:#F6F1FC; --paper:#FFFFFF;
+  --text:#241B33; --muted:#665D77; --line:#E9E1F7;
+  --ok:#1E6B3F; --ok-soft:#D8F0E1; --bad:#B42318; --bad-soft:#FEF3F2; --warn:#7A5A00; --warn-soft:#FFF3CD;
+  --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',sans-serif;
+  --shadow-sm:0 2px 8px rgba(11,42,74,.08); --shadow-md:0 6px 20px rgba(11,42,74,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.6;padding-top:84px;overflow-x:hidden}
+h1,h2,h3{font-family:var(--font-display);font-weight:600}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* header */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 6%;background:var(--paper);border-bottom:3px solid var(--gold);box-shadow:0 2px 14px rgba(11,42,74,.08)}
+.hdr-brand{display:flex;align-items:center;gap:14px;text-decoration:none;min-width:0}
+.hdr-brand img{height:52px;width:auto}
+.hdr-brand span{font-family:var(--font-display);font-weight:600;color:var(--navy);font-size:1.1rem;line-height:1.25}
+.hdr nav ul{display:flex;gap:4px;list-style:none}
+.hdr nav a{display:block;padding:9px 12px;border-radius:6px;text-decoration:none;font-weight:600;font-size:.9rem;white-space:nowrap}
+.hdr nav a:hover,.hdr nav a.on{background:var(--navy-soft);color:var(--navy)}
+.menu-btn{display:none;width:44px;height:44px;border:0;border-radius:10px;background:var(--navy-soft);color:var(--navy);font-size:1.2rem;cursor:pointer}
+@media(max-width:1000px){
+  body{padding-top:70px}
+  .hdr-brand span{font-size:.92rem}.hdr-brand img{height:40px}
+  .menu-btn{display:block}
+  .hdr nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);border-top:1px solid var(--line);box-shadow:0 14px 30px rgba(11,42,74,.16)}
+  .hdr nav.open{display:block}
+  .hdr nav ul{flex-direction:column;gap:0}
+  .hdr nav a{padding:15px 6%;border-bottom:1px solid var(--line);border-radius:0}
+}
+
+/* page */
+.hero{background:linear-gradient(120deg,var(--navy-deep),var(--navy));color:#fff;padding:46px 6% 52px}
+.hero-in{max-width:900px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#E9D5FF;margin-bottom:12px}
+.hero h1{font-size:2.3rem;line-height:1.2;margin-bottom:10px}
+.hero p{opacity:.9;max-width:62ch}
+.wrap{max-width:900px;margin:-26px auto 60px;padding:0 5%}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-md);padding:28px}
+.flash{max-width:900px;margin:18px auto 0;padding:0 5%}
+.flash div{padding:13px 16px;border-radius:10px;font-weight:500;font-size:.92rem;margin-bottom:8px;border:1px solid transparent}
+.flash .success{background:var(--ok-soft);color:var(--ok);border-color:#B5E0C5}
+.flash .error{background:var(--bad-soft);color:var(--bad);border-color:#FDA29B}
+.flash .message{background:var(--navy-soft);color:var(--navy-deep)}
+.hero + .flash{margin-top:0;position:relative;z-index:2;margin-bottom:-6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 26px;border:0;border-radius:6px;background:var(--navy);color:#fff;
+  font-weight:700;font-size:.95rem;font-family:inherit;cursor:pointer;text-decoration:none;transition:background .2s,transform .2s}
+.btn:hover{background:var(--navy-mid);transform:translateY(-1px)}
+.btn.light{background:var(--navy-soft);color:var(--navy-deep)}
+
+/* footer */
+.ftr{background:var(--navy-deep);color:#C6CEDA;padding:34px 6% 26px;font-size:.88rem}
+.ftr-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ftr a{color:#E9D5FF;text-decoration:none}.ftr a:hover{text-decoration:underline}
+.ftr p+p{margin-top:4px}
+</style>
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<header class="hdr">
+  <a class="hdr-brand" href="/" target="_self" aria-label="OSCCPA home">
+    <img src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo">
+    <span>Ondo State Competition &amp; Consumer Protection Agency</span>
+  </a>
+  <nav id="nav" aria-label="Main navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/news">News &amp; Activities</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/complaints">Complaints</a></li>
+      <li><a href="/register-business" class="{{ 'on' if request.endpoint == 'register_business' }}">Register Business</a></li>
+      <li><a href="/verify" class="{{ 'on' if request.endpoint == 'verify_business' }}">Verify</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav"><i class="fas fa-bars"></i></button>
+</header>
+
+{% block hero %}{% endblock %}
+
+{% with msgs = get_flashed_messages(with_categories=true) %}
+{% if msgs %}<div class="flash" role="status">{% for cat, m in msgs %}<div class="{{ cat }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div>
+      <p><strong>Ondo State Competition &amp; Consumer Protection Agency</strong></p>
+      <p>Old board of internal revenue building, After CUDA, Alagbaka, Akure, Ondo State</p>
+    </div>
+    <div>
+      <p>info@occpa.on.gov.ng &middot; +234 904 335 3001</p>
+      <p>Mon &ndash; Fri: 8AM &ndash; 5PM</p>
+      <p><a href="/register-business">Register a business</a> &middot; <a href="/verify">Verify a business</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('menuBtn').addEventListener('click', function () {
+  var open = document.getElementById('nav').classList.toggle('open');
+  this.setAttribute('aria-expanded', open);
+});
+</script>
+</body>
+</html>
