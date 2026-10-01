@@ -333,9 +333,8 @@ def init_db_command():
     db.create_all()
     click.echo("Tables created.")
 
-@app.cli.command("init-storage")
-def init_storage_command():
-    """Create the private 'evidence' bucket and the public 'news-images' and 'gallery-images' buckets."""
+def ensure_buckets(verbose=False):
+    """Create the storage buckets that don't exist yet (existing ones are left alone)."""
     buckets = [
         (EVIDENCE_BUCKET, False),
         (NEWS_BUCKET, True),
@@ -343,15 +342,34 @@ def init_storage_command():
     ]
     limit = MAX_UPLOAD_MB * 1024 * 1024
     for name, public in buckets:
-        r = _sb.post(f"{STORAGE_URL}/bucket",
-                     json={"id": name, "name": name, "public": public, "file_size_limit": limit},
-                     timeout=STORAGE_TIMEOUT)
+        try:
+            r = _sb.post(f"{STORAGE_URL}/bucket",
+                         json={"id": name, "name": name, "public": public, "file_size_limit": limit},
+                         timeout=STORAGE_TIMEOUT)
+        except requests.RequestException as e:
+            app.logger.warning("Could not reach Supabase Storage to create '%s': %s", name, e)
+            if verbose:
+                click.echo(f"Could not create '{name}': {e}")
+            continue
         if r.status_code in (200, 201):
-            click.echo(f"Created {'public' if public else 'private'} bucket '{name}'.")
+            app.logger.info("Created %s storage bucket '%s'.", "public" if public else "private", name)
+            if verbose:
+                click.echo(f"Created {'public' if public else 'private'} bucket '{name}'.")
         elif "already exists" in r.text.lower() or r.status_code == 409:
-            click.echo(f"Bucket '{name}' already exists.")
+            if verbose:
+                click.echo(f"Bucket '{name}' already exists.")
         else:
-            click.echo(f"Could not create '{name}' ({r.status_code}): {r.text[:200]}")
+            app.logger.warning("Could not create bucket '%s' (%s): %s", name, r.status_code, r.text[:200])
+            if verbose:
+                click.echo(f"Could not create '{name}' ({r.status_code}): {r.text[:200]}")
+
+@app.cli.command("init-storage")
+def init_storage_command():
+    """Create the private 'evidence' bucket and the public 'news-images' and 'gallery-images' buckets."""
+    ensure_buckets(verbose=True)
+
+# Also do it automatically at startup (background thread so a slow network never delays boot).
+threading.Thread(target=ensure_buckets, daemon=True).start()
 
 @app.cli.command("create-admin")
 @click.argument("username")
@@ -987,10 +1005,10 @@ def rate_limited(bucket, limit, window):
     return False
 
 def new_business_id():
-    """Random, unguessable ID such as ODCCPA-2026-K7M3QX (unique in the database)."""
+    """Random, unguessable ID such as OSCCPA-2026-K7M3QX (unique in the database)."""
     for _ in range(20):
         code = "".join(secrets.choice(ID_ALPHABET) for _ in range(6))
-        rid = f"ODCCPA-{datetime.utcnow().year}-{code}"
+        rid = f"OSCCPA-{datetime.utcnow().year}-{code}"
         if not Business.query.filter_by(reg_id=rid).first():
             return rid
     raise RuntimeError("Could not generate a unique business ID")
@@ -1094,7 +1112,7 @@ def build_certificate_pdf(biz, verify_url):
     name = _pdf_text(biz.business_name)
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=(W, H))
-    c.setTitle(f"ODCCPA Certificate of Registration - {biz.reg_id}")
+    c.setTitle(f"OSCCPA Certificate of Registration - {biz.reg_id}")
     c.setAuthor("Ondo State Competition & Consumer Protection Agency")
 
     # borders
@@ -1138,7 +1156,7 @@ def build_certificate_pdf(biz, verify_url):
     y -= 6
     c.setFillColor(muted); c.setFont("Helvetica", 12)
     msg = ("has been registered in the business registry of the Ondo State Competition & Consumer "
-           "Protection Agency (ODCCPA) and is issued the registration ID below.")
+           "Protection Agency (OSCCPA) and is issued the registration ID below.")
     for ln in simpleSplit(msg, "Helvetica", 12, 600):
         c.drawCentredString(W / 2, y, ln)
         y -= 17
@@ -1234,7 +1252,7 @@ def business_certificate(reg_id):
         app.logger.error("reportlab is not installed (add 'reportlab' to requirements.txt)")
         abort(503)
     resp = send_file(io.BytesIO(pdf), mimetype="application/pdf", as_attachment=True,
-                     download_name=f"ODCCPA-Certificate-{biz.reg_id}.pdf")
+                     download_name=f"OSCCPA-Certificate-{biz.reg_id}.pdf")
     resp.headers["Cache-Control"] = "no-store"
     return resp
 
