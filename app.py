@@ -312,6 +312,15 @@ class NewsImage(db.Model):
         'images', order_by='NewsImage.position', cascade='all, delete-orphan'))
 
 
+# Create any table that does not exist yet (never alters or drops existing tables), so a new
+# model such as Business can't crash the site with "relation does not exist" after a deploy.
+with app.app_context():
+    try:
+        db.create_all()
+    except Exception as exc:
+        app.logger.error("db.create_all() failed: %s", exc)
+
+
 # ---------------------------------------------------------------------------
 # CLI: fresh database setup
 #   flask init-db                      -> creates all tables in Supabase
