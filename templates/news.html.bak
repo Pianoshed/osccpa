@@ -937,7 +937,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <p class="lead-deck">{{ top.summary }}</p>
         {% if top.body %}<div class="lead-body">{{ top.body | truncate(420) | nl2br }}</div>{% endif %}
         {% if top.link %}<a class="link-preview-card lead-link-preview" data-link-preview-id="{{ top.id }}" href="{{ top.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ top.title }}">
-          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>
+          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async"></span>
           <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
         </a>{% endif %}
         <div class="lead-actions">
@@ -1029,7 +1029,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         {% if act.body %}<div class="activity-body">{{ act.body | truncate(500) | nl2br }}</div>{% endif %}
         <div class="targets" aria-label="Category"><span>{{ act.tag }}</span></div>
         {% if act.link %}<a class="link-preview-card activity-link-preview" data-link-preview-id="{{ act.id }}" href="{{ act.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ act.title }}">
-          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>
+          <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async"></span>
           <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
         </a>{% endif %}
       </div>
@@ -1168,7 +1168,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <p class="preview">{{ post.summary }}</p>
           {% if post.body %}<div class="more-text">{{ post.body | nl2br }}</div>{% endif %}
           {% if post.link %}<a class="link-preview-card" data-link-preview-id="{{ post.id }}" href="{{ post.link }}" target="_blank" rel="noopener noreferrer" aria-label="Open source article for {{ post.title }}">
-            <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></span>
+            <span class="link-preview-image-wrap"><img class="link-preview-image" alt="" loading="lazy" decoding="async"></span>
             <span class="link-preview-copy"><span class="link-preview-label"><i class="fas fa-link"></i> External article</span><span class="link-preview-title"></span><span class="link-preview-description"></span><span class="link-preview-domain"></span></span>
           </a>{% endif %}
           <div class="actions">
@@ -1416,7 +1416,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <!-- Abattoir (local video) -->
       <article class="news-card">
         <div class="news-image">
-          <video controls preload="none" playsinline poster="{{ url_for('static', filename='gallery/gal1.jpeg') }}">
+          <video controls preload="none" playsinline poster="{{ url_for('static', filename='gallery/gal10.jpeg') }}">
             <source src="{{ url_for('static', filename='videos/isinkan1.mp4') }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -1455,6 +1455,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <img src="{{ url_for('static', filename='gallery/gal7.jpeg') }}"  alt="Event 7" loading="lazy" decoding="async">
           <img src="{{ url_for('static', filename='gallery/gal8.jpeg') }}"  alt="Event 8" loading="lazy" decoding="async">
           <img src="{{ url_for('static', filename='gallery/gal9.jpeg') }}"  alt="Event 9" loading="lazy" decoding="async">
+          <img src="{{ url_for('static', filename='gallery/gal10.jpeg') }}" alt="Event 10" loading="lazy" decoding="async">
           <img src="{{ url_for('static', filename='gallery/gal11.jpeg') }}" alt="Event 11" loading="lazy" decoding="async">
           <img src="{{ url_for('static', filename='gallery/gal12.jpeg') }}" alt="Event 12" loading="lazy" decoding="async">
           <img src="{{ url_for('static', filename='gallery/gal13.jpeg') }}" alt="Event 13" loading="lazy" decoding="async">
