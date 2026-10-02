@@ -480,6 +480,7 @@ footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; hei
 .social-links { display: flex; gap: 12px; margin-top: 4px; }
 .social-link { width: 42px; height: 42px; background: rgba(255,255,255,.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 1.05rem; transition: all var(--transition-fast); }
 .social-link:hover, .social-link:focus { background: var(--gold); color: var(--navy-deep); transform: translateY(-3px); outline: none; }
+.social-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .footer-bottom { padding: 22px 7%; background: rgba(0,0,0,.22); position: relative; z-index: 1; }
 .footer-bottom-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
 .footer-credit { color: #7E8AA0; font-size: .87rem; }
@@ -1552,10 +1553,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <p><strong>Our Mission:</strong> To safeguard consumers through effective regulation, enforcement, advocacy, and public sensitization, while promoting ethical trade practices and sustainable socio-economic development across Ondo State.</p>
         </div>
         <div class="social-links">
-          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
-          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://m.me/occpa" data-social="facebook" class="social-link" target="_blank" rel="noopener" aria-label="Chat on Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://wa.me/2349043353001" data-social="whatsapp" class="social-link" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
 
@@ -1620,16 +1619,30 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 <!-- CHAT FLOAT -->
 <div class="chat-float">
-  <a href="https://wa.me/2349043353001" target="_blank" rel="noopener" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/2349043353001" data-social="whatsapp" target="_blank" rel="noopener" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" decoding="async">
   </a>
-  <a href="https://m.me/occpa" target="_blank" rel="noopener" class="chat-btn facebook" aria-label="Chat on Facebook">
+  <a href="https://m.me/occpa" data-social="facebook" target="_blank" rel="noopener" class="chat-btn facebook" aria-label="Chat on Facebook">
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" decoding="async">
   </a>
   <span class="chat-tooltip">Chat with us</span>
 </div>
 
 <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+/* Social links: edit them here once; footer icons and floating chat buttons both use these. */
+(function () {
+  var SOCIAL = {
+    whatsapp: "https://wa.me/2349043353001",
+    facebook: "https://m.me/occpa"
+  };
+  document.querySelectorAll("[data-social]").forEach(function (a) {
+    var url = SOCIAL[a.dataset.social];
+    if (url) a.href = url;
+  });
+})();
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
