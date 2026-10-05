@@ -1557,22 +1557,6 @@ def build_certificate_pdf(biz, verify_url):
         c.setFillColor(HexColor("#1E6B3F")); c.setFont("Helvetica-Bold", 9)
         c.drawCentredString(W / 2, y - 29, "CAC NUMBER VERIFIED")
 
-    # signatures (Executive Chairman + Administrative Secretary)
-    def signer(cx, sig_path, person, title):
-        line_y = 122
-        if os.path.exists(sig_path):
-            try:
-                c.drawImage(sig_path, cx - 55, line_y + 2, 110, 36, preserveAspectRatio=True, mask="auto", anchor="s")
-            except Exception:
-                pass
-        c.setStrokeColor(muted); c.setLineWidth(0.8); c.line(cx - 90, line_y, cx + 90, line_y)
-        c.setFillColor(dark); c.setFont("Helvetica-Bold", 10.5)
-        c.drawCentredString(cx, line_y - 14, _pdf_text(person))
-        c.setFillColor(muted); c.setFont("Helvetica", 9)
-        c.drawCentredString(cx, line_y - 26, _pdf_text(title))
-    signer(W / 2 - 150, CHAIRMAN_SIG, CHAIRMAN_NAME, CHAIRMAN_TITLE)
-    signer(W / 2 + 150, SECRETARY_SIG, SECRETARY_NAME, SECRETARY_TITLE)
-
     # QR code + verify text (bottom left)
     widget = qr.QrCodeWidget(verify_url)
     b = widget.getBounds()
@@ -1606,8 +1590,6 @@ def registered_business(reg_id):
     biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
     return render_template("registered_business.html", biz=biz,
                            verify_url=verify_url_for(biz.reg_id),
-                           chairman=(CHAIRMAN_NAME, CHAIRMAN_TITLE),
-                           secretary=(SECRETARY_NAME, SECRETARY_TITLE),
                            email_enabled=EMAIL_ENABLED)
 
 @app.route("/registered/<reg_id>/resend", methods=["POST"])
