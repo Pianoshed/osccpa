@@ -278,6 +278,7 @@ class Business(db.Model):
     cac_number = db.Column(db.String(40))
     nafdac_number = db.Column(db.String(40))                          # optional
     sector = db.Column(db.String(100))                                # optional
+    business_type = db.Column(db.String(60))                          # Sole Proprietorship, Partnership, LLC, Cooperative...
     other_info = db.Column(db.Text)                                   # optional
     status = db.Column(db.String(20), default="Pending", nullable=False)  # Pending | Approved | Rejected | Suspended
     issued_at = db.Column(db.DateTime)
@@ -317,6 +318,8 @@ class NewsImage(db.Model):
 
 # Create any table that does not exist yet (never alters or drops existing tables), so a new
 # model such as Business can't crash the site with "relation does not exist" after a deploy.
+# NOTE: create_all() does NOT add new columns to existing tables. For business_type run once in Supabase:
+#   ALTER TABLE businesses ADD COLUMN IF NOT EXISTS business_type VARCHAR(60);
 with app.app_context():
     try:
         db.create_all()
@@ -1096,6 +1099,24 @@ ONDO_LGAS = ["Akoko North-East", "Akoko North-West", "Akoko South-East", "Akoko 
 BUSINESS_SECTORS = ["Retail / Trading", "Food & Beverage", "Pharmacy / Health", "Manufacturing",
                     "Hospitality", "Fuel / Petroleum", "Electronics / Telecom", "Agriculture",
                     "Professional Services", "Other"]
+
+# Legal structure of the business (required on the form)
+BUSINESS_TYPES = [
+    "Sole Proprietorship",
+    "Partnership",
+    "Limited Liability Company (Ltd)",
+    "Public Limited Company (PLC)",
+    "Limited Liability Partnership (LLP)",
+    "Limited Partnership (LP)",
+    "Cooperative Society",
+    "Incorporated Trustees (NGO / Association)",
+    "Other",
+]
+
+@app.context_processor
+def inject_business_types():
+    return {"business_types": BUSINESS_TYPES}
+
 BUSINESS_STATUSES = ("Pending", "Approved", "Rejected", "Suspended")
 ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"      # no 0/O/1/I so IDs are easy to read out
 CAC_RE = re.compile(r"^[A-Z]{0,3}-?\d{3,10}$")           # RC123456, BN1234567, IT12345 ...
@@ -1145,8 +1166,10 @@ def new_business_id():
 
 def _business_form_error(f):
     if not (f["owner_name"] and f["business_name"] and f["address"] and f["lga"]
-            and f["phone"] and f["email"] and f["cac_number"]):
+            and f["phone"] and f["email"] and f["cac_number"] and f["business_type"]):
         return "Please fill in all the required fields."
+    if f["business_type"] not in BUSINESS_TYPES:
+        return "Please choose a business type from the list."
     if f["lga"] not in ONDO_LGAS:
         return "Please choose a Local Government Area from the list."
     if not EMAIL_RE.match(f["email"]):
@@ -1177,6 +1200,7 @@ def register_business():
             "cac_number": re.sub(r"\s+", "", clean(request.form.get("cac_number"), 40)).upper(),
             "nafdac_number": clean(request.form.get("nafdac_number"), 40).upper(),
             "sector": clean(request.form.get("sector"), 100),
+            "business_type": clean(request.form.get("business_type"), 60),
             "other_info": clean(request.form.get("other_info"), 3000),
             "consent": request.form.get("consent") == "on",
         }
@@ -1207,6 +1231,7 @@ def register_business():
                        address=form["address"], lga=form["lga"], phone=form["phone"],
                        email=form["email"], cac_number=form["cac_number"],
                        nafdac_number=form["nafdac_number"] or None, sector=form["sector"] or None,
+                       business_type=form["business_type"],
                        other_info=form["other_info"] or None, status="Approved")
         try:
             biz.reg_id = new_business_id()               # instant: no admin approval needed
@@ -1245,15 +1270,32 @@ def build_certificate_pdf(biz, verify_url):
     c.setTitle(f"OSCCPA Certificate of Registration - {biz.reg_id}")
     c.setAuthor("Ondo State Competition & Consumer Protection Agency")
 
+    logo = os.path.join(basedir, "static", "logo", "osccpa_logo.png")
+    has_logo = os.path.exists(logo)
+
+    # soft background tint
+    c.setFillColor(HexColor("#FBF9FE"))
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+
+    # faint centred logo watermark
+    if has_logo:
+        c.saveState()
+        try:
+            c.setFillAlpha(0.07)
+            c.drawImage(logo, W / 2 - 200, H / 2 - 135, 400, 270,
+                        preserveAspectRatio=True, mask="auto", anchor="c")
+        except Exception:
+            pass
+        c.restoreState()
+
     # borders
     c.setStrokeColor(purple); c.setLineWidth(5); c.rect(16, 16, W - 32, H - 32)
     c.setStrokeColor(accent); c.setLineWidth(1); c.rect(26, 26, W - 52, H - 52)
 
-    # logo + agency
-    logo = os.path.join(basedir, "static", "logo", "osccpa_logo.png")
-    if os.path.exists(logo):
+    # header logo + agency
+    if has_logo:
         try:
-            c.drawImage(logo, W / 2 - 60, H - 118, 120, 68, preserveAspectRatio=True, mask="auto", anchor="c")
+            c.drawImage(logo, W / 2 - 65, H - 122, 130, 72, preserveAspectRatio=True, mask="auto", anchor="c")
         except Exception:
             pass
     c.setFillColor(purple); c.setFont("Helvetica-Bold", 13)
@@ -1302,16 +1344,22 @@ def build_certificate_pdf(biz, verify_url):
     c.drawCentredString(W / 2, y - 48, biz.reg_id)
     y -= box_h + 20
 
-    # details line
+    # details line (business type first)
     bits = []
+    if biz.business_type:
+        bits.append(_pdf_text(biz.business_type))
     if biz.lga:
         bits.append(_pdf_text(biz.lga) + " Local Government Area")
     if biz.sector:
         bits.append(_pdf_text(biz.sector))
     if biz.issued_at:
         bits.append("Issued " + biz.issued_at.strftime("%d %B %Y"))
-    c.setFillColor(dark); c.setFont("Helvetica", 11)
-    c.drawCentredString(W / 2, y, "   |   ".join(bits))
+    detail = "   |   ".join(bits)
+    dsize = 11
+    while dsize > 8 and c.stringWidth(detail, "Helvetica", dsize) > W - 120:
+        dsize -= 0.5
+    c.setFillColor(dark); c.setFont("Helvetica", dsize)
+    c.drawCentredString(W / 2, y, detail)
     if biz.cac_verified:
         c.setFillColor(HexColor("#D8F0E1")); c.setStrokeColor(HexColor("#1E6B3F")); c.setLineWidth(1)
         c.roundRect(W / 2 - 78, y - 36, 156, 22, 11, fill=1, stroke=1)

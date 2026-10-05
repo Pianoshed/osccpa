@@ -26,7 +26,6 @@
 {% endblock %}
 
 {% block hero %}
-{% if registration_open|default(false) %}
 <section class="hero">
   <div class="hero-in">
     <span class="eyebrow"><i class="fas fa-store"></i> Business Registry</span>
@@ -34,19 +33,9 @@
     <p>Fill in the form and get your registration ID and downloadable certificate instantly. No waiting for approval. Customers can verify your ID on this website.</p>
   </div>
 </section>
-{% else %}
-<section class="hero">
-  <div class="hero-in">
-    <span class="eyebrow"><i class="fas fa-clock"></i> Business Registry</span>
-    <h1>Business registration is coming soon</h1>
-    <p>We are getting ready to open online registration for businesses in Ondo State.</p>
-  </div>
-</section>
-{% endif %}
 {% endblock %}
 
 {% block content %}
-{% if registration_open|default(false) %}
 <div class="wrap">
   <form class="card" id="regForm" method="POST" action="{{ url_for('register_business') }}" novalidate>
     <div class="grid">
@@ -75,7 +64,7 @@
         <label for="address">Business address <span class="req">*</span></label>
         <input type="text" id="address" name="address" maxlength="300" required autocomplete="street-address" placeholder="Street, town / city" value="{{ form.get('address', '') }}">
       </div>
-      <div class="field">
+      <div class="field full">
         <label for="lga">Local Government Area <span class="req">*</span></label>
         <select id="lga" name="lga" required>
           <option value="">Select LGA</option>
@@ -83,9 +72,17 @@
         </select>
       </div>
       <div class="field">
-        <label for="sector">Type of business <span class="opt">(optional)</span></label>
+        <label for="business_type">Type of business <span class="req">*</span></label>
+        <select id="business_type" name="business_type" required>
+          <option value="">Select business type</option>
+          {% for t in business_types %}<option value="{{ t }}" {{ 'selected' if form.get('business_type') == t }}>{{ t }}</option>{% endfor %}
+        </select>
+        <p class="hint">Sole proprietorship, partnership, limited liability, cooperative, etc.</p>
+      </div>
+      <div class="field">
+        <label for="sector">Sector / line of business <span class="opt">(optional)</span></label>
         <select id="sector" name="sector">
-          <option value="">Select type</option>
+          <option value="">Select sector</option>
           {% for s in sectors %}<option value="{{ s }}" {{ 'selected' if form.get('sector') == s }}>{{ s }}</option>{% endfor %}
         </select>
       </div>
@@ -133,18 +130,4 @@
   window.addEventListener('pageshow', function () { var b = f.querySelector('button[type=submit]'); if (b && b.dataset.busy) { delete b.dataset.busy; b.style.opacity = ''; b.innerHTML = '<i class="fas fa-bolt"></i> Register &amp; get my ID'; } });
 })();
 </script>
-{% else %}
-<div class="wrap">
-  <div class="card" style="text-align:center;padding:34px 22px">
-    <div style="width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:var(--navy-soft);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:1.6rem"><i class="fas fa-store"></i></div>
-    <h2 style="font-size:1.4rem;margin-bottom:8px">Opening soon</h2>
-    <p style="color:var(--muted);max-width:46ch;margin:0 auto 20px">Online business registration, instant registration IDs and downloadable certificates are not available yet. We will announce when it opens.</p>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-      <a class="btn" href="/" target="_self"><i class="fas fa-house"></i> Back to home</a>
-      <a class="btn light" href="/verify" target="_self"><i class="fas fa-shield-halved"></i> Verify a business</a>
-      <a class="btn light" href="/complaints" target="_self"><i class="fas fa-pen-to-square"></i> File a complaint</a>
-    </div>
-  </div>
-</div>
-{% endif %}
 {% endblock %}

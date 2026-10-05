@@ -18,8 +18,13 @@
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(109,40,217,.45)}50%{box-shadow:0 0 0 10px rgba(109,40,217,0)}}
 .btn.wa{background:#25D366;color:#fff}
 .btn.wa:hover{background:#1DA851}
-.cert{margin-top:24px;border:3px solid var(--navy);border-radius:10px;padding:5px;background:#fff}
-.cert-in{border:1px solid var(--gold);border-radius:6px;padding:22px 16px;text-align:center}
+
+/* Certificate preview: header logo + faint logo watermark on a soft tinted background */
+.cert{margin-top:24px;border:3px solid var(--navy);border-radius:10px;padding:5px;background:#FBF9FE}
+.cert-in{position:relative;overflow:hidden;background:#FBF9FE;border:1px solid var(--gold);border-radius:6px;padding:22px 16px;text-align:center}
+.cert-in::before{content:"";position:absolute;inset:0;background:url("{{ url_for('static', filename='logo/osccpa_logo.png') }}") center / 60% no-repeat;opacity:.07;pointer-events:none}
+.cert-in>*{position:relative}
+.cert-logo{display:block;margin:0 auto 8px;height:72px;max-width:100%;width:auto;object-fit:contain}
 .cert-in .ag{font-size:.64rem;font-weight:700;letter-spacing:.06em;color:var(--navy);text-transform:uppercase}
 .cert-in h2{font-family:var(--font-display);color:var(--navy-deep);font-size:1.25rem;margin:8px 0 12px;letter-spacing:.02em}
 .cert-in .sm{font-size:.78rem;color:var(--muted)}
@@ -36,7 +41,7 @@
 .toast.on{opacity:1;transform:translateX(-50%)}
 .confetti{position:fixed;top:-12px;width:9px;height:14px;border-radius:2px;z-index:200;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
-@media(max-width:700px){.hero h1{font-size:1.6rem}.card{padding:18px}.idbox code{font-size:1.35rem}.btn{font-size:.92rem}}
+@media(max-width:700px){.hero h1{font-size:1.6rem}.card{padding:18px}.idbox code{font-size:1.35rem}.btn{font-size:.92rem}.cert-logo{height:60px}}
 @media(prefers-reduced-motion:reduce){.btn.big,.tick{animation:none}.confetti{display:none}}
 </style>
 {% endblock %}
@@ -67,13 +72,14 @@
 
     <div class="cert" aria-label="Certificate preview">
       <div class="cert-in">
+        <img class="cert-logo" src="{{ url_for('static', filename='logo/osccpa_logo.png') }}" alt="OSCCPA logo" onerror="this.style.display='none'">
         <div class="ag">Ondo State Competition &amp; Consumer Protection Agency</div>
         <h2>CERTIFICATE OF REGISTRATION</h2>
         <div class="sm">This is to certify that</div>
         <div class="bn">{{ biz.business_name }}</div>
         <div class="sm">is registered with the agency under ID</div>
         <div class="cid">{{ biz.reg_id }}</div>
-        <div class="sm">{{ biz.lga }} LGA{% if biz.sector %} &middot; {{ biz.sector }}{% endif %}{% if biz.issued_at %} &middot; {{ biz.issued_at.strftime('%d %B %Y') }}{% endif %}</div>
+        <div class="sm">{% if biz.business_type %}{{ biz.business_type }} &middot; {% endif %}{{ biz.lga }} LGA{% if biz.sector %} &middot; {{ biz.sector }}{% endif %}{% if biz.issued_at %} &middot; {{ biz.issued_at.strftime('%d %B %Y') }}{% endif %}</div>
         <div class="sigs">
           <div class="sig"><b>{{ chairman[0] }}</b><span>{{ chairman[1] }}</span></div>
           <div class="sig"><b>{{ secretary[0] }}</b><span>{{ secretary[1] }}</span></div>
