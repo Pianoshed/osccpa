@@ -37,6 +37,8 @@
 .steps{margin-top:22px;padding:16px 18px;background:var(--cream);border-radius:12px;font-size:.88rem;color:var(--muted)}
 .steps li{margin-left:18px;margin-bottom:4px}
 .steps strong{color:var(--text)}
+.resend{margin-top:12px;text-align:center;font-size:.86rem;color:var(--muted)}
+.resend button{background:none;border:0;padding:0;color:var(--navy);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:var(--navy-deep);color:#fff;padding:11px 20px;border-radius:30px;font-weight:600;font-size:.9rem;opacity:0;pointer-events:none;transition:.3s;z-index:300}
 .toast.on{opacity:1;transform:translateX(-50%)}
 .confetti{position:fixed;top:-12px;width:9px;height:14px;border-radius:2px;z-index:200;pointer-events:none;animation:fall linear forwards}
@@ -44,6 +46,7 @@
 @media(max-width:700px){.hero h1{font-size:1.6rem}.card{padding:18px}.idbox code{font-size:1.35rem}.btn{font-size:.92rem}.cert-logo{height:60px}}
 @media(prefers-reduced-motion:reduce){.btn.big,.tick{animation:none}.confetti{display:none}}
 </style>
+<style>:root{--hero-img:url("{{ url_for('static', filename='Slide/gal1.jpeg') }}")}</style>
 {% endblock %}
 
 {% block hero %}
@@ -69,6 +72,12 @@
       <button type="button" class="btn light" id="copyBtn"><i class="fas fa-copy"></i> Copy ID</button>
       <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Share</a>
     </div>
+
+    {% if email_enabled and biz.email %}
+    <form class="resend" method="POST" action="{{ url_for('resend_certificate', reg_id=biz.reg_id) }}">
+      Certificate not in your inbox? <button type="submit">Email it to me again</button>
+    </form>
+    {% endif %}
 
     <div class="cert" aria-label="Certificate preview">
       <div class="cert-in">
@@ -99,7 +108,7 @@
 
 <script>
 (function () {
-  var id = "{{ biz.reg_id }}", vurl = "{{ verify_url }}", name = {{ biz.business_name|tojson }};
+  var id = {{ biz.reg_id|tojson }}, vurl = {{ verify_url|tojson }}, name = {{ biz.business_name|tojson }};
   try { localStorage.setItem('osccpaRegistered', '1'); } catch (e) {}
 
   function toast(t) { var el = document.getElementById('toast'); el.textContent = t; el.classList.add('on'); setTimeout(function () { el.classList.remove('on'); }, 2200); }

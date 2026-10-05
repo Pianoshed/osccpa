@@ -37,7 +37,7 @@
 
 {% block content %}
 <div class="wrap">
-  <form class="card" id="regForm" method="POST" action="{{ url_for('register_business') }}" novalidate>
+  <form class="card" id="regForm" method="POST" action="{{ url_for('register_business') }}">
     <div class="grid">
 
       <h2 class="sect full">Business owner</h2>
@@ -90,11 +90,11 @@
       <h2 class="sect full">Registration numbers</h2>
       <div class="field">
         <label for="cac_number">CAC registration number <span class="req">*</span></label>
-        <input type="text" id="cac_number" name="cac_number" maxlength="40" required placeholder="e.g. RC1234567 or BN1234567" value="{{ form.get('cac_number', '') }}">
+        <input type="text" id="cac_number" name="cac_number" maxlength="40" required placeholder="e.g. RC1234567 or BN1234567" pattern="[A-Za-z]{0,3}\s*-?\s*[0-9]{3,10}" title="Letters then digits, e.g. RC1234567 or BN1234567" value="{{ form.get('cac_number', '') }}">
       </div>
       <div class="field">
         <label for="nafdac_number">NAFDAC registration number <span class="opt">(if applicable)</span></label>
-        <input type="text" id="nafdac_number" name="nafdac_number" maxlength="40" placeholder="Only for food, drug, cosmetics etc." value="{{ form.get('nafdac_number', '') }}">
+        <input type="text" id="nafdac_number" name="nafdac_number" maxlength="40" placeholder="Only for food, drug, cosmetics etc." pattern="[A-Za-z0-9][A-Za-z0-9/ \-]{3,29}" title="4 to 30 letters, digits, / or -. Leave blank if not applicable." value="{{ form.get('nafdac_number', '') }}">
       </div>
 
       <div class="field full">
@@ -105,7 +105,7 @@
       <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
       <label class="check full">
-        <input type="checkbox" name="consent" {{ 'checked' if form.get('consent') }}>
+        <input type="checkbox" name="consent" required {{ 'checked' if form.get('consent') }}>
         <span>I confirm that the information above is true and complete. I understand the agency may verify it and reject or suspend a registration that is found to be false.</span>
       </label>
 

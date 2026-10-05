@@ -225,6 +225,11 @@ MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO") or ""
 SITE_URL = (os.environ.get("SITE_URL") or "https://www.occpa.on.gov.ng").rstrip("/")
 BREVO_URL = "https://api.brevo.com/v3/smtp/email"
 EMAIL_ENABLED = bool(BREVO_API_KEY and MAIL_SENDER_EMAIL)
+
+def verify_url_for(reg_id):
+    """ONE canonical verify link used by the page, the downloaded PDF, the emailed PDF and the QR,
+    so every copy of a certificate points at the same address (SITE_URL)."""
+    return f"{SITE_URL}/verify/{quote(reg_id)}"
 RESEND_COOLDOWN_SECONDS = 120    # min gap between two certificate emails for the same business
 if not EMAIL_ENABLED:
     app.logger.warning("Brevo email is OFF: set BREVO_API_KEY and MAIL_SENDER_EMAIL to enable it.")
@@ -320,8 +325,7 @@ def email_certificate_async(biz_id):
             biz = db.session.get(Business, biz_id)
             if not biz or biz.status != "Approved" or not biz.reg_id:
                 return
-            # No request context in a thread, so build the verify URL from SITE_URL
-            verify_url = f"{SITE_URL}/verify/{biz.reg_id}"
+            verify_url = verify_url_for(biz.reg_id)     # no request context in a thread
             try:
                 pdf = build_certificate_pdf(biz, verify_url)
             except Exception as e:
@@ -333,9 +337,25 @@ def email_certificate_async(biz_id):
     except Exception as e:
         app.logger.error("email_certificate_async crashed: %s", e)
 
+_email_inflight = set()
+_email_inflight_lock = threading.Lock()
+
+def _email_job(biz_id):
+    try:
+        email_certificate_async(biz_id)
+    finally:
+        with _email_inflight_lock:
+            _email_inflight.discard(biz_id)
+
 def queue_certificate_email(biz_id):
-    """Fire-and-forget background send."""
-    threading.Thread(target=email_certificate_async, args=(biz_id,), daemon=True).start()
+    """Fire-and-forget background send. Skips if one is already running for this business,
+    so repeated clicks on 'email it again' can't fire duplicate emails before the first lands."""
+    with _email_inflight_lock:
+        if biz_id in _email_inflight:
+            return False
+        _email_inflight.add(biz_id)
+    threading.Thread(target=_email_job, args=(biz_id,), daemon=True).start()
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -536,7 +556,7 @@ def resend_certificates_command():
     click.echo(f"{len(rows)} business(es) not emailed yet.")
     sent = 0
     for biz in rows:
-        verify_url = f"{SITE_URL}/verify/{biz.reg_id}"
+        verify_url = verify_url_for(biz.reg_id)
         try:
             ok = send_certificate_email(biz, verify_url, build_certificate_pdf(biz, verify_url))
         except Exception as e:
@@ -945,7 +965,7 @@ def nl2br(value):
 @app.before_request
 def redirect_to_www():
     if request.host == "occpa.on.gov.ng":
-        return redirect("https://www.occpa.on.gov.ng" + request.full_path, code=301)
+        return redirect("https://www.occpa.on.gov.ng" + request.full_path.rstrip("?"), code=301)
 
 @app.after_request
 def security_headers(resp):
@@ -965,7 +985,7 @@ def file_too_large(_e):
     if is_xhr():
         return jsonify(ok=False, error=msg), 413
     flash(msg, "error")
-    return redirect(url_for("complaints"))
+    return redirect(url_for("admin_dashboard" if request.path.startswith("/admin") else "complaints"))
 
 
 # ---------------------------------------------------------------------------
@@ -1301,6 +1321,7 @@ RESEND_LIMIT = (10, 3600)        # "email me my certificate again" requests per 
 
 _rate_hits = {}
 _rate_lock = threading.Lock()
+_register_lock = threading.Lock()   # makes "check CAC is free" + "insert" one step (double-tap / parallel requests)
 
 def rate_limited(bucket, limit, window):
     """True if this IP has made `limit` calls to `bucket` in the last `window` seconds."""
@@ -1374,38 +1395,39 @@ def register_business():
             flash("Too many submissions from your connection. Please try again later.", "error")
             return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
                                    sectors=BUSINESS_SECTORS), 429
-        error = _business_form_error(form)
-        if not error:
-            dup = Business.query.filter(Business.cac_number == form["cac_number"],
-                                        Business.status != "Rejected").first()
-            if dup:
-                # Same CAC + same email = the owner came back (lost ID / double tap): show the certificate again.
-                if (dup.email or "").lower() == form["email"].lower() and dup.status == "Approved" and dup.reg_id:
-                    flash("This business is already registered. Here is your certificate.", "success")
-                    return redirect(url_for("registered_business", reg_id=dup.reg_id))
-                error = ("A business with that CAC number has already been registered. "
-                         "If this is a mistake, please contact the agency.")
-        if error:
-            flash(error, "error")
-            return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
-                                   sectors=BUSINESS_SECTORS), 400
+        with _register_lock:
+            error = _business_form_error(form)
+            if not error:
+                dup = Business.query.filter(Business.cac_number == form["cac_number"],
+                                            Business.status != "Rejected").first()
+                if dup:
+                    # Same CAC + same email = the owner came back (lost ID / double tap): show the certificate again.
+                    if (dup.email or "").lower() == form["email"].lower() and dup.status == "Approved" and dup.reg_id:
+                        flash("This business is already registered. Here is your certificate.", "success")
+                        return redirect(url_for("registered_business", reg_id=dup.reg_id))
+                    error = ("A business with that CAC number has already been registered. "
+                             "If this is a mistake, please contact the agency.")
+            if error:
+                flash(error, "error")
+                return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                                       sectors=BUSINESS_SECTORS), 400
 
-        biz = Business(owner_name=form["owner_name"], business_name=form["business_name"],
-                       address=form["address"], lga=form["lga"], phone=form["phone"],
-                       email=form["email"], cac_number=form["cac_number"],
-                       nafdac_number=form["nafdac_number"] or None, sector=form["sector"] or None,
-                       business_type=form["business_type"],
-                       other_info=form["other_info"] or None, status="Approved")
-        try:
-            biz.reg_id = new_business_id()               # instant: no admin approval needed
-            biz.issued_at = datetime.utcnow()
-            db.session.add(biz)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            flash("We could not save your application. Please try again.", "error")
-            return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
-                                   sectors=BUSINESS_SECTORS), 500
+            biz = Business(owner_name=form["owner_name"], business_name=form["business_name"],
+                           address=form["address"], lga=form["lga"], phone=form["phone"],
+                           email=form["email"], cac_number=form["cac_number"],
+                           nafdac_number=form["nafdac_number"] or None, sector=form["sector"] or None,
+                           business_type=form["business_type"],
+                           other_info=form["other_info"] or None, status="Approved")
+            try:
+                biz.reg_id = new_business_id()               # instant: no admin approval needed
+                biz.issued_at = datetime.utcnow()
+                db.session.add(biz)
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                flash("We could not save your application. Please try again.", "error")
+                return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
+                                       sectors=BUSINESS_SECTORS), 500
 
         # Email the certificate (PDF + verify link) in the background: it never slows down
         # or breaks the registration if Brevo is slow or down.
@@ -1583,7 +1605,7 @@ def registered_business(reg_id):
     rid = re.sub(r"\s+", "", clean(reg_id, 40)).upper()
     biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
     return render_template("registered_business.html", biz=biz,
-                           verify_url=url_for("verify_business", reg_id=biz.reg_id, _external=True),
+                           verify_url=verify_url_for(biz.reg_id),
                            chairman=(CHAIRMAN_NAME, CHAIRMAN_TITLE),
                            secretary=(SECRETARY_NAME, SECRETARY_TITLE),
                            email_enabled=EMAIL_ENABLED)
@@ -1616,7 +1638,7 @@ def business_certificate(reg_id):
     rid = re.sub(r"\s+", "", clean(reg_id, 40)).upper()
     biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
     try:
-        pdf = build_certificate_pdf(biz, url_for("verify_business", reg_id=biz.reg_id, _external=True))
+        pdf = build_certificate_pdf(biz, verify_url_for(biz.reg_id))
     except ImportError:
         app.logger.error("reportlab is not installed (add 'reportlab' to requirements.txt)")
         abort(503)
