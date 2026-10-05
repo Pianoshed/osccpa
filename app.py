@@ -220,7 +220,7 @@ def inject_storage_helpers():
 # ---------------------------------------------------------------------------
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY") or ""
 MAIL_SENDER_EMAIL = os.environ.get("MAIL_SENDER_EMAIL") or ""
-MAIL_SENDER_NAME = os.environ.get("MAIL_SENDER_NAME", "OSCCPA")
+MAIL_SENDER_NAME = os.environ.get("MAIL_SENDER_NAME", "ODCCPA")
 MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO") or ""
 SITE_URL = (os.environ.get("SITE_URL") or "https://www.occpa.on.gov.ng").rstrip("/")
 BREVO_URL = "https://api.brevo.com/v3/smtp/email"
@@ -286,7 +286,7 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
       <div style="border:1px solid #e5def5;border-top:0;padding:22px;border-radius:0 0 10px 10px">
         <p>Dear {owner},</p>
         <p>Congratulations! <strong>{biz_name}</strong> has been successfully registered with the
-        Ondo State Competition &amp; Consumer Protection Agency (OSCCPA).</p>
+        Ondo State Competition &amp; Consumer Protection Agency (ODCCPA).</p>
         <div style="background:#F1EBFC;border:1.5px solid #6D28D9;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
           <div style="font-size:11px;letter-spacing:1px;color:#665D77;font-weight:bold">REGISTRATION ID</div>
           <div style="font-family:Courier New,monospace;font-size:24px;font-weight:bold;color:#4C1D95">{rid}</div>
@@ -304,16 +304,16 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
     </div>"""
     text = (f"Dear {biz.owner_name},\n\n"
             f"{biz.business_name} has been successfully registered with the Ondo State Competition & "
-            f"Consumer Protection Agency (OSCCPA).\n\n"
+            f"Consumer Protection Agency (ODCCPA).\n\n"
             f"Registration ID: {biz.reg_id}\n"
             f"Verify your registration: {verify_url}\n\n"
             "Your Certificate of Registration is attached to this email (PDF). "
             "Scan the QR code on it, or open the link above, to verify.\n")
     return brevo_send(
         biz.email, biz.owner_name,
-        f"Your OSCCPA Certificate of Registration - {biz.reg_id}",
+        f"Your ODCCPA Certificate of Registration - {biz.reg_id}",
         html, text,
-        attachments=[(f"OSCCPA-Certificate-{biz.reg_id}.pdf", pdf_bytes)],
+        attachments=[(f"ODCCPA-Certificate-{biz.reg_id}.pdf", pdf_bytes)],
     )
 
 
@@ -1340,10 +1340,10 @@ def rate_limited(bucket, limit, window):
     return False
 
 def new_business_id():
-    """Random, unguessable ID such as OSCCPA-2026-K7M3QX (unique in the database)."""
+    """Random, unguessable ID such as ODCCPA-2026-K7M3QX (unique in the database)."""
     for _ in range(20):
         code = "".join(secrets.choice(ID_ALPHABET) for _ in range(6))
-        rid = f"OSCCPA-{datetime.utcnow().year}-{code}"
+        rid = f"ODCCPA-{datetime.utcnow().year}-{code}"
         if not Business.query.filter_by(reg_id=rid).first():
             return rid
     raise RuntimeError("Could not generate a unique business ID")
@@ -1458,7 +1458,7 @@ def build_certificate_pdf(biz, verify_url):
     name = _pdf_text(biz.business_name)
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=(W, H))
-    c.setTitle(f"OSCCPA Certificate of Registration - {biz.reg_id}")
+    c.setTitle(f"ODCCPA Certificate of Registration - {biz.reg_id}")
     c.setAuthor("Ondo State Competition & Consumer Protection Agency")
 
     logo = os.path.join(basedir, "static", "logo", "osccpa_logo.png")
@@ -1519,7 +1519,7 @@ def build_certificate_pdf(biz, verify_url):
     y -= 6
     c.setFillColor(muted); c.setFont("Helvetica", 12)
     msg = ("has been registered in the business registry of the Ondo State Competition & Consumer "
-           "Protection Agency (OSCCPA) and is issued the registration ID below.")
+           "Protection Agency (ODCCPA) and is issued the registration ID below.")
     for ln in simpleSplit(msg, "Helvetica", 12, 600):
         c.drawCentredString(W / 2, y, ln)
         y -= 17
@@ -1625,7 +1625,7 @@ def business_certificate(reg_id):
         app.logger.error("reportlab is not installed (add 'reportlab' to requirements.txt)")
         abort(503)
     resp = send_file(io.BytesIO(pdf), mimetype="application/pdf", as_attachment=True,
-                     download_name=f"OSCCPA-Certificate-{biz.reg_id}.pdf")
+                     download_name=f"ODCCPA-Certificate-{biz.reg_id}.pdf")
     resp.headers["Cache-Control"] = "no-store"
     return resp
 
