@@ -9,6 +9,7 @@ import re
 import math
 import time
 import uuid
+import base64
 import unicodedata
 import secrets
 import threading
@@ -207,6 +208,137 @@ def inject_storage_helpers():
 
 
 # ---------------------------------------------------------------------------
+# BREVO EMAIL (transactional API) -- sends the registration certificate (PDF)
+# plus the verification link to the business's email.
+#   BREVO_API_KEY       Brevo API key (xkeysib-...)  SERVER ONLY
+#   MAIL_SENDER_EMAIL   a sender/domain you verified in Brevo (e.g. no-reply@occpa.on.gov.ng)
+#   MAIL_SENDER_NAME    display name (default "OSCCPA")
+#   MAIL_REPLY_TO       optional reply-to address
+#   SITE_URL            public base URL used in the verify link / QR (default https://www.occpa.on.gov.ng)
+# If BREVO_API_KEY or MAIL_SENDER_EMAIL is missing, emailing is simply switched off
+# (registration still works).
+# ---------------------------------------------------------------------------
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY") or ""
+MAIL_SENDER_EMAIL = os.environ.get("MAIL_SENDER_EMAIL") or ""
+MAIL_SENDER_NAME = os.environ.get("MAIL_SENDER_NAME", "OSCCPA")
+MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO") or ""
+SITE_URL = (os.environ.get("SITE_URL") or "https://www.occpa.on.gov.ng").rstrip("/")
+BREVO_URL = "https://api.brevo.com/v3/smtp/email"
+EMAIL_ENABLED = bool(BREVO_API_KEY and MAIL_SENDER_EMAIL)
+RESEND_COOLDOWN_SECONDS = 120    # min gap between two certificate emails for the same business
+if not EMAIL_ENABLED:
+    app.logger.warning("Brevo email is OFF: set BREVO_API_KEY and MAIL_SENDER_EMAIL to enable it.")
+
+
+def brevo_send(to_email, to_name, subject, html, text=None, attachments=None):
+    """Send one transactional email through Brevo. Returns True/False, never raises.
+    attachments: list of (filename, bytes)."""
+    if not EMAIL_ENABLED or not to_email:
+        return False
+    payload = {
+        "sender": {"name": MAIL_SENDER_NAME, "email": MAIL_SENDER_EMAIL},
+        "to": [{"email": to_email, "name": to_name or to_email}],
+        "subject": subject,
+        "htmlContent": html,
+    }
+    if text:
+        payload["textContent"] = text
+    if MAIL_REPLY_TO:
+        payload["replyTo"] = {"email": MAIL_REPLY_TO, "name": MAIL_SENDER_NAME}
+    if attachments:
+        payload["attachment"] = [
+            {"name": n, "content": base64.b64encode(b).decode("ascii")} for n, b in attachments
+        ]
+    try:
+        r = requests.post(
+            BREVO_URL, json=payload, timeout=30,
+            headers={"api-key": BREVO_API_KEY, "accept": "application/json",
+                     "content-type": "application/json"},
+        )
+    except requests.RequestException as e:
+        app.logger.error("Brevo send error: %s", e)
+        return False
+    if r.status_code not in (200, 201, 202):
+        app.logger.error("Brevo send failed (%s): %s", r.status_code, r.text[:300])
+        return False
+    return True
+
+
+def send_certificate_email(biz, verify_url, pdf_bytes):
+    """Email the certificate PDF + verify link to the business. Returns True/False."""
+    if not biz.email:
+        return False
+    biz_name = escape(biz.business_name)
+    owner = escape(biz.owner_name)
+    rid = escape(biz.reg_id)
+    vurl = escape(verify_url)
+
+    html = f"""
+    <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#241B33">
+      <div style="background:#6D28D9;color:#fff;padding:18px 22px;border-radius:10px 10px 0 0">
+        <h2 style="margin:0;font-size:18px">Ondo State Competition &amp; Consumer Protection Agency</h2>
+      </div>
+      <div style="border:1px solid #e5def5;border-top:0;padding:22px;border-radius:0 0 10px 10px">
+        <p>Dear {owner},</p>
+        <p>Congratulations! <strong>{biz_name}</strong> has been successfully registered with the
+        Ondo State Competition &amp; Consumer Protection Agency (OSCCPA).</p>
+        <div style="background:#F1EBFC;border:1.5px solid #6D28D9;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
+          <div style="font-size:11px;letter-spacing:1px;color:#665D77;font-weight:bold">REGISTRATION ID</div>
+          <div style="font-family:Courier New,monospace;font-size:24px;font-weight:bold;color:#4C1D95">{rid}</div>
+        </div>
+        <p>Your <strong>Certificate of Registration</strong> is attached to this email as a PDF.
+        The certificate carries a QR code that anyone can scan to confirm your registration.</p>
+        <p style="text-align:center;margin:22px 0">
+          <a href="{vurl}" style="background:#6D28D9;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;display:inline-block">Verify this registration</a>
+        </p>
+        <p style="font-size:12px;color:#665D77;word-break:break-all">Or copy this link:<br>{vurl}</p>
+        <hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+        <p style="font-size:11px;color:#665D77">Keep your Registration ID safe. If you did not make this
+        registration, please contact the agency immediately.</p>
+      </div>
+    </div>"""
+    text = (f"Dear {biz.owner_name},\n\n"
+            f"{biz.business_name} has been successfully registered with the Ondo State Competition & "
+            f"Consumer Protection Agency (OSCCPA).\n\n"
+            f"Registration ID: {biz.reg_id}\n"
+            f"Verify your registration: {verify_url}\n\n"
+            "Your Certificate of Registration is attached to this email (PDF). "
+            "Scan the QR code on it, or open the link above, to verify.\n")
+    return brevo_send(
+        biz.email, biz.owner_name,
+        f"Your OSCCPA Certificate of Registration - {biz.reg_id}",
+        html, text,
+        attachments=[(f"OSCCPA-Certificate-{biz.reg_id}.pdf", pdf_bytes)],
+    )
+
+
+def email_certificate_async(biz_id):
+    """Build the certificate and email it. Meant to run in a background thread so the
+    visitor isn't kept waiting on the PDF / Brevo. Never raises."""
+    try:
+        with app.app_context():
+            biz = db.session.get(Business, biz_id)
+            if not biz or biz.status != "Approved" or not biz.reg_id:
+                return
+            # No request context in a thread, so build the verify URL from SITE_URL
+            verify_url = f"{SITE_URL}/verify/{biz.reg_id}"
+            try:
+                pdf = build_certificate_pdf(biz, verify_url)
+            except Exception as e:
+                app.logger.error("Certificate PDF failed for %s: %s", biz.reg_id, e)
+                return
+            if send_certificate_email(biz, verify_url, pdf):
+                biz.cert_emailed_at = datetime.utcnow()
+                db.session.commit()
+    except Exception as e:
+        app.logger.error("email_certificate_async crashed: %s", e)
+
+def queue_certificate_email(biz_id):
+    """Fire-and-forget background send."""
+    threading.Thread(target=email_certificate_async, args=(biz_id,), daemon=True).start()
+
+
+# ---------------------------------------------------------------------------
 # MODELS
 # ---------------------------------------------------------------------------
 class Admin(db.Model):
@@ -287,6 +419,8 @@ class Business(db.Model):
     cac_verified = db.Column(db.Boolean, default=False, nullable=False, server_default=db.false())
     cac_verified_at = db.Column(db.DateTime)
     cac_verified_by = db.Column(db.String(150))
+    # Set when the certificate email was accepted by Brevo (NULL = not emailed yet)
+    cert_emailed_at = db.Column(db.DateTime)
 
 class NewsPost(db.Model):
     __tablename__ = 'news_posts'
@@ -318,8 +452,9 @@ class NewsImage(db.Model):
 
 # Create any table that does not exist yet (never alters or drops existing tables), so a new
 # model such as Business can't crash the site with "relation does not exist" after a deploy.
-# NOTE: create_all() does NOT add new columns to existing tables. For business_type run once in Supabase:
+# NOTE: create_all() does NOT add new columns to existing tables. Run once in Supabase (SQL editor):
 #   ALTER TABLE businesses ADD COLUMN IF NOT EXISTS business_type VARCHAR(60);
+#   ALTER TABLE businesses ADD COLUMN IF NOT EXISTS cert_emailed_at TIMESTAMP;
 with app.app_context():
     try:
         db.create_all()
@@ -389,6 +524,33 @@ def create_admin_command(username, password):
     db.session.add(Admin(username=username, password=generate_password_hash(password)))
     db.session.commit()
     click.echo(f"Admin '{username}' created.")
+
+@app.cli.command("resend-certificates")
+def resend_certificates_command():
+    """Email the certificate to every approved business that hasn't received it yet."""
+    if not EMAIL_ENABLED:
+        raise click.ClickException("Set BREVO_API_KEY and MAIL_SENDER_EMAIL first.")
+    rows = Business.query.filter(Business.status == "Approved",
+                                 Business.reg_id.isnot(None),
+                                 Business.cert_emailed_at.is_(None)).all()
+    click.echo(f"{len(rows)} business(es) not emailed yet.")
+    sent = 0
+    for biz in rows:
+        verify_url = f"{SITE_URL}/verify/{biz.reg_id}"
+        try:
+            ok = send_certificate_email(biz, verify_url, build_certificate_pdf(biz, verify_url))
+        except Exception as e:
+            click.echo(f"  {biz.reg_id}: failed ({e})")
+            continue
+        if ok:
+            biz.cert_emailed_at = datetime.utcnow()
+            db.session.commit()
+            sent += 1
+            click.echo(f"  {biz.reg_id}: sent to {biz.email}")
+        else:
+            click.echo(f"  {biz.reg_id}: Brevo rejected / failed")
+        time.sleep(0.3)
+    click.echo(f"Done. Sent {sent}/{len(rows)}.")
 
 
 # ---------------------------------------------------------------------------
@@ -1135,6 +1297,7 @@ SECRETARY_SIG = os.path.join(basedir, "static", "signatures", "secretary.png")
 REGISTER_LIMIT = (60, 3600)      # submissions per IP per hour
 VERIFY_LIMIT = (90, 60)          # lookups per IP per minute
 CERT_LIMIT = (60, 60)            # certificate downloads per IP per minute
+RESEND_LIMIT = (10, 3600)        # "email me my certificate again" requests per IP per hour
 
 _rate_hits = {}
 _rate_lock = threading.Lock()
@@ -1243,6 +1406,12 @@ def register_business():
             flash("We could not save your application. Please try again.", "error")
             return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
                                    sectors=BUSINESS_SECTORS), 500
+
+        # Email the certificate (PDF + verify link) in the background: it never slows down
+        # or breaks the registration if Brevo is slow or down.
+        if EMAIL_ENABLED:
+            queue_certificate_email(biz.id)
+            flash("Your certificate is also being sent to " + biz.email + ".", "success")
         return redirect(url_for("registered_business", reg_id=biz.reg_id))
     return render_template("register_business.html", form=form, lgas=ONDO_LGAS,
                            sectors=BUSINESS_SECTORS)
@@ -1416,7 +1585,29 @@ def registered_business(reg_id):
     return render_template("registered_business.html", biz=biz,
                            verify_url=url_for("verify_business", reg_id=biz.reg_id, _external=True),
                            chairman=(CHAIRMAN_NAME, CHAIRMAN_TITLE),
-                           secretary=(SECRETARY_NAME, SECRETARY_TITLE))
+                           secretary=(SECRETARY_NAME, SECRETARY_TITLE),
+                           email_enabled=EMAIL_ENABLED)
+
+@app.route("/registered/<reg_id>/resend", methods=["POST"])
+def resend_certificate(reg_id):
+    """Public 'email my certificate again' button. It ALWAYS sends to the email saved on the
+    record (never one typed by the visitor), so it can't be used to spam other people."""
+    rid = re.sub(r"\s+", "", clean(reg_id, 40)).upper()
+    back = redirect(url_for("registered_business", reg_id=rid))
+    if not EMAIL_ENABLED:
+        flash("Email is not available right now. Please download your certificate instead.", "error")
+        return back
+    if rate_limited("resend", *RESEND_LIMIT):
+        flash("Too many requests. Please try again later.", "error")
+        return back
+    biz = Business.query.filter_by(reg_id=rid, status="Approved").first_or_404()
+    if biz.cert_emailed_at and (datetime.utcnow() - biz.cert_emailed_at).total_seconds() < RESEND_COOLDOWN_SECONDS:
+        flash("We just emailed your certificate. Please check your inbox (and spam folder) "
+              "and wait a couple of minutes before asking again.", "success")
+        return back
+    queue_certificate_email(biz.id)
+    flash("Certificate re-sent to " + biz.email + ".", "success")
+    return back
 
 @app.route("/certificate/<reg_id>.pdf")
 def business_certificate(reg_id):
@@ -1461,7 +1652,8 @@ def admin_dashboard():
     return render_template("admin_dashboard.html", complaints=complaints_data,
                             contacts=contacts_data, news_posts=news_data,
                             gallery_items=gallery_rows(),
-                            businesses=Business.query.order_by(Business.created_at.desc()).all())
+                            businesses=Business.query.order_by(Business.created_at.desc()).all(),
+                            email_enabled=EMAIL_ENABLED)
 
 @app.route("/admin/evidence/<path:filename>")
 @login_required
@@ -1618,10 +1810,12 @@ def business_set_status(biz_id):
     if new_status not in BUSINESS_STATUSES:
         flash("Invalid status.", "error")
         return redirect(url_for("admin_dashboard"))
+    first_issue = False
     try:
         if new_status == "Approved" and not biz.reg_id:      # the ID is issued once and never changes
             biz.reg_id = new_business_id()
             biz.issued_at = datetime.utcnow()
+            first_issue = True
         biz.status = new_status
         db.session.commit()
     except Exception:
@@ -1630,8 +1824,28 @@ def business_set_status(biz_id):
         return redirect(url_for("admin_dashboard"))
     if new_status == "Approved":
         flash(f"{biz.business_name} approved. Registration ID: {biz.reg_id}", "success")
+        # An ID was just issued by an admin: email the certificate to the owner too
+        if first_issue and EMAIL_ENABLED:
+            queue_certificate_email(biz.id)
     else:
         flash(f"{biz.business_name} marked {new_status}.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/businesses/resend/<int:biz_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def business_resend_cert(biz_id):
+    """Admin: (re)send the certificate email to the business."""
+    biz = Business.query.get_or_404(biz_id)
+    if not EMAIL_ENABLED:
+        flash("Email is not configured. Set BREVO_API_KEY and MAIL_SENDER_EMAIL.", "error")
+    elif biz.status != "Approved" or not biz.reg_id:
+        flash("Only approved businesses have a certificate to send.", "error")
+    elif not biz.email:
+        flash("This business has no email address on record.", "error")
+    else:
+        queue_certificate_email(biz.id)
+        flash(f"Certificate is being sent to {biz.email}.", "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/businesses/cac/<int:biz_id>", methods=["POST"])
