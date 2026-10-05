@@ -277,6 +277,10 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
     owner = escape(biz.owner_name)
     rid = escape(biz.reg_id)
     vurl = escape(verify_url)
+    cac_ok = bool(biz.cac_verified)
+    cac_html = ('<p style="background:#D8F0E1;border:1px solid #1E6B3F;color:#1E6B3F;border-radius:8px;'
+                'padding:10px 14px;font-weight:bold;text-align:center">&#10003; Your CAC number has been verified.</p>'
+                if cac_ok else "")
 
     html = f"""
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#241B33">
@@ -287,6 +291,7 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
         <p>Dear {owner},</p>
         <p>Congratulations! <strong>{biz_name}</strong> has been successfully registered with the
         Ondo State Competition &amp; Consumer Protection Agency (ODCCPA).</p>
+        {cac_html}
         <div style="background:#F1EBFC;border:1.5px solid #6D28D9;border-radius:10px;padding:14px;text-align:center;margin:18px 0">
           <div style="font-size:11px;letter-spacing:1px;color:#665D77;font-weight:bold">REGISTRATION ID</div>
           <div style="font-family:Courier New,monospace;font-size:24px;font-weight:bold;color:#4C1D95">{rid}</div>
@@ -305,13 +310,15 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
     text = (f"Dear {biz.owner_name},\n\n"
             f"{biz.business_name} has been successfully registered with the Ondo State Competition & "
             f"Consumer Protection Agency (ODCCPA).\n\n"
+            + ("Your CAC number has been verified.\n\n" if cac_ok else "") +
             f"Registration ID: {biz.reg_id}\n"
             f"Verify your registration: {verify_url}\n\n"
             "Your Certificate of Registration is attached to this email (PDF). "
             "Scan the QR code on it, or open the link above, to verify.\n")
     return brevo_send(
         biz.email, biz.owner_name,
-        f"Your ODCCPA Certificate of Registration - {biz.reg_id}",
+        (f"Your CAC number is verified - ODCCPA Certificate {biz.reg_id}" if cac_ok
+         else f"Your ODCCPA Certificate of Registration - {biz.reg_id}"),
         html, text,
         attachments=[(f"ODCCPA-Certificate-{biz.reg_id}.pdf", pdf_bytes)],
     )
@@ -1859,11 +1866,23 @@ def business_set_cac(biz_id):
     """Admin ticks (or un-ticks) 'CAC verified' after checking the number on search.cac.gov.ng."""
     biz = Business.query.get_or_404(biz_id)
     verified = request.form.get("verified") == "1"
+    newly_verified = verified and not biz.cac_verified
     biz.cac_verified = verified
     biz.cac_verified_at = datetime.utcnow() if verified else None
     biz.cac_verified_by = session.get("admin_user") if verified else None
-    db.session.commit()
-    flash(f"{biz.business_name}: CAC number marked " + ("verified." if verified else "not verified."), "success")
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        flash("Could not update the business. Please try again.", "error")
+        return redirect(url_for("admin_dashboard"))
+    msg = f"{biz.business_name}: CAC number marked " + ("verified." if verified else "not verified.")
+    # Automatic: the moment a CAC number is verified, email the Registration ID + updated
+    # certificate to the address the business supplied. No extra admin click needed.
+    if newly_verified and EMAIL_ENABLED and biz.status == "Approved" and biz.reg_id and biz.email:
+        queue_certificate_email(biz.id)
+        msg += f" Verification email with ID sent to {biz.email}."
+    flash(msg, "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/businesses/delete/<int:biz_id>", methods=["POST"])
