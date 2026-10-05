@@ -2063,6 +2063,92 @@ def export_excel():
                      download_name=f"occpa_export_{datetime.now().strftime('%Y-%m-%d')}.xlsx")
 
 
+# ---------------------------------------------------------------------------
+# ADMIN: PER-TAB EXPORT (CSV or Excel).  /admin/export/<section>/<csv|xlsx>
+# Sections: complaints, contacts, businesses, news.  Read-only; the all-in-one
+# /export_excel workbook above is unchanged.
+# ---------------------------------------------------------------------------
+def _wat(dt):
+    """UTC (as stored) -> Nigerian time (WAT, UTC+1, no daylight saving) for readable exports."""
+    return (dt + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M") if dt else ""
+
+def _yn(v):
+    return "Yes" if v else "No"
+
+EXPORT_SECTIONS = {
+    "complaints": (Complaint, Complaint.created_at.desc(), [
+        ("Ref", lambda r: r.id), ("Submitted (WAT)", lambda r: _wat(r.created_at)),
+        ("Full name", lambda r: r.full_name), ("Email", lambda r: r.email), ("Phone", lambda r: r.phone),
+        ("LGA", lambda r: r.lga), ("Business", lambda r: r.business_name),
+        ("Complaint type", lambda r: r.complaint_type), ("Details", lambda r: r.complaint_details),
+        ("Status", lambda r: r.status or "Pending"),
+        ("Evidence file", lambda r: re.sub(r"^[0-9a-f]{12}_", "", r.evidence or "")),
+    ]),
+    "contacts": (Contact, Contact.created_at.desc(), [
+        ("Ref", lambda r: r.id), ("Received (WAT)", lambda r: _wat(r.created_at)),
+        ("Name", lambda r: r.name), ("Email", lambda r: r.email), ("Phone", lambda r: r.phone),
+        ("Subject", lambda r: r.subject), ("Message", lambda r: r.message),
+    ]),
+    "businesses": (Business, Business.created_at.desc(), [
+        ("Ref", lambda r: r.id), ("Submitted (WAT)", lambda r: _wat(r.created_at)),
+        ("Registration ID", lambda r: r.reg_id), ("Business name", lambda r: r.business_name),
+        ("Owner", lambda r: r.owner_name), ("Business type", lambda r: r.business_type),
+        ("Sector", lambda r: r.sector), ("Address", lambda r: r.address), ("LGA", lambda r: r.lga),
+        ("Phone", lambda r: r.phone), ("Email", lambda r: r.email),
+        ("CAC number", lambda r: r.cac_number), ("NAFDAC number", lambda r: r.nafdac_number),
+        ("Status", lambda r: r.status), ("CAC verified", lambda r: _yn(r.cac_verified)),
+        ("CAC verified by", lambda r: r.cac_verified_by), ("CAC verified at (WAT)", lambda r: _wat(r.cac_verified_at)),
+        ("Registered on (WAT)", lambda r: _wat(r.issued_at)),
+        ("Certificate emailed (WAT)", lambda r: _wat(r.cert_emailed_at)),
+        ("Other information", lambda r: r.other_info),
+    ]),
+    "news": (NewsPost, NewsPost.created_at.desc(), [
+        ("Ref", lambda r: r.id), ("Created (WAT)", lambda r: _wat(r.created_at)),
+        ("Updated (WAT)", lambda r: _wat(r.updated_at)), ("Title", lambda r: r.title),
+        ("Tag", lambda r: r.tag), ("Published", lambda r: _yn(r.published)),
+        ("Summary", lambda r: r.summary), ("Body", lambda r: r.body), ("Link", lambda r: r.link),
+        ("Photos", lambda r: len(r.images)),
+    ]),
+}
+
+@app.route("/admin/export/<section>/<fmt>")
+@login_required
+def export_data(section, fmt):
+    spec = EXPORT_SECTIONS.get(section)
+    if not spec or fmt not in ("csv", "xlsx"):
+        abort(404)
+    model, order, cols = spec
+    rows = model.query.order_by(order).all()
+    headers = [c[0] for c in cols]
+    data = [[_excel_safe(fn(r)) for _, fn in cols] for r in rows]
+    stamp = datetime.now().strftime("%Y-%m-%d")
+    fname = f"occpa_{section}_{stamp}.{fmt}"
+
+    if fmt == "csv":
+        import csv
+        buf = io.StringIO()
+        w = csv.writer(buf)
+        w.writerow(headers)
+        w.writerows(data)
+        resp = Response("\ufeff" + buf.getvalue(), mimetype="text/csv; charset=utf-8")   # BOM so Excel reads UTF-8
+    else:
+        out = io.BytesIO()
+        df = pd.DataFrame(data, columns=headers)
+        with pd.ExcelWriter(out, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name=section.capitalize())
+            ws = writer.sheets[section.capitalize()]
+            for i, h in enumerate(headers, start=1):
+                longest = max([len(str(h))] + [len(str(row[i - 1] or "")) for row in data[:200]])
+                ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = min(max(longest + 2, 10), 50)
+            ws.freeze_panes = "A2"
+        out.seek(0)
+        resp = Response(out.getvalue(),
+                        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    resp.headers["Content-Disposition"] = f'attachment; filename="{fname}"'
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
 @app.route('/sitemap.xml', methods=['GET'])
 def sitemap():
     """Simple XML sitemap for the public pages"""

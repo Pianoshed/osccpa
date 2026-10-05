@@ -514,6 +514,8 @@ body{background:var(--bg)}
       <input type="date" id="cDate" aria-label="Filter by date submitted">
       <button type="button" class="btn" id="cClear">Clear filters</button>
       <span class="result-count" id="cCount"></span>
+      <a class="btn" href="{{ url_for('export_data', section='complaints', fmt='csv') }}" title="Download all complaints as CSV"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      <a class="btn" href="{{ url_for('export_data', section='complaints', fmt='xlsx') }}" title="Download all complaints as Excel"><i class="fa-solid fa-file-excel"></i> Excel</a>
     </div>
 
     <div class="table-box">
@@ -588,6 +590,8 @@ body{background:var(--bg)}
       <input type="date" id="mDate" aria-label="Filter by date received">
       <button type="button" class="btn" id="mClear">Clear filters</button>
       <span class="result-count" id="mCount"></span>
+      <a class="btn" href="{{ url_for('export_data', section='contacts', fmt='csv') }}" title="Download all contacts as CSV"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      <a class="btn" href="{{ url_for('export_data', section='contacts', fmt='xlsx') }}" title="Download all contacts as Excel"><i class="fa-solid fa-file-excel"></i> Excel</a>
     </div>
 
     <div class="table-box">
@@ -632,6 +636,8 @@ body{background:var(--bg)}
         <input type="search" id="nSearch" placeholder="Search title, tag..." aria-label="Search news posts"></div>
       <button type="button" class="btn" id="nClear">Clear filters</button>
       <span class="result-count" id="nCount"></span>
+      <a class="btn" href="{{ url_for('export_data', section='news', fmt='csv') }}" title="Download all news as CSV"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      <a class="btn" href="{{ url_for('export_data', section='news', fmt='xlsx') }}" title="Download all news as Excel"><i class="fa-solid fa-file-excel"></i> Excel</a>
       <button type="button" class="btn primary" id="nNewBtn" style="margin-left:auto">
         <i class="fa-solid fa-plus"></i> New post
       </button>
@@ -791,6 +797,8 @@ body{background:var(--bg)}
       </select>
       <button type="button" class="btn" id="bClear">Clear filters</button>
       <span class="result-count" id="bCount"></span>
+      <a class="btn" href="{{ url_for('export_data', section='businesses', fmt='csv') }}" title="Download all businesses as CSV"><i class="fa-solid fa-file-csv"></i> CSV</a>
+      <a class="btn" href="{{ url_for('export_data', section='businesses', fmt='xlsx') }}" title="Download all businesses as Excel"><i class="fa-solid fa-file-excel"></i> Excel</a>
     </div>
     <p class="news-hint">Businesses register on <strong>/register-business</strong> and receive their ID <strong>instantly</strong>, with no approval step. Use <strong>Suspended</strong> to revoke a registration that turns out to be false (the ID then shows as suspended on <strong>/verify</strong>), or <strong>Rejected</strong> to hide it. &ldquo;Email ID to owner&rdquo; in a record is optional.<br><strong>CAC check (free):</strong> open <a href="https://search.cac.gov.ng/home" target="_blank" rel="noopener">search.cac.gov.ng</a>, search the CAC number, confirm the name and that it is active, then mark the business <strong>CAC verified</strong>. The mark then appears on its certificate and the public Verify page.</p>
 
@@ -805,7 +813,7 @@ body{background:var(--bg)}
           <tr data-id="{{ b.id }}">
             <td data-label="Ref"><span class="ref">#{{ b.id }}</span></td>
             <td data-label="Submitted"><time class="js-time" datetime="{{ bts }}">{{ b.created_at.strftime('%d %b %Y, %H:%M') ~ ' UTC' if b.created_at else '—' }}</time></td>
-            <td data-label="Business"><span><strong>{{ b.business_name }}</strong><span class="sub">{{ b.owner_name }} &middot; {{ b.lga }}</span></span></td>
+            <td data-label="Business"><span><strong>{{ b.business_name }}</strong><span class="sub">{{ b.owner_name }} &middot; {{ b.lga }}</span>{% if b.business_type %}<span class="sub">{{ b.business_type }}{% if b.sector %} &middot; {{ b.sector }}{% endif %}</span>{% endif %}</span></td>
             <td data-label="CAC / NAFDAC"><span>{{ b.cac_number }}{% if b.nafdac_number %}<span class="sub">NAFDAC: {{ b.nafdac_number }}</span>{% endif %}<span class="cac-b {{ 'ok' if b.cac_verified else 'no' }}">{{ 'CAC verified' if b.cac_verified else 'CAC not checked' }}</span></span></td>
             <td data-label="Registration ID">{% if b.reg_id %}<span class="ref">{{ b.reg_id }}</span>{% else %}<span class="muted">Not issued</span>{% endif %}</td>
             <td data-label="Status">
@@ -1035,7 +1043,7 @@ const BUSINESSES = [
 {%- for b in businesses %}
 {{ {
   'id': b.id, 'name': b.business_name, 'owner': b.owner_name, 'address': b.address, 'lga': b.lga,
-  'phone': b.phone, 'email': b.email, 'cac': b.cac_number, 'nafdac': b.nafdac_number, 'sector': b.sector,
+  'phone': b.phone, 'email': b.email, 'cac': b.cac_number, 'nafdac': b.nafdac_number, 'sector': b.sector, 'btype': b.business_type,
   'other': b.other_info, 'status': b.status, 'regId': b.reg_id or '',
   'cacOk': b.cac_verified, 'cacBy': b.cac_verified_by or '', 'cacAt': b.cac_verified_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.cac_verified_at else '',
   'ts': b.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') if b.created_at else '',
@@ -1425,7 +1433,7 @@ const FLASHES = {{ msgs | tojson }};
       ['Registration ID', b.regId || 'Not issued yet'], ['Registered on', b.issued ? fmtDateTime(b.issued) : '—'],
       ['CAC number', b.cac], ['CAC check', b.cacOk ? 'Verified' + (b.cacBy ? ' by ' + b.cacBy : '') + (b.cacAt ? ' on ' + fmtDateTime(b.cacAt) : '') : 'Not yet checked'], ['NAFDAC number', b.nafdac || 'Not provided'],
       ['Email', b.email, 'mail'], ['Phone', b.phone, 'tel'],
-      ['Local Government Area', b.lga], ['Type of business', b.sector || '—'],
+      ['Local Government Area', b.lga], ['Type of business', b.btype || '—'], ['Sector', b.sector || '—'],
       ['Address', b.address], ['Submitted', fmtDateTime(b.ts)]
     ]);
     $('#bmOther').textContent = b.other || '—';
@@ -1464,7 +1472,7 @@ const FLASHES = {{ msgs | tojson }};
       let shown = 0;
       rows.forEach(r => {
         const b = bMap.get(r.dataset.id);
-        const text = [b.name, b.owner, b.cac, b.nafdac, b.regId, b.email, b.phone, b.lga].join(' ').toLowerCase() + ' #' + b.id;
+        const text = [b.name, b.owner, b.cac, b.nafdac, b.regId, b.email, b.phone, b.lga, b.btype, b.sector].join(' ').toLowerCase() + ' #' + b.id;
         const cs = cacSel.value;
         const hit = (!q || text.includes(q)) && (!st || b.status === st) && (!cs || (cs === 'yes') === !!b.cacOk);
         r.hidden = !hit; if (hit) shown++;
