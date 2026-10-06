@@ -34,7 +34,7 @@ from PIL import Image, ImageOps
 
 app = Flask(__name__)
 import logging
-app.logger.setLevel(logging.INFO)    # so INFO lines (e.g. "Brevo accepted ...") show in Render logs
+app.logger.setLevel(logging.INFO)    # so INFO lines (e.g. "Resend accepted ...") show in Render logs
 
 
 # ---------------------------------------------------------------------------
@@ -210,23 +210,25 @@ def inject_storage_helpers():
 
 
 # ---------------------------------------------------------------------------
-# BREVO EMAIL (transactional API) -- sends the registration certificate (PDF)
+# RESEND EMAIL (transactional API) -- sends the registration certificate (PDF)
 # plus the verification link to the business's email.
-#   BREVO_API_KEY       Brevo API key (xkeysib-...)  SERVER ONLY
-#   MAIL_SENDER_EMAIL   a sender/domain you verified in Brevo (e.g. no-reply@occpa.on.gov.ng)
-#   MAIL_SENDER_NAME    display name (default "OSCCPA")
+#   RESEND_API_KEY      Resend API key (re_...)  SERVER ONLY
+#   MAIL_SENDER_EMAIL   an address on a domain you verified in Resend (e.g. no-reply@yourdomain.com)
+#   MAIL_SENDER_NAME    display name (default "ODCCPA")
 #   MAIL_REPLY_TO       optional reply-to address
 #   SITE_URL            public base URL used in the verify link / QR (default https://www.occpa.on.gov.ng)
-# If BREVO_API_KEY or MAIL_SENDER_EMAIL is missing, emailing is simply switched off
+# NOTE: Resend only delivers to other people once your sending DOMAIN is verified in Resend
+# (Domains -> Add domain -> add the DNS records). Until then it can only email your own account address.
+# If RESEND_API_KEY or MAIL_SENDER_EMAIL is missing, emailing is simply switched off
 # (registration still works).
 # ---------------------------------------------------------------------------
-BREVO_API_KEY = os.environ.get("BREVO_API_KEY") or ""
-MAIL_SENDER_EMAIL = os.environ.get("MAIL_SENDER_EMAIL") or ""
-MAIL_SENDER_NAME = os.environ.get("MAIL_SENDER_NAME", "ODCCPA")
-MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO") or ""
-SITE_URL = (os.environ.get("SITE_URL") or "https://www.occpa.on.gov.ng").rstrip("/")
-BREVO_URL = "https://api.brevo.com/v3/smtp/email"
-EMAIL_ENABLED = bool(BREVO_API_KEY and MAIL_SENDER_EMAIL)
+RESEND_API_KEY = (os.environ.get("RESEND_API_KEY") or "").strip()
+MAIL_SENDER_EMAIL = (os.environ.get("MAIL_SENDER_EMAIL") or "").strip()
+MAIL_SENDER_NAME = (os.environ.get("MAIL_SENDER_NAME", "ODCCPA") or "ODCCPA").strip().strip('"\'')
+MAIL_REPLY_TO = (os.environ.get("MAIL_REPLY_TO") or "").strip()
+SITE_URL = (os.environ.get("SITE_URL") or "https://www.occpa.on.gov.ng").strip().rstrip("/")
+RESEND_URL = "https://api.resend.com/emails"
+EMAIL_ENABLED = bool(RESEND_API_KEY and MAIL_SENDER_EMAIL)
 
 def verify_url_for(reg_id):
     """ONE canonical verify link used by the page, the downloaded PDF, the emailed PDF and the QR,
@@ -234,41 +236,42 @@ def verify_url_for(reg_id):
     return f"{SITE_URL}/verify/{quote(reg_id)}"
 RESEND_COOLDOWN_SECONDS = 120    # min gap between two certificate emails for the same business
 if not EMAIL_ENABLED:
-    app.logger.warning("Brevo email is OFF: set BREVO_API_KEY and MAIL_SENDER_EMAIL to enable it.")
+    app.logger.warning("Email is OFF: set RESEND_API_KEY and MAIL_SENDER_EMAIL to enable it.")
 
 
-def brevo_send(to_email, to_name, subject, html, text=None, attachments=None):
-    """Send one transactional email through Brevo. Returns True/False, never raises.
+def mail_send(to_email, to_name, subject, html, text=None, attachments=None):
+    """Send one transactional email through Resend. Returns True/False, never raises.
     attachments: list of (filename, bytes)."""
     if not EMAIL_ENABLED or not to_email:
         return False
+    safe_name = re.sub(r'["<>\r\n]', "", MAIL_SENDER_NAME) or "ODCCPA"
     payload = {
-        "sender": {"name": MAIL_SENDER_NAME, "email": MAIL_SENDER_EMAIL},
-        "to": [{"email": to_email, "name": to_name or to_email}],
+        "from": f'"{safe_name}" <{MAIL_SENDER_EMAIL}>',
+        "to": [to_email],
         "subject": subject,
-        "htmlContent": html,
+        "html": html,
     }
     if text:
-        payload["textContent"] = text
+        payload["text"] = text
     if MAIL_REPLY_TO:
-        payload["replyTo"] = {"email": MAIL_REPLY_TO, "name": MAIL_SENDER_NAME}
+        payload["reply_to"] = MAIL_REPLY_TO
     if attachments:
-        payload["attachment"] = [
-            {"name": n, "content": base64.b64encode(b).decode("ascii")} for n, b in attachments
+        payload["attachments"] = [
+            {"filename": n, "content": base64.b64encode(b).decode("ascii")} for n, b in attachments
         ]
     try:
         r = requests.post(
-            BREVO_URL, json=payload, timeout=30,
-            headers={"api-key": BREVO_API_KEY, "accept": "application/json",
-                     "content-type": "application/json"},
+            RESEND_URL, json=payload, timeout=30,
+            headers={"Authorization": f"Bearer {RESEND_API_KEY}",
+                     "Content-Type": "application/json"},
         )
     except requests.RequestException as e:
-        app.logger.error("Brevo send error: %s", e)
+        app.logger.error("Resend send error: %s", e)
         return False
     if r.status_code not in (200, 201, 202):
-        app.logger.error("Brevo send failed (%s): %s", r.status_code, r.text[:300])
+        app.logger.error("Resend send failed (%s): %s", r.status_code, r.text[:300])
         return False
-    app.logger.info("Brevo accepted email to %s (%s): %s", to_email, r.status_code, r.text[:120])
+    app.logger.info("Resend accepted email to %s (%s): %s", to_email, r.status_code, r.text[:120])
     return True
 
 
@@ -318,7 +321,7 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
             f"Verify your registration: {verify_url}\n\n"
             "Your Certificate of Registration is attached to this email (PDF). "
             "Scan the QR code on it, or open the link above, to verify.\n")
-    return brevo_send(
+    return mail_send(
         biz.email, biz.owner_name,
         (f"Your CAC number is verified - ODCCPA Certificate {biz.reg_id}" if cac_ok
          else f"Your ODCCPA Certificate of Registration - {biz.reg_id}"),
@@ -329,7 +332,7 @@ def send_certificate_email(biz, verify_url, pdf_bytes):
 
 def email_certificate_async(biz_id):
     """Build the certificate and email it. Meant to run in a background thread so the
-    visitor isn't kept waiting on the PDF / Brevo. Never raises."""
+    visitor isn't kept waiting on the PDF / email service. Never raises."""
     try:
         with app.app_context():
             biz = db.session.get(Business, biz_id)
@@ -450,7 +453,7 @@ class Business(db.Model):
     cac_verified = db.Column(db.Boolean, default=False, nullable=False, server_default=db.false())
     cac_verified_at = db.Column(db.DateTime)
     cac_verified_by = db.Column(db.String(150))
-    # Set when the certificate email was accepted by Brevo (NULL = not emailed yet)
+    # Set when the certificate email was accepted by the email service (Resend) (NULL = not emailed yet)
     cert_emailed_at = db.Column(db.DateTime)
 
 class NewsPost(db.Model):
@@ -560,7 +563,7 @@ def create_admin_command(username, password):
 def resend_certificates_command():
     """Email the certificate to every approved business that hasn't received it yet."""
     if not EMAIL_ENABLED:
-        raise click.ClickException("Set BREVO_API_KEY and MAIL_SENDER_EMAIL first.")
+        raise click.ClickException("Set RESEND_API_KEY and MAIL_SENDER_EMAIL first.")
     rows = Business.query.filter(Business.status == "Approved",
                                  Business.reg_id.isnot(None),
                                  Business.cert_emailed_at.is_(None)).all()
@@ -579,7 +582,7 @@ def resend_certificates_command():
             sent += 1
             click.echo(f"  {biz.reg_id}: sent to {biz.email}")
         else:
-            click.echo(f"  {biz.reg_id}: Brevo rejected / failed")
+            click.echo(f"  {biz.reg_id}: Resend rejected / failed")
         time.sleep(0.3)
     click.echo(f"Done. Sent {sent}/{len(rows)}.")
 
@@ -1441,7 +1444,7 @@ def register_business():
                                        sectors=BUSINESS_SECTORS), 500
 
         # Email the certificate (PDF + verify link) in the background: it never slows down
-        # or breaks the registration if Brevo is slow or down.
+        # or breaks the registration if the email service is slow or down.
         if EMAIL_ENABLED:
             queue_certificate_email(biz.id)
             flash("Your certificate is also being sent to " + biz.email + ".", "success")
@@ -1853,7 +1856,7 @@ def business_resend_cert(biz_id):
     """Admin: (re)send the certificate email to the business."""
     biz = Business.query.get_or_404(biz_id)
     if not EMAIL_ENABLED:
-        flash("Email is not configured. Set BREVO_API_KEY and MAIL_SENDER_EMAIL.", "error")
+        flash("Email is not configured. Set RESEND_API_KEY and MAIL_SENDER_EMAIL.", "error")
     elif biz.status != "Approved" or not biz.reg_id:
         flash("Only approved businesses have a certificate to send.", "error")
     elif not biz.email:
