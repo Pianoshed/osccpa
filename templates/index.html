@@ -1083,7 +1083,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
 <section class="slider-container" aria-label="Featured slides">
   <div class="slider" id="slider">
 
+
     <div class="slide" role="group" aria-roledescription="slide" aria-label="1 of 4">
+      <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="lazy" decoding="async">
+      <div class="vignette"></div>
+      <div class="slide-text">
+        <span class="slide-eyebrow">Partnership</span>
+        <h2>ODCCPA Pays Courtesy Visit to Ondo State Police Command</h2>
+        <p>ODCCPA pays courtesy visit to Ondo State Police Command</p>
+        <a href="/news" class="slide-cta">Read Full Story <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
       <img src="{{ url_for('static', filename='Slide/slide3.jpeg') }}" alt="Consumer Protection" loading="eager" fetchpriority="high" decoding="async">
       <div class="vignette"></div>
       <div class="slide-text">
@@ -1094,16 +1106,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </div>
     </div>
 
-    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 4">
-      <img src="{{ url_for('static', filename='Slide/slide1.jpeg') }}" alt="Consumer protection bill" loading="lazy" decoding="async">
-      <div class="vignette"></div>
-      <div class="slide-text">
-        <span class="slide-eyebrow">Consumer Protection Bill</span>
-        <h2>Ondo Assembly passes Consumer Protection Agency bill into law</h2>
-        <p>Ondo Assembly passes Consumer Protection Agency bill into law</p>
-        <a href="/news" class="slide-cta">Read Full Story <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
 
     <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 4">
       <img src="{{ url_for('static', filename='Slide/gal1.jpeg') }}" alt="Agency Activities" loading="lazy" decoding="async">
