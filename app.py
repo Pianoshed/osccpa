@@ -2182,6 +2182,5 @@ def sitemap():
 
     return Response(sitemap_xml, mimetype='application/xml')
 
-
 if __name__ == '__main__':
     app.run()
