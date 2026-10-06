@@ -985,7 +985,10 @@ body{background:var(--bg)}
         <input type="hidden" name="verified" id="bmCacVal" value="1">
         <button type="submit" class="btn" id="bmCacBtn"><i class="fa-solid fa-circle-check"></i> <span id="bmCacLbl">Mark CAC verified</span></button>
       </form>
-      <a class="btn primary" id="bmReply" href="#"><i class="fa-solid fa-envelope"></i> <span id="bmReplyLbl">Email owner</span></a>
+      <form method="POST" id="bmMailForm" style="display:contents">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn primary" id="bmReply"><i class="fa-solid fa-envelope"></i> <span id="bmReplyLbl">Email owner</span></button>
+      </form>
       <button type="button" class="btn" data-close>Close</button>
     </div>
   </div>
@@ -1445,18 +1448,13 @@ const FLASHES = {{ msgs | tojson }};
     };
     const a = $('#bmReply');
     if (b.email) {
-      let subject, body;
-      if (b.regId && b.status === 'Approved') {
-        subject = 'Your ODCCPA business registration ID';
-        body = 'Dear ' + b.owner + ',\n\nYour business "' + b.name + '" is now registered with the Ondo State Competition & Consumer Protection Agency.\n\nRegistration ID: ' + b.regId +
-               '\nCustomers can verify it at: ' + location.origin + '/verify?id=' + b.regId + '\n\nRegards,\nODCCPA';
-        $('#bmReplyLbl').textContent = 'Email ID to owner';
-      } else {
-        subject = 'Your ODCCPA business registration (application #' + b.id + ')';
-        body = 'Dear ' + b.owner + ',\n\nRegarding your business registration application #' + b.id + ' for "' + b.name + '"...\n\nRegards,\nODCCPA';
-        $('#bmReplyLbl').textContent = 'Email owner';
-      }
-      a.href = 'mailto:' + b.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      // sent by the server (Resend), so it works without a mail app on this computer
+      $('#bmMailForm').action = '/admin/businesses/email/' + b.id;
+      const lbl = (b.regId && b.status === 'Approved') ? 'Email ID to owner'
+                : b.status === 'Rejected' ? 'Email rejection notice'
+                : b.status === 'Suspended' ? 'Email suspension notice'
+                : 'Email status update';
+      $('#bmReplyLbl').textContent = lbl;
       a.hidden = false;
     } else a.hidden = true;
     openModal($('#businessModal'));

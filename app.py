@@ -372,6 +372,61 @@ def queue_certificate_email(biz_id):
     return True
 
 
+STATUS_EMAIL_TEXT = {
+    "Rejected": ("Update on your ODCCPA business registration",
+                 "Your business registration could not be approved.",
+                 "The registration ID previously issued for this business is no longer valid and will "
+                 "not pass verification. If you believe this is a mistake, or you would like to correct "
+                 "your details and apply again, please reply to this email or contact the agency."),
+    "Suspended": ("Your ODCCPA business registration has been suspended",
+                  "Your business registration has been suspended.",
+                  "Your registration ID will show as suspended when anyone verifies it, and your "
+                  "certificate should not be relied on until the suspension is lifted. Please reply to "
+                  "this email or contact the agency to resolve this."),
+    "Pending": ("Your ODCCPA business registration is under review",
+                "Your business registration is under review.",
+                "We will email you again as soon as a decision has been made."),
+}
+
+def send_status_email(biz):
+    """Tell the business owner their registration was Rejected / Suspended / put under review."""
+    spec = STATUS_EMAIL_TEXT.get(biz.status)
+    if not spec or not biz.email:
+        return False
+    subject, headline, detail = spec
+    owner, bname = escape(biz.owner_name), escape(biz.business_name)
+    ref = escape(biz.reg_id or f"Application #{biz.id}")
+    html = f"""
+    <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#241B33">
+      <div style="background:#6D28D9;color:#fff;padding:18px 22px;border-radius:10px 10px 0 0">
+        <h2 style="margin:0;font-size:18px">Ondo State Competition &amp; Consumer Protection Agency</h2>
+      </div>
+      <div style="border:1px solid #e5def5;border-top:0;padding:22px;border-radius:0 0 10px 10px">
+        <p>Dear {owner},</p>
+        <p><strong>{escape(headline)}</strong></p>
+        <p>Business: <strong>{bname}</strong><br>Reference: <strong>{ref}</strong></p>
+        <p>{escape(detail)}</p>
+        <hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+        <p style="font-size:11px;color:#665D77">Ondo State Competition &amp; Consumer Protection Agency (ODCCPA)</p>
+      </div>
+    </div>"""
+    text = (f"Dear {biz.owner_name},\n\n{headline}\n\nBusiness: {biz.business_name}\n"
+            f"Reference: {biz.reg_id or 'Application #' + str(biz.id)}\n\n{detail}\n\nODCCPA\n")
+    return mail_send(biz.email, biz.owner_name, subject, html, text)
+
+def _status_email_job(biz_id):
+    try:
+        with app.app_context():
+            biz = db.session.get(Business, biz_id)
+            if biz:
+                send_status_email(biz)
+    except Exception as e:
+        app.logger.error("status email crashed: %s", e)
+
+def queue_status_email(biz_id):
+    threading.Thread(target=_status_email_job, args=(biz_id,), daemon=True).start()
+
+
 # ---------------------------------------------------------------------------
 # MODELS
 # ---------------------------------------------------------------------------
@@ -1829,6 +1884,7 @@ def business_set_status(biz_id):
         flash("Invalid status.", "error")
         return redirect(url_for("admin_dashboard"))
     first_issue = False
+    old_status = biz.status
     try:
         if new_status == "Approved" and not biz.reg_id:      # the ID is issued once and never changes
             biz.reg_id = new_business_id()
@@ -1846,7 +1902,32 @@ def business_set_status(biz_id):
         if first_issue and EMAIL_ENABLED:
             queue_certificate_email(biz.id)
     else:
-        flash(f"{biz.business_name} marked {new_status}.", "success")
+        msg = f"{biz.business_name} marked {new_status}."
+        # Automatic: tell the owner when their registration is Rejected or Suspended
+        if new_status in ("Rejected", "Suspended") and new_status != old_status \
+                and EMAIL_ENABLED and biz.email:
+            queue_status_email(biz.id)
+            msg += f" Notice emailed to {biz.email}."
+        flash(msg, "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/businesses/email/<int:biz_id>", methods=["POST"])
+@login_required
+@csrf_protect
+def business_email_owner(biz_id):
+    """Admin 'Email owner' button: sends from the server (no mail app needed).
+    Approved -> certificate + ID.  Rejected / Suspended / Pending -> status notice."""
+    biz = Business.query.get_or_404(biz_id)
+    if not EMAIL_ENABLED:
+        flash("Email is not configured. Set RESEND_API_KEY and MAIL_SENDER_EMAIL.", "error")
+    elif not biz.email:
+        flash("This business has no email address on record.", "error")
+    elif biz.status == "Approved" and biz.reg_id:
+        queue_certificate_email(biz.id)
+        flash(f"Certificate and ID are being sent to {biz.email}.", "success")
+    else:
+        queue_status_email(biz.id)
+        flash(f"A {biz.status} notice is being sent to {biz.email}.", "success")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/businesses/resend/<int:biz_id>", methods=["POST"])
