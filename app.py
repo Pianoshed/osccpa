@@ -33,6 +33,8 @@ from markupsafe import Markup, escape
 from PIL import Image, ImageOps
 
 app = Flask(__name__)
+import logging
+app.logger.setLevel(logging.INFO)    # so INFO lines (e.g. "Brevo accepted ...") show in Render logs
 
 
 # ---------------------------------------------------------------------------
@@ -266,6 +268,7 @@ def brevo_send(to_email, to_name, subject, html, text=None, attachments=None):
     if r.status_code not in (200, 201, 202):
         app.logger.error("Brevo send failed (%s): %s", r.status_code, r.text[:300])
         return False
+    app.logger.info("Brevo accepted email to %s (%s): %s", to_email, r.status_code, r.text[:120])
     return True
 
 
@@ -333,6 +336,7 @@ def email_certificate_async(biz_id):
             if not biz or biz.status != "Approved" or not biz.reg_id:
                 return
             verify_url = verify_url_for(biz.reg_id)     # no request context in a thread
+            app.logger.info("Sending certificate email for %s to %s", biz.reg_id, biz.email)
             try:
                 pdf = build_certificate_pdf(biz, verify_url)
             except Exception as e:
@@ -2181,6 +2185,7 @@ def sitemap():
     sitemap_xml += '</urlset>'
 
     return Response(sitemap_xml, mimetype='application/xml')
+
 
 if __name__ == '__main__':
     app.run()
